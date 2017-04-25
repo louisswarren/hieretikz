@@ -1,9 +1,10 @@
 accumulate = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
-formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
-    'lem', 'wlem', 'dp', 'he', 'dnsu', 'dnse', 'glpo', 'glpoa', 'gmp'
+formulae = dne, lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
+    'dne', 'lem', 'wlem', 'dp', 'he', 'dnsu', 'dnse', 'glpo', 'glpoa', 'gmp'
 
 proofs = {
+        (dne, glpoa): 'pft',
         (lem, wlem):  'pf0',
         (dp, wlem):   'pf1',
         (he, wlem):   'pf2',
@@ -17,6 +18,7 @@ proofs = {
         }
 
 counter_models = {
+        (glpoa, dne): 'cmt',
         (wlem, lem):  'cm0',
         (wlem, dp):   'cm1',
         (wlem, he):   'cm2',
@@ -39,30 +41,30 @@ def compute_adjacency(edges):
 pf_adjacency = compute_adjacency(proofs)
 cm_adjacency = compute_adjacency(counter_models)
 
+
 @accumulate(dict)
-def find_reachable(a, adjacency, ignore=set()):
-    for b in adjacency.get(a, []):
+def find_derivable(a, ignore=set()):
+    for b in pf_adjacency.get(a, []):
         if b not in ignore:
             yield b, (a, b)
-            from_b = find_reachable(b, ignore | {a})
+            # Todo: return shortest
+            from_b = find_derivable(b, ignore | {a})
             for c, path in from_b.items():
                 yield c, (a,) + path
 
-def find_provable(a):
-    return find_path(a, pf_adjacency)
-
-def find_disprovable(a):
-    return find_path(a, cm_adjacency)
-
+# a |--- b : a -> ... -> b
+# a |-/- b : b -> ... -> c and a ||-/- c
 def find_relation(a, b):
-    """Returns triple (pp, spm, pcm), where pp is a path via proofs from a to
-    b, where spp is a path via proofs from a to some formula c, and pcm is a
-    path of countermodels from b to c. Either pp will be None or spm and pcm
-    will be None.  If all are none, the relation is unknown."""
-    from_a = find_reachable(a)
-    if b in from_a:
-        return from_a[b], None, None
-    from_b = find_reachable(b)
-    if not from_a ^ from_b:
-        return None, None, None
-
+    """Returns pair (pp, spp), where pp is a path via proofs from a to b, and
+    spp is a path via proofs from b to some formula c, for which there is a
+    countermodel showing a does not imply c. Either pp or spp will be None If
+    both are none, the relation is unknown."""
+    a_b_path = find_derivable(a).get(b)
+    if a_b_path:
+        return a_b_path, None
+    b_consequences = find_derivable(b)
+    for underivable in cm_adjacency.get(a, []):
+        if underivable in b_consequences:
+            # Todo: return shortest
+            return None, b_consequences[underivable]
+    return None, None
