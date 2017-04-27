@@ -35,16 +35,27 @@ def compute_adjacency(edges):
     d = {}
     for key in edges:
         premise, conclusion = key
-        d[premise] = d.get(premise, tuple()) + (conclusion,)
+        d[premise] = d.get(premise, ()) + (conclusion,)
     return d
 
 pf_adjacency = compute_adjacency(proofs)
 cm_adjacency = compute_adjacency(counter_models)
 
+class PathDict(dict):
+    def __init__(self, pairs):
+        best_paths = {}
+        for dest, path in pairs:
+            current_len = len(best_paths.get(dest, ())) or float('inf')
+            if len(path) < current_len:
+                best_paths[dest] = path
+        super().__init__(best_paths.items())
+
+d = PathDict([(0, (1, 2, 3)), (0, (1, 2)), (1, (1, 2)), (1, (1, 2, 3))])
+
 
 @accumulate(dict)
 def find_derivable(a, ignore=set()):
-    for b in pf_adjacency.get(a, []):
+    for b in pf_adjacency.get(a, ()):
         if b not in ignore:
             yield b, (a, b)
             # Todo: return shortest
