@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 accumulate = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
 formulae = dne, lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
@@ -32,10 +34,10 @@ counter_models = {
         }
 
 def compute_adjacency(edges):
-    d = {}
+    d = defaultdict(lambda:())
     for key in edges:
         premise, conclusion = key
-        d[premise] = d.get(premise, ()) + (conclusion,)
+        d[premise] += (conclusion,)
     return d
 
 pf_adjacency = compute_adjacency(proofs)
@@ -43,22 +45,19 @@ cm_adjacency = compute_adjacency(counter_models)
 
 class PathDict(dict):
     def __init__(self, pairs):
-        best_paths = {}
+        best_paths = defaultdict(lambda:())
         for dest, path in pairs:
-            current_len = len(best_paths.get(dest, ())) or float('inf')
+            current_len = len(best_paths[dest]) or float('inf')
             if len(path) < current_len:
                 best_paths[dest] = path
         super().__init__(best_paths.items())
 
-d = PathDict([(0, (1, 2, 3)), (0, (1, 2)), (1, (1, 2)), (1, (1, 2, 3))])
 
-
-@accumulate(dict)
+@accumulate(PathDict)
 def find_derivable(a, ignore=set()):
-    for b in pf_adjacency.get(a, ()):
+    for b in pf_adjacency[a]:
         if b not in ignore:
             yield b, (a, b)
-            # Todo: return shortest
             from_b = find_derivable(b, ignore | {a})
             for c, path in from_b.items():
                 yield c, (a,) + path
@@ -74,7 +73,7 @@ def find_relation(a, b):
     if a_b_path:
         return a_b_path, None
     b_consequences = find_derivable(b)
-    for underivable in cm_adjacency.get(a, []):
+    for underivable in cm_adjacency[a]:
         if underivable in b_consequences:
             # Todo: return shortest
             return None, b_consequences[underivable]
