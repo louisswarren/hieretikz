@@ -57,10 +57,10 @@ class PathDict(dict):
 def find_derivable(a, ignore=set()):
     for b in pf_adjacency[a]:
         if b not in ignore:
-            yield b, (a, b)
+            yield b, ((a, b),)
             from_b = find_derivable(b, ignore | {a})
             for c, path in from_b.items():
-                yield c, (a,) + path
+                yield c, ((a,b),) + path
 
 # a |--- b : a -> ... -> b
 # a |-/- b : b -> ... -> c and a ||-/- c
@@ -78,3 +78,8 @@ def find_relation(a, b):
             # Todo: return shortest
             return None, b_consequences[underivable]
     return None, None
+
+
+
+assert(find_relation(glpoa, wlem)[0])
+assert(find_relation(wlem, glpoa)[1])
