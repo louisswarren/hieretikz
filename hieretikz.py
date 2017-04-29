@@ -43,7 +43,7 @@ def compute_adjacency(edges):
 pf_adjacency = compute_adjacency(proofs)
 cm_adjacency = compute_adjacency(counter_models)
 
-class PathDict(dict):
+class ShortestPathDict(dict):
     def __init__(self, pairs):
         best_paths = defaultdict(lambda:())
         for dest, path in pairs:
@@ -53,7 +53,7 @@ class PathDict(dict):
         super().__init__(best_paths.items())
 
 
-@accumulate(PathDict)
+@accumulate(ShortestPathDict)
 def find_derivable(a, ignore=set()):
     yield a, ()
     for b in pf_adjacency[a]:
@@ -76,7 +76,6 @@ def find_relation(a, b):
     b_consequences = find_derivable(b)
     for underivable in cm_adjacency[a]:
         if underivable in b_consequences:
-            # Todo: return shortest
             return None, b_consequences[underivable]
     return None, None
 
