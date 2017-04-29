@@ -55,6 +55,7 @@ class PathDict(dict):
 
 @accumulate(PathDict)
 def find_derivable(a, ignore=set()):
+    yield a, ()
     for b in pf_adjacency[a]:
         if b not in ignore:
             yield b, ((a, b),)
@@ -81,5 +82,6 @@ def find_relation(a, b):
 
 
 
-assert(find_relation(glpoa, wlem)[0])
-assert(find_relation(wlem, glpoa)[1])
+assert(find_relation(glpoa, wlem) == (((glpoa, lem), (lem, wlem)), None))
+assert(find_relation(wlem, glpoa) == (None, ((glpoa, lem),)))
+assert(find_relation(wlem, lem) == (None, ()))
