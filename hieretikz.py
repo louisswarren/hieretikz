@@ -59,7 +59,7 @@ class LongestPathDict(dict):
     def __init__(self, pairs):
         best_paths = defaultdict(lambda:())
         for dest, path in pairs:
-            current_len = len(best_paths[dest]) or float('inf')
+            current_len = len(best_paths[dest]) or float('-inf')
             if current_len < len(path) :
                 best_paths[dest] = path
         super().__init__(best_paths.items())
