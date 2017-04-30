@@ -1,4 +1,5 @@
 from collections import defaultdict
+import itertools
 
 accumulate = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
@@ -84,3 +85,30 @@ def find_relation(a, b):
 assert(find_relation(glpoa, wlem) == (((glpoa, lem), (lem, wlem)), None))
 assert(find_relation(wlem, glpoa) == (None, ((glpoa, lem),)))
 assert(find_relation(wlem, lem) == (None, ()))
+
+
+def make_graph_edges(formulae):
+    for a, b in itertools.combinations(formulae, 2):
+        pf, cm = find_relation(a, b)
+        rev_pf, rev_cm = find_relation(b, a)
+        equivalent = pf and rev_pf
+        weak_equivalent = (cm is not None) and (rev_cm is not None)
+        implies, rev_implies = pf, rev_pf
+        weak_implies, weak_rev_implies = cm is None, rev_cm is None
+        if equivalent:
+            yield (a, b), '<=>'
+        elif implies:
+            yield (a, b), '==>'
+            if weak_rev_implies:
+                yield (b, a), '-->'
+        elif rev_implies:
+            yield (b, a), '==>'
+            if weak_implies:
+                yield (a, b), '-->'
+        elif weak_equivalent:
+            yield (a, b), '<->'
+        elif weak_implies:
+            yield (a, b), '-->'
+        elif weak_rev_implies:
+            yield (b, a), '-->'
+
