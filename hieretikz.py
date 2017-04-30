@@ -6,6 +6,17 @@ accumulate = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 formulae = dne, lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
     'dne', 'lem', 'wlem', 'dp', 'he', 'dnsu', 'dnse', 'glpo', 'glpoa', 'gmp'
 
+
+_______ = None
+formula_layout = [
+[_______ , glpoa   , _______ , _______ , _______ , _______ , _______ ],
+[_______ , _______ , _______ , lem     , _______ , glpo    , _______ ],
+[_______ , _______ , _______ , _______ , _______ , _______ , _______ ],
+[_______ , dp      , _______ , _______ , _______ , he      , _______ ],
+[dnsu    , _______ , gmp     , _______ , _______ , _______ , dnse    ],
+[_______ , _______ , _______ , wlem    , _______ , _______ , _______ ],
+]
+
 proofs = {
         (dne, glpoa): 'pft',
         (lem, wlem):  'pf0',
