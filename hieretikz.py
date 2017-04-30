@@ -43,17 +43,17 @@ def compute_adjacency(edges):
 pf_adjacency = compute_adjacency(proofs)
 cm_adjacency = compute_adjacency(counter_models)
 
-class ShortestPathDict(dict):
+class LongestPathDict(dict):
     def __init__(self, pairs):
         best_paths = defaultdict(lambda:())
         for dest, path in pairs:
             current_len = len(best_paths[dest]) or float('inf')
-            if len(path) < current_len:
+            if current_len < len(path) :
                 best_paths[dest] = path
         super().__init__(best_paths.items())
 
 
-@accumulate(ShortestPathDict)
+@accumulate(LongestPathDict)
 def find_derivable(a, ignore=set()):
     yield a, ()
     for b in pf_adjacency[a]:
