@@ -98,6 +98,7 @@ assert(find_relation(wlem, glpoa) == (None, ((glpoa, lem),)))
 assert(find_relation(wlem, lem) == (None, ()))
 
 
+# TODO: Only yield arrows for proofs if link length is one
 def make_graph_edges(formulae):
     for a, b in itertools.combinations(formulae, 2):
         pf, cm = find_relation(a, b)
@@ -122,4 +123,7 @@ def make_graph_edges(formulae):
             yield (a, b), '-->'
         elif weak_rev_implies:
             yield (b, a), '-->'
+
+print('\n'.join(map(str, make_graph_edges(formulae))))
+
 
