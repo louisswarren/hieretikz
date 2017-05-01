@@ -32,18 +32,22 @@ def find_derivable(a, pf_adjacency, ignore=set()):
 
 # a |--- b : a -> ... -> b
 # a |-/- b : b -> ... -> c and a ||-/- c
+#         OR d -> ... -> a and d ||-/- b
 def find_relation(a, b, pf_adjacency, cm_adjacency):
     """Returns pair (pp, spp), where pp is a path via proofs from a to b, and
     spp is a path via proofs from b to some formula c, for which there is a
     countermodel showing a does not imply c. Either pp or spp will be None If
     both are none, the relation is unknown."""
+    print("\n\n\n", a, b)
     a_b_path = find_derivable(a, pf_adjacency).get(b)
     if a_b_path:
         return a_b_path, None
     b_consequences = find_derivable(b, pf_adjacency)
+    print(a, 'sep:', cm_adjacency[a])
     for underivable in cm_adjacency[a]:
         if underivable in b_consequences:
             return None, b_consequences[underivable]
+    raise NotImplementedError("Need to check second condition")
     return None, None
 
 @accumulate(set)
