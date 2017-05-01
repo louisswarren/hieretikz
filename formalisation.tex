@@ -1,0 +1,52 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+
+\DeclareMathOperator{\WD}{W}
+\DeclareMathOperator{\SD}{D}
+
+
+\title{Constructive hierarchies}
+\author{Louis Warren}
+
+\begin{document}
+\maketitle
+
+\section{Intuition}
+
+\paragraph{}
+Consider directed graphs in which the existence of only some of the edges are
+known. Moreover, suppose that it is known that some vertices are disconnected.
+It may be possible to recover precisely which edges exist from this information;
+on the other hand, the existence of some edges may be undecidable.
+
+\section{Formalisation}
+
+\paragraph{}
+A \emph{hierarchy} $H$ is a triple $H = (V, E, S)$, where $V$ is a set of
+\emph{vertices}, $E \subseteq V \times V$ is a set of \emph{edges}, and $S
+\subseteq V \times V$ is a set of \emph{separations}.
+
+\paragraph{}
+Consider vertices $x, y, z \in V$ in some hierarchy $H = (V, E, S)$. We say $x$
+is \emph{connected} to $y$, written $x \geq y$, if there is a finite set of edges
+\[
+	\{(x, v_1), (v_1, v_2), (v_2, v_3), \dotsc (v_{n-1}, v_n), (v_n, y)\}
+\]
+in $E$ (and trivially $x \geq x$). Note that this is equivalent to $x$ being
+connected to $y$ in the digraph $(V, E)$. We call $(V, E)$ the \emph{strong
+digraph} of $H$, or $\SD(H)$.
+
+\paragraph{}
+The \emph{weak digraph} of $H$ is $\WD(H) = (V, \widetilde{E}, S)$, where
+\[
+	\widetilde{E} = \{ e \in V \times V \mid
+		\forall_{(x, y) \in S}\left(
+			x \not\geq y \text{ in } (V, E \cup\{e\}, S)
+		\right)
+	\}
+. \]
+The hierarchy is \emph{consistent} if $\SD(H)$ is a subgraph of $\WD(H)$.  If
+there is a separation of $x$ and $y$, then there will be no consistent
+supergraph of $\SD(H)$ in which $x$ and $y$ are connected.
+
+\end{document}
