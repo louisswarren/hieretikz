@@ -3,57 +3,12 @@ import itertools
 
 accumulate = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
-formulae = dne, lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
-    'dne', 'lem', 'wlem', 'dp', 'he', 'dnsu', 'dnse', 'glpo', 'glpoa', 'gmp'
-
-
-_______ = None
-formula_layout = [
-[_______ , glpoa   , _______ , _______ , _______ , _______ , _______ ],
-[_______ , _______ , _______ , lem     , _______ , glpo    , _______ ],
-[_______ , _______ , _______ , _______ , _______ , _______ , _______ ],
-[_______ , dp      , _______ , _______ , _______ , he      , _______ ],
-[dnsu    , _______ , gmp     , _______ , _______ , _______ , dnse    ],
-[_______ , _______ , _______ , wlem    , _______ , _______ , _______ ],
-]
-
-proofs = {
-        (dne, glpoa): 'pft',
-        (lem, wlem):  'pf0',
-        (dp, wlem):   'pf1',
-        (he, wlem):   'pf2',
-        (glpoa, lem): 'pf3',
-        (lem, glpo):  'pf4',
-        (glpo, lem):  'pf5',
-        (dp, gmp):    'pf6',
-        (gmp, wlem):  'pf7',
-        (dp, dnsu):   'pf8',
-        (he, dnse):   'pf9',
-        }
-
-counter_models = {
-        (glpoa, dne): 'cmt',
-        (wlem, lem):  'cm0',
-        (wlem, dp):   'cm1',
-        (wlem, he):   'cm2',
-        (lem, glpoa): 'cm3',
-        (glpo, lem):  'cm4',
-        (lem, glpo):  'cm5',
-        (gmp, dp):    'cm6',
-        (wlem, gmp):  'cm7',
-        (dnsu, dp):   'cm8',
-        (dnse, he):   'cm9',
-        }
-
 def compute_adjacency(edges):
     d = defaultdict(lambda:())
     for key in edges:
         premise, conclusion = key
         d[premise] += (conclusion,)
     return d
-
-pf_adjacency = compute_adjacency(proofs)
-cm_adjacency = compute_adjacency(counter_models)
 
 class LongestPathDict(dict):
     def __init__(self, pairs):
@@ -66,77 +21,73 @@ class LongestPathDict(dict):
 
 
 @accumulate(LongestPathDict)
-def find_derivable(a, ignore=set()):
+def find_derivable(a, pf_adjacency, ignore=set()):
     yield a, ()
     for b in pf_adjacency[a]:
         if b not in ignore:
             yield b, ((a, b),)
-            from_b = find_derivable(b, ignore | {a})
+            from_b = find_derivable(b, pf_adjacency, ignore | {a})
             for c, path in from_b.items():
                 yield c, ((a,b),) + path
 
 # a |--- b : a -> ... -> b
 # a |-/- b : b -> ... -> c and a ||-/- c
-def find_relation(a, b):
+def find_relation(a, b, pf_adjacency, cm_adjacency):
     """Returns pair (pp, spp), where pp is a path via proofs from a to b, and
     spp is a path via proofs from b to some formula c, for which there is a
     countermodel showing a does not imply c. Either pp or spp will be None If
     both are none, the relation is unknown."""
-    a_b_path = find_derivable(a).get(b)
+    a_b_path = find_derivable(a, pf_adjacency).get(b)
     if a_b_path:
         return a_b_path, None
-    b_consequences = find_derivable(b)
+    b_consequences = find_derivable(b, pf_adjacency)
     for underivable in cm_adjacency[a]:
         if underivable in b_consequences:
             return None, b_consequences[underivable]
     return None, None
 
 @accumulate(set)
-def find_weak_edges(formulae):
+def find_weak_edges(formulae, pf_adjacency, cm_adjacency):
     for a, b in itertools.permutations(formulae, 2):
-        pf, cm = find_relation(a, b)
+        pf, cm = find_relation(a, b, pf_adjacency, cm_adjacency)
         if pf is None and cm is None:
             yield (a, b)
 
-
-@accumulate('\n'.join)
-def make_tikz_edges(formulae):
-    drawn = set()
-    fmt = r'\draw[{}] ({}) to node {{}} ({});'
-    for a, b in proofs:
-        if (b, a) in drawn:
-            continue
-        if (b, a) in proofs:
-            yield fmt.format('<->', a, b)
-        else:
-            yield fmt.format('->', a, b)
-        drawn.add((a, b))
-    weak_edges = find_weak_edges(formulae)
-    for a, b in weak_edges:
-        assert((a, b) not in drawn)
-        if (b, a) in drawn:
-            continue
-        if (b, a) in proofs:
-            yield fmt.format('dashed,<->', a, b)
-        else:
-            yield fmt.format('dashed,->', a, b)
-        drawn.add((a, b))
-
 @accumulate('\n'.join)
 def make_tikz_nodes(formula_layout):
-    fmt = r'\node ({}) at ({}, {}) {{{}}}'
+    fmt = r'\node ({}) at ({}, {}) {{{}}};'
     for j, row in enumerate(formula_layout):
         for i, formula in enumerate(row):
             if formula is not None:
                 yield fmt.format(formula, i, -j, formula)
 
 @accumulate('\n'.join)
-def make_tikz():
-    yield r"\begin{tikzpicture}[node distance=2 cm, line width=0.3mm, auto]"
-    yield make_tikz_nodes(formula_layout)
-    yield make_tikz_edges(formulae)
-    yield r"\end{tikzpicture}"
+def make_tikz_edges(formulae, strong_edges, weak_edges):
+    drawn = set()
+    fmt = r'\draw[{}] ({}) to node {{}} ({});'
+    for a, b in strong_edges:
+        if (b, a) in drawn:
+            continue
+        if (b, a) in strong_edges:
+            yield fmt.format('<->', a, b)
+        else:
+            yield fmt.format('->', a, b)
+        drawn.add((a, b))
+    for a, b in weak_edges:
+        assert((a, b) not in drawn)
+        if (b, a) in drawn:
+            continue
+        if (b, a) in weak_edges:
+            yield fmt.format('dashed,<->', a, b)
+        else:
+            yield fmt.format('dashed,->', a, b)
+        drawn.add((a, b))
 
-
-print(make_tikz())
+def make_tikz(formulae, formula_layout, proofs, counter_models):
+    pf_adjacency = compute_adjacency(proofs)
+    cm_adjacency = compute_adjacency(counter_models)
+    weak_edges = find_weak_edges(formulae, pf_adjacency, cm_adjacency)
+    tikz_nodes = make_tikz_nodes(formula_layout)
+    tikz_edges = make_tikz_edges(formulae, proofs, weak_edges)
+    return tikz_nodes + tikz_edges
 
