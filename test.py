@@ -1,5 +1,5 @@
 from hieretikz import *
-from subprocess import Popen
+import subprocess
 
 formulae = dne, lem, lpo, wlem = 'dne lem lpo wlem'.split()
 
@@ -22,7 +22,6 @@ counter_models = {
         (wlem, lem): 'cm1',
         }
 
-
 document = r'''
 \documentclass{article}
 \usepackage{tikz}
@@ -34,7 +33,15 @@ r'''
 \end{tikzpicture}
 \end{document}
 '''
-print(document)
 with open('test.tex', 'w') as f:
     f.write(document)
-Popen(['pdflatex', 'test.tex'])
+subprocess.Popen(['pdflatex', 'test.tex'], stdout=subprocess.DEVNULL)
+
+
+
+# Debugging
+
+# print('='*80)
+# pf_adjacency = compute_adjacency(proofs)
+# cm_adjacency = compute_adjacency(counter_models)
+# print(find_relation(lpo, dne, pf_adjacency, cm_adjacency))
