@@ -19,7 +19,6 @@ class LongestPathDict(dict):
                 best_paths[dest] = path
         super().__init__(best_paths.items())
 
-
 @accumulate(LongestPathDict)
 def find_reachable(a, adjacency, ignore=set()):
     """Returns a dictionary of all nodes reachable from a, mapped to the paths
