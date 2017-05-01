@@ -25,6 +25,9 @@ proofs = {
         (glpoa, glpo): '',
         (dp, dnsu):    '',
         (glpoa, dnsu): '',
+#
+        (he, dnse): '',
+        (gmp, dnse): '',
         }
 
 counter_models = {
@@ -35,6 +38,11 @@ counter_models = {
         (lem, glpoa): '',
         (he, dnsu):   '',
         (dnsu, dp):   '',
+#
+        (dp, lem): '',
+        (he, lem): '',
+        (dnse, dp): '',
+        (dp, dnse): '',
         }
 
 
