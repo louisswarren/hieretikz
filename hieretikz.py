@@ -91,42 +91,12 @@ def find_relation(a, b):
             return None, b_consequences[underivable]
     return None, None
 
-
-
-assert(find_relation(glpoa, wlem) == (((glpoa, lem), (lem, wlem)), None))
-assert(find_relation(wlem, glpoa) == (None, ((glpoa, lem),)))
-assert(find_relation(wlem, lem) == (None, ()))
-
-
-# TODO: Only yield arrows for proofs if link length is one
-def make_graph_edges(formulae):
-    edges, weak_edges = [], []
-    for a, b in itertools.combinations(formulae, 2):
+def find_weak_edges(formulae):
+    for a, b in itertools.permutations(formulae, 2):
         pf, cm = find_relation(a, b)
-        rev_pf, rev_cm = find_relation(b, a)
-        equivalent = pf and rev_pf
-        weak_equivalent = (cm is not None) and (rev_cm is not None)
-        implies, rev_implies = pf, rev_pf
-        weak_implies, weak_rev_implies = cm is None, rev_cm is None
-        if equivalent:
-            edges.append((a, b))
-            edges.append((b, a))
-        elif implies:
-            edges.append((a, b))
-            if weak_rev_implies:
-                weak_edges.append((b, a))
-        elif rev_implies:
-            edges.append((b, a))
-            if weak_implies:
-                weak_edges.append((a, b))
-        elif weak_equivalent:
-            weak_edges.append((a, b))
-            weak_edges.append((b, a))
-        elif weak_implies:
-            weak_edges.append((a, b))
-        elif weak_rev_implies:
-            weak_edges.append((b, a))
-    return edges, weak_edges
+        if pf is None and cm is None:
+            yield (a, b)
+
 
 edges, weak_edges = make_graph_edges(formulae)
 print('\n'.join('{} ==> {}'.format(*e) for e in edges))
