@@ -100,6 +100,7 @@ assert(find_relation(wlem, lem) == (None, ()))
 
 # TODO: Only yield arrows for proofs if link length is one
 def make_graph_edges(formulae):
+    edges, weak_edges = [], []
     for a, b in itertools.combinations(formulae, 2):
         pf, cm = find_relation(a, b)
         rev_pf, rev_cm = find_relation(b, a)
@@ -108,22 +109,27 @@ def make_graph_edges(formulae):
         implies, rev_implies = pf, rev_pf
         weak_implies, weak_rev_implies = cm is None, rev_cm is None
         if equivalent:
-            yield (a, b), '<=>'
+            edges.append((a, b))
+            edges.append((b, a))
         elif implies:
-            yield (a, b), '==>'
+            edges.append((a, b))
             if weak_rev_implies:
-                yield (b, a), '-->'
+                weak_edges.append((b, a))
         elif rev_implies:
-            yield (b, a), '==>'
+            edges.append((b, a))
             if weak_implies:
-                yield (a, b), '-->'
+                weak_edges.append((a, b))
         elif weak_equivalent:
-            yield (a, b), '<->'
+            weak_edges.append((a, b))
+            weak_edges.append((b, a))
         elif weak_implies:
-            yield (a, b), '-->'
+            weak_edges.append((a, b))
         elif weak_rev_implies:
-            yield (b, a), '-->'
+            weak_edges.append((b, a))
+    return edges, weak_edges
 
-print('\n'.join(map(str, make_graph_edges(formulae))))
+edges, weak_edges = make_graph_edges(formulae)
+print('\n'.join('{} ==> {}'.format(*e) for e in edges))
+print('\n'.join('{} --> {}'.format(*e) for e in weak_edges))
 
 
