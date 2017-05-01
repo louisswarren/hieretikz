@@ -91,6 +91,7 @@ def find_relation(a, b):
             return None, b_consequences[underivable]
     return None, None
 
+@accumulate(set)
 def find_weak_edges(formulae):
     for a, b in itertools.permutations(formulae, 2):
         pf, cm = find_relation(a, b)
@@ -98,8 +99,28 @@ def find_weak_edges(formulae):
             yield (a, b)
 
 
-edges, weak_edges = make_graph_edges(formulae)
-print('\n'.join('{} ==> {}'.format(*e) for e in edges))
-print('\n'.join('{} --> {}'.format(*e) for e in weak_edges))
+@accumulate('\n'.join)
+def make_tikz_edges(formulae):
+    drawn = set()
+    fmt = r'\draw[{}] ({}) to node {{}} ({});'
+    for a, b in proofs:
+        if (b, a) in drawn:
+            continue
+        if (b, a) in proofs:
+            yield fmt.format('<->', a, b)
+        else:
+            yield fmt.format('->', a, b)
+        drawn.add((a, b))
+    weak_edges = find_weak_edges(formulae)
+    for a, b in weak_edges:
+        assert((a, b) not in drawn)
+        if (b, a) in drawn:
+            continue
+        if (b, a) in proofs:
+            yield fmt.format('dashed,<->', a, b)
+        else:
+            yield fmt.format('dashed,->', a, b)
+        drawn.add((a, b))
 
+print(make_tikz_edges(formulae))
 
