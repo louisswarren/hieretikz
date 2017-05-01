@@ -122,5 +122,21 @@ def make_tikz_edges(formulae):
             yield fmt.format('dashed,->', a, b)
         drawn.add((a, b))
 
-print(make_tikz_edges(formulae))
+@accumulate('\n'.join)
+def make_tikz_nodes(formula_layout):
+    fmt = r'\node ({}) at ({}, {}) {{{}}}'
+    for j, row in enumerate(formula_layout):
+        for i, formula in enumerate(row):
+            if formula is not None:
+                yield fmt.format(formula, i, -j, formula)
+
+@accumulate('\n'.join)
+def make_tikz():
+    yield r"\begin{tikzpicture}[node distance=2 cm, line width=0.3mm, auto]"
+    yield make_tikz_nodes(formula_layout)
+    yield make_tikz_edges(formulae)
+    yield r"\end{tikzpicture}"
+
+
+print(make_tikz())
 
