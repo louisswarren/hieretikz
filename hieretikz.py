@@ -84,15 +84,19 @@ def make_tikz_edges(formulae, strong_edges, weak_edges):
         else:
             yield fmt.format('->', a, b)
         drawn.add((a, b))
+    weak_drawn = set()
     for a, b in weak_edges:
         assert((a, b) not in drawn)
-        if (b, a) in drawn:
+        if (b, a) in weak_drawn:
             continue
         if (b, a) in weak_edges:
-            yield fmt.format('dashed,<->', a, b)
+            yield fmt.format('dashed, <->', a, b)
         else:
-            yield fmt.format('dashed,->', a, b)
-        drawn.add((a, b))
+            if (b, a) in drawn:
+                yield fmt.format('dashed, bend left=30, ->', a, b)
+            else:
+                yield fmt.format('dashed, ->', a, b)
+        weak_drawn.add((a, b))
 
 def make_tikz(formulae, formula_layout, proofs, counter_models):
     pf_adjacency = compute_adjacency(proofs)

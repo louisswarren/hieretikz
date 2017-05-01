@@ -1,20 +1,22 @@
 from hieretikz import *
 import subprocess
 
-formulae = dne, lem, lpo, wlem = 'dne lem lpo wlem'.split()
+formulae = dne, lem, lpo, wlem, mwlpo = 'dne lem lpo wlem mwlpo'.split()
 
 _______ = None
 formula_layout = [
 [_______ , dne     , _______ ],
 [lem     , _______ , lpo     ],
 [_______ , wlem    , _______ ],
+[_______ , mwlpo   , _______ ],
 ]
 
 proofs = {
-        (dne, lem):  'pf0',
-        (lem, lpo):  'pf1',
-        (lpo, lem):  'pf1',
-        (lem, wlem): 'pf2',
+        (dne, lem):    'pf0',
+        (lem, lpo):    'pf1',
+        (lpo, lem):    'pf1',
+        (lem, wlem):   'pf2',
+        (wlem, mwlpo): 'pf2',
         }
 
 counter_models = {
