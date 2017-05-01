@@ -1,5 +1,5 @@
 from hieretikz import *
-from subprocess import Popen
+import subprocess
 
 formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
     'lem', 'wlem', 'dp', 'he', 'dnsu', 'dnse', 'glpo', 'glpoa', 'gmp'
@@ -23,8 +23,8 @@ proofs = {
         (glpo, lem):   '',
         (glpoa, lem):  '',
         (glpoa, glpo): '',
-        (dp, dnse):    '',
-        (glpoa, dnse): '',
+        (dp, dnsu):    '',
+        (glpoa, dnsu): '',
         }
 
 counter_models = {
@@ -33,8 +33,8 @@ counter_models = {
         (lem, dp):    '',
         (lem, he):    '',
         (lem, glpoa): '',
-        (he, dnse):   '',
-        (dnse, dp):   '',
+        (he, dnsu):   '',
+        (dnsu, dp):   '',
         }
 
 
@@ -52,5 +52,6 @@ r'''
 print(document)
 with open('drinker.tex', 'w') as f:
     f.write(document)
-Popen(['pdflatex', 'drinker.tex'])
+subprocess.Popen(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
 
+assist(formulae, formula_layout, proofs, counter_models)
