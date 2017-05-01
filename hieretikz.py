@@ -107,3 +107,11 @@ def make_tikz(formulae, formula_layout, proofs, counter_models):
     tikz_edges = make_tikz_edges(formulae, proofs, weak_edges)
     return tikz_nodes + tikz_edges
 
+def assist(formulae, formula_layout, proofs, counter_models):
+    pf_adjacency = compute_adjacency(proofs)
+    pf_rev_adjacency = compute_adjacency((q, p) for p, q in proofs)
+    cm_adjacency = compute_adjacency(counter_models)
+    weak_edges = find_weak_edges(formulae, pf_adjacency, pf_rev_adjacency, cm_adjacency)
+    print("It remains to investigate:")
+    for e in weak_edges:
+        print('{:8s} => {:8s}'.format(*e))
