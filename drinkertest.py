@@ -70,8 +70,20 @@ r'''
 \end{multicols}
 \end{document}
 '''
-print(document)
 with open('drinker.tex', 'w') as f:
     f.write(document)
-subprocess.Popen(['pdflatex', 'drinker.tex'])
+subprocess.Popen(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
 
+
+
+print("=" * 80)
+
+
+pf_adjacency = compute_adjacency(proofs)
+pf_rev_adjacency = compute_adjacency((q, p) for p, q in proofs)
+cm_adjacency = compute_adjacency(counter_models)
+print(cm_adjacency)
+print("a=glpo, b=lem")
+print(find_relation(glpo, lem, pf_adjacency, pf_rev_adjacency, cm_adjacency))
+print("a=wlem, b=lem")
+print(find_relation(wlem, lem, pf_adjacency, pf_rev_adjacency, cm_adjacency))
