@@ -5,10 +5,11 @@ formulae = dne, lem, lpo, wlem, mwlpo = 'dne lem lpo wlem mwlpo'.split()
 
 _______ = None
 formula_layout = [
-[_______ , dne     , _______ ],
-[lem     , _______ , lpo     ],
-[_______ , wlem    , _______ ],
-[_______ , mwlpo   , _______ ],
+'          dne               ',
+'lem                 lpo     ',
+'         wlem               ',
+'         mwlpo              ',
+'                            ',
 ]
 
 proofs = {
