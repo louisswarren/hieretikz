@@ -47,6 +47,11 @@ def find_relation(a, b, pf_adjacency, pf_rev_adjacency, cm_adjacency):
     if a_b_path:
         return a_b_path, None
     b_consequences = find_reachable(b, pf_adjacency)
+    raise NotImplementedError("""
+        Testing against cm_adjacency is not sufficient; we may know that a
+        consequence of b is not implied by a for reasons other than a direct
+        counter-model.
+    """)
     for underivable in cm_adjacency[a]:
         if underivable in b_consequences:
             return None, b_consequences[underivable]
