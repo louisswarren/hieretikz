@@ -12,7 +12,7 @@ formula_layout = [
 '                                                                    ',
 '             dp                                he                   ',
 '                    gmp                                             ',
-'dnsu                                                        dnse    ',
+'    dnsu                                                dnse        ',
 '                              wlem                                  ',
 ]
 
@@ -53,15 +53,21 @@ document = r'''
 \usepackage{tikz}
 \usepackage{amsmath}
 \usepackage{fullpage}
+\usepackage{multicol}
 \begin{document}
 \begin{tikzpicture}[node distance=1 cm, line width=0.3mm, auto]
 ''' + \
 make_tikz(formulae, formula_layout, proofs, counter_models) + \
 r'''
-\end{tikzpicture}\\
+\end{tikzpicture}
+\paragraph{}
+It remains to investigate:
+\begin{multicols}{3}
+\noindent
 ''' + \
 assist(formulae, formula_layout, proofs, counter_models) + \
 r'''
+\end{multicols}
 \end{document}
 '''
 print(document)

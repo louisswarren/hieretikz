@@ -118,6 +118,5 @@ def assist(formulae, formula_layout, proofs, counter_models):
     pf_rev_adjacency = compute_adjacency((q, p) for p, q in proofs)
     cm_adjacency = compute_adjacency(counter_models)
     weak_edges = find_weak_edges(formulae, pf_adjacency, pf_rev_adjacency, cm_adjacency)
-    yield "It remains to investigate:"
     for e in weak_edges:
         yield '{:8s} $\implies$ {:8s}'.format(*e)
