@@ -64,12 +64,18 @@ def find_weak_edges(formulae, pf_adjacency, pf_rev_adjacency, cm_adjacency):
             yield (a, b)
 
 @accumulate('\n'.join)
-def make_tikz_nodes(formula_layout):
+def make_tikz_nodes(formulae, formula_layout):
     fmt = r'\node ({}) at ({}, {}) {{{}}};'
     for j, row in enumerate(formula_layout):
-        for i, formula in enumerate(row):
-            if formula is not None:
-                yield fmt.format(formula, i, -j, formula)
+        i = 0
+        while i < len(row):
+            for formula in formulae:
+                tok = row[i:].split(' ')
+                if tok and tok[0] == formula:
+                    yield fmt.format(formula, i // 5, -j * 2, formula)
+                    i += len(tok[0]) - 1
+                    break
+            i += 1
 
 @accumulate('\n'.join)
 def make_tikz_edges(formulae, strong_edges, weak_edges):
@@ -102,15 +108,16 @@ def make_tikz(formulae, formula_layout, proofs, counter_models):
     pf_rev_adjacency = compute_adjacency((q, p) for p, q in proofs)
     cm_adjacency = compute_adjacency(counter_models)
     weak_edges = find_weak_edges(formulae, pf_adjacency, pf_rev_adjacency, cm_adjacency)
-    tikz_nodes = make_tikz_nodes(formula_layout)
+    tikz_nodes = make_tikz_nodes(formulae, formula_layout)
     tikz_edges = make_tikz_edges(formulae, proofs, weak_edges)
     return tikz_nodes + tikz_edges
 
+@accumulate('\\\\\n'.join)
 def assist(formulae, formula_layout, proofs, counter_models):
     pf_adjacency = compute_adjacency(proofs)
     pf_rev_adjacency = compute_adjacency((q, p) for p, q in proofs)
     cm_adjacency = compute_adjacency(counter_models)
     weak_edges = find_weak_edges(formulae, pf_adjacency, pf_rev_adjacency, cm_adjacency)
-    print("It remains to investigate:")
+    yield "It remains to investigate:"
     for e in weak_edges:
-        print('{:8s} => {:8s}'.format(*e))
+        yield '{:8s} $\implies$ {:8s}'.format(*e)

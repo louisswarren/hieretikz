@@ -7,13 +7,13 @@ formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
 
 _______ = None
 formula_layout = [
-[_______ , glpoa   , _______ , _______ , _______ , _______ , _______ ],
-[_______ , _______ , _______ , lem     , _______ , glpo    , _______ ],
-[_______ , _______ , _______ , _______ , _______ , _______ , _______ ],
-[_______ , dp      , _______ , _______ , _______ , he      , _______ ],
-[dnsu    , _______ , gmp     , _______ , _______ , _______ , dnse    ],
-[_______ , _______ , _______ , _______ , _______ , _______ , _______ ],
-[_______ , _______ , _______ , wlem    , _______ , _______ , _______ ],
+'          glpoa                                                     ',
+'                              lem                 glpo              ',
+'                                                                    ',
+'             dp                                he                   ',
+'                    gmp                                             ',
+'dnsu                                                        dnse    ',
+'                              wlem                                  ',
 ]
 
 proofs = {
@@ -51,17 +51,21 @@ counter_models = {
 document = r'''
 \documentclass{article}
 \usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{fullpage}
 \begin{document}
-\begin{tikzpicture}[node distance=2 cm, line width=0.3mm, auto]
+\begin{tikzpicture}[node distance=1 cm, line width=0.3mm, auto]
 ''' + \
 make_tikz(formulae, formula_layout, proofs, counter_models) + \
 r'''
-\end{tikzpicture}
+\end{tikzpicture}\\
+''' + \
+assist(formulae, formula_layout, proofs, counter_models) + \
+r'''
 \end{document}
 '''
 print(document)
 with open('drinker.tex', 'w') as f:
     f.write(document)
-subprocess.Popen(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
+subprocess.Popen(['pdflatex', 'drinker.tex'])
 
-assist(formulae, formula_layout, proofs, counter_models)
