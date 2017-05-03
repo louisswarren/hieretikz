@@ -49,3 +49,12 @@ def spanning_tree(edges):
         if not is_isthmus(edge, edges):
             return spanning_tree(edges - {edge})
     return edges
+
+def rank_possible_edge(edge, vertices, edges, disconnections):
+    truev = len(find_possible_edges(vertices, edges | {edge}, disconnections))
+    falsev = len(find_possible_edges(vertices, edges, disconnections | {edge}))
+    return truev * falsev
+
+def most_valuable_edge(vertices, edges, disconnections):
+    ranker = lambda e: rank_possible_edge(e, vertices, edges, disconnections)
+    return max(find_possible_edges(vertices, edges, disconnections), key=ranker)
