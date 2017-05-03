@@ -55,3 +55,4 @@ def assist(formulae, formula_layout, proofs, counter_models):
     weak_edges = hierarchy.find_possible_edges(formulae, proofs, counter_models)
     for e in weak_edges:
         yield '{:8s} $\implies$ {:8s}'.format(*e)
+    yield str(hierarchy.most_valuable_edge(formulae, set(proofs), set(counter_models)))
