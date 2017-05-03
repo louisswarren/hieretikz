@@ -36,10 +36,12 @@ def find_possible_edges(vertices, edges, disconnections):
     """Find which edges can be added without connecting any pairs in
     disconnections."""
     return {(a, b) for a in vertices for b in vertices
-            if a != b and is_separated(a, b, edges, disconnections)}
+            if a != b and
+            (a, b) not in edges and
+            not is_separated(a, b, edges, disconnections)}
 
 def is_isthmus(edge, edges):
-    a, b = edge
+    a, _ = edge
     return not downward_closure(a, edges - {edge}) == downward_closure(a, edges)
 
 def spanning_tree(edges):
