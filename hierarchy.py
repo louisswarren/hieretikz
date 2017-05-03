@@ -37,3 +37,13 @@ def find_possible_edges(vertices, edges, disconnections):
     disconnections."""
     return {(a, b) for a in vertices for b in vertices
             if a != b and is_separated(a, b, edges, disconnections)}
+
+def is_isthmus(edge, edges):
+    a, b = edge
+    return not downward_closure(a, edges - {edge}) == downward_closure(a, edges)
+
+def spanning_tree(edges):
+    for edge in edges:
+        if not is_isthmus(edge, edges):
+            return spanning_tree(edges - {edge})
+    return edges

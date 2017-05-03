@@ -47,7 +47,7 @@ def make_tikz_edges(formulae, strong_edges, weak_edges):
 def make_tikz(formulae, formula_layout, proofs, counter_models):
     weak_edges = hierarchy.find_possible_edges(formulae, proofs, counter_models)
     tikz_nodes = make_tikz_nodes(formulae, formula_layout)
-    tikz_edges = make_tikz_edges(formulae, proofs, weak_edges)
+    tikz_edges = make_tikz_edges(formulae, hierarchy.spanning_tree(set(proofs)), weak_edges)
     return tikz_nodes + tikz_edges
 
 @accumulate('\\\\\n'.join)
