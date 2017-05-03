@@ -1,5 +1,6 @@
 from hieretikz import *
 import subprocess
+from hierarchy import *
 
 formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
     'lem', 'wlem', 'dp', 'he', 'dnsu', 'dnse', 'glpo', 'glpoa', 'gmp'
@@ -11,7 +12,7 @@ formula_layout = [
 '                              lem                 glpo              ',
 '                                                                    ',
 '             dp                                he                   ',
-'                    gmp                                             ',
+'                         gmp                                        ',
 '    dnsu                                                dnse        ',
 '                              wlem                                  ',
 ]
@@ -73,5 +74,4 @@ r'''
 with open('drinker.tex', 'w') as f:
     f.write(document)
 subprocess.Popen(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
-
 
