@@ -1,3 +1,6 @@
+"""Reason about a directed graph in which the (non-)existance of some edges
+must be inferred by the disconnectedness of certain vertices"""
+
 def transitive_closure_set(vertices, edges):
     neighbours = {b for a, b in edges if a in vertices}
     if neighbours.issubset(vertices):
