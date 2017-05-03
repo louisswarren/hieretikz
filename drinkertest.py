@@ -58,7 +58,7 @@ document = r'''
 \begin{document}
 \begin{tikzpicture}[node distance=1 cm, line width=0.3mm, auto]
 ''' + \
-make_tikz(formulae, formula_layout, proofs, counter_models) + \
+make_tikz(formulae, formula_layout, set(proofs), set(counter_models)) + \
 r'''
 \end{tikzpicture}
 \paragraph{}
@@ -66,7 +66,7 @@ It remains to investigate:
 \begin{multicols}{3}
 \noindent
 ''' + \
-assist(formulae, formula_layout, proofs, counter_models) + \
+assist(formulae, formula_layout, set(proofs), set(counter_models)) + \
 r'''
 \end{multicols}
 \end{document}
