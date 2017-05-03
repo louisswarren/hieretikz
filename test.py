@@ -53,6 +53,7 @@ def test_all():
     yield test(is_connected, vx, vb, qedges)(False)
     yield test(is_separated, va, vb, qedges, {(vq, vz)} )(True)
     yield test(is_separated, va, vb, qedges, {(vq, va)} )(False)
+    yield test(is_separated, vb, vy, qedges, set())(False)
 
 def run_tests():
     failures = sum(test_all())
