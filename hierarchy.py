@@ -45,10 +45,7 @@ def spanning_tree(edges):
     return edges
 
 def rank_possible_edge(edge, vertices, edges, disconnections):
-    truev = len(find_possible_connections(vertices, edges | {edge}, disconnections))
-    falsev = len(find_possible_connections(vertices, edges, disconnections | {edge}))
-    return truev * falsev
-
-def most_valuable_edge(vertices, edges, disconnections):
-    ranker = lambda e: rank_possible_edge(e, vertices, edges, disconnections)
-    return max(find_possible_connections(vertices, edges, disconnections), key=ranker)
+    evaluator = lambda x, y: len(find_possible_connections(vertices, x, y))
+    exists_rank = evaluator(edges | {edge}, disconnections)
+    not_exists_rank = evaluator(edges, disconnections | {edge})
+    return abs(exists_rank) + abs(not_exists_rank)
