@@ -4,12 +4,6 @@ import itertools
 
 accumulate = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
-@accumulate(set)
-def find_weak_edges(formulae, proofs, counter_models):
-    for a, b in itertools.permutations(formulae, 2):
-        if hierarchy.is_separated(a, b, proofs, counter_models):
-            yield (a, b)
-
 @accumulate('\n'.join)
 def make_tikz_nodes(formulae, formula_layout):
     fmt = r'\node ({}) at ({}, {}) {{{}}};'
@@ -51,13 +45,13 @@ def make_tikz_edges(formulae, strong_edges, weak_edges):
         weak_drawn.add((a, b))
 
 def make_tikz(formulae, formula_layout, proofs, counter_models):
-    weak_edges = find_weak_edges(formulae, proofs, counter_models)
+    weak_edges = hierarchy.find_possible_edges(formulae, proofs, counter_models)
     tikz_nodes = make_tikz_nodes(formulae, formula_layout)
     tikz_edges = make_tikz_edges(formulae, proofs, weak_edges)
     return tikz_nodes + tikz_edges
 
 @accumulate('\\\\\n'.join)
 def assist(formulae, formula_layout, proofs, counter_models):
-    weak_edges = find_weak_edges(formulae, proofs, counter_models)
+    weak_edges = hierarchy.find_possible_edges(formulae, proofs, counter_models)
     for e in weak_edges:
         yield '{:8s} $\implies$ {:8s}'.format(*e)

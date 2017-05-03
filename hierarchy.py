@@ -31,3 +31,9 @@ def is_separated(a, b, edges, disconnections):
             if is_separated(p, q, edges, disconnections):
                 return True
     return False
+
+def find_possible_edges(vertices, edges, disconnections):
+    """Find which edges can be added without connecting any pairs in
+    disconnections."""
+    return {(a, b) for a in vertices for b in vertices
+            if a != b and is_separated(a, b, edges, disconnections)}
