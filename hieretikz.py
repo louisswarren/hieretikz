@@ -45,14 +45,14 @@ def make_tikz_edges(formulae, strong_edges, weak_edges):
         weak_drawn.add((a, b))
 
 def make_tikz(formulae, formula_layout, proofs, counter_models):
-    weak_edges = hierarchy.find_possible_edges(formulae, proofs, counter_models)
+    weak_edges = hierarchy.find_possible_connections(formulae, proofs, counter_models)
     tikz_nodes = make_tikz_nodes(formulae, formula_layout)
     tikz_edges = make_tikz_edges(formulae, hierarchy.spanning_tree(set(proofs)), weak_edges)
     return tikz_nodes + tikz_edges
 
 @accumulate('\\\\\n'.join)
 def assist(formulae, formula_layout, proofs, counter_models):
-    weak_edges = hierarchy.find_possible_edges(formulae, proofs, counter_models)
+    weak_edges = hierarchy.find_possible_connections(formulae, proofs, counter_models)
     for e in weak_edges:
         yield '{:8s} $\implies$ {:8s}'.format(*e)
     yield str(hierarchy.most_valuable_edge(formulae, set(proofs), set(counter_models)))

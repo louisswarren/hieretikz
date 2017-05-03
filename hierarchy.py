@@ -34,12 +34,11 @@ def is_separated(a, b, edges, disconnections, a_checked=None, b_checked=None):
                 return True
     return False
 
-def find_possible_edges(vertices, edges, disconnections):
-    """Find which edges can be added without connecting any pairs in
-    disconnections."""
-    return {(a, b) for a in vertices for b in vertices
-            if a != b and
-            (a, b) not in edges and
+def find_possible_connections(vertices, edges, disconnections):
+    """Find which edges can be added to create new connections, without
+    connecting any pairs in disconnections."""
+    return {(a, b) for a in vertices for b in vertices if
+            not is_connected(a, b, edges) and
             not is_separated(a, b, edges, disconnections)}
 
 def is_isthmus(edge, edges):
@@ -53,10 +52,10 @@ def spanning_tree(edges):
     return edges
 
 def rank_possible_edge(edge, vertices, edges, disconnections):
-    truev = len(find_possible_edges(vertices, edges | {edge}, disconnections))
-    falsev = len(find_possible_edges(vertices, edges, disconnections | {edge}))
+    truev = len(find_possible_connections(vertices, edges | {edge}, disconnections))
+    falsev = len(find_possible_connections(vertices, edges, disconnections | {edge}))
     return truev * falsev
 
 def most_valuable_edge(vertices, edges, disconnections):
     ranker = lambda e: rank_possible_edge(e, vertices, edges, disconnections)
-    return max(find_possible_edges(vertices, edges, disconnections), key=ranker)
+    return max(find_possible_connections(vertices, edges, disconnections), key=ranker)
