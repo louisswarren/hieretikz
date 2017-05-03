@@ -46,8 +46,7 @@ def find_possible_connections(vertices, edges, disconnections):
             not is_separated(a, b, edges, disconnections)}
 
 def is_isthmus(edge, edges):
-    a, _ = edge
-    return not downward_closure(a, edges - {edge}) == downward_closure(a, edges)
+    return not is_connected(*edge, edges - {edge})
 
 def spanning_tree(edges):
     for edge in edges:
