@@ -16,19 +16,21 @@ def upward_closure(vertex, edges):
 def is_connected(a, b, edges):
     return b in downward_closure(a, edges)
 
-def is_separated(a, b, edges, disconnections):
+def is_separated(a, b, edges, disconnections, a_checked=None, b_checked=None):
     """Checks that a and b will remain not connected, even if edges are added
     to the graph, as long as the vertex pairs listed in disconnections remain
     disconected."""
     if (a, b) in disconnections:
         return True
-    # Removing the alternate closures removes the relevant vertex, and avoids
-    # any cycle issues
-    above_a = upward_closure(a, edges) - downward_closure(a, edges)
-    below_b = downward_closure(b, edges) - upward_closure(b, edges)
+    a_checked = a_checked or set()
+    b_checked = b_checked or set()
+    above_a = upward_closure(a, edges) - a_checked
+    below_b = downward_closure(b, edges) - b_checked
+    new_a_checked = a_checked | {a}
+    new_b_checked = b_checked | {b}
     for p in above_a:
         for q in below_b:
-            if is_separated(p, q, edges, disconnections):
+            if is_separated(p, q, edges, disconnections, new_a_checked, new_b_checked):
                 return True
     return False
 
