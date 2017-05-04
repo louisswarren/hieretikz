@@ -1,4 +1,4 @@
-'''Reason about a directed graph in which the (non-)existance of some edges
+'''Reason about a directed graph in which the (non-)existence of some edges
 must be inferred by the disconnectedness of certain vertices. Collect (truthy)
 evidence for boolean function return values.'''
 
@@ -31,21 +31,20 @@ def is_connected(a, b, edges):
 def is_separated(a, b, edges, disconnections):
     '''Check that a and b will remain not connected even if edges are added to
     the graph, as long as the vertex pairs listed in disconnections remain
-    disconected.'''
-    a_upward = upward_closure(a, edges)
-    b_downward = downward_closure(b, edges)
-    for p in a_upward:
-        for q in b_downward:
+    disconnected.'''
+    for p, p_path in upward_closure(a, edges).items():
+        for q, q_path in downward_closure(b, edges).items():
             if (p, q) in disconnections:
-                return a_upward[p], b_downward[q]
+                # Should reverse p_path
+                return p_path, q_path
     return False
 
 def find_possible_connections(vertices, edges, disconnections):
     '''Find which edges can be added to create new connections, without
     connecting any pairs in disconnections.'''
-    return {(a, b) for a in vertices for b in vertices if
-            not is_connected(a, b, edges) and
-            not is_separated(a, b, edges, disconnections)}
+    return {(a, b) for a in vertices for b in vertices
+            if not is_connected(a, b, edges)
+            if not is_separated(a, b, edges, disconnections)}
 
 def is_redundant_edge(edge, edges):
     '''Give alternate path if one exists.'''
