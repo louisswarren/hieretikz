@@ -43,18 +43,32 @@ def make_tikz_edges(strong_edges, weak_edges):
 
 @compose('\n'.join)
 def make_tikz_diagram(formula_layout, strong_edges, weak_edges):
-    yield r'\begin{tikzpicture}[node distance=1 cm, line width=0.3mm, auto]'
+    yield r'\begin{tikzpicture}[line width=0.3mm, auto]'
     yield string_node_layout_to_tikz(formula_layout)
     yield make_tikz_edges(strong_edges, weak_edges)
     yield r'\end{tikzpicture}'
 
-@compose('\n'.join)
-def make_tikz(formulae, formula_layout, proofs, counter_models):
-    weak_edges = find_possible_connections(formulae, proofs, counter_models)
-    yield make_tikz_diagram(formula_layout, proofs, weak_edges)
-
 @compose('\\\\\n'.join)
-def assist(formulae, formula_layout, proofs, counter_models):
-    weak_edges = find_possible_connections(formulae, proofs, counter_models)
-    for e in weak_edges:
-        yield '{:8s} $\implies$ {:8s}'.format(*e)
+def make_tikz_questions(evaluated_weak_edges):
+    yield r'\begin{multicols}{3} \noindent'
+    order = lambda x: sum(x[1])
+    for edge, rank in sorted(evaluated_weak_edges.items(), key=order, reverse=True):
+        yield '{:8s} $\implies$ {:8s} \quad {}'.format(*edge, rank)
+    yield r'\end{multicols}'
+
+@compose('\n'.join)
+def hieretikz_document(formulae, formula_layout, proofs, counter_models):
+    evaluated_weak_edges = find_evaluated_connections(
+            formulae, set(proofs), set(counter_models))
+    yield r'\documentclass{article}'
+    yield r'\usepackage{tikz}'
+    yield r'\usepackage{amsmath}'
+    yield r'\usepackage{fullpage}'
+    yield r'\usepackage{multicol}'
+    yield r'\begin{document}'
+    yield make_tikz_diagram(formula_layout, proofs, evaluated_weak_edges)
+    yield r'\paragraph{}'
+    yield r'It remains to investigate:'
+    yield make_tikz_questions(evaluated_weak_edges)
+    yield r'\end{document}'
+

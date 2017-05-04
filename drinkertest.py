@@ -48,27 +48,8 @@ counter_models = {
         (dp, dnse): '',
         }
 
+document = hieretikz_document(formulae, formula_layout, proofs, counter_models)
 
-document = r'''
-\documentclass{article}
-\usepackage{tikz}
-\usepackage{amsmath}
-\usepackage{fullpage}
-\usepackage{multicol}
-\begin{document}
-''' + \
-make_tikz(formulae, formula_layout, set(proofs), set(counter_models)) + \
-r'''
-\paragraph{}
-It remains to investigate:
-\begin{multicols}{3}
-\noindent
-''' + \
-assist(formulae, formula_layout, set(proofs), set(counter_models)) + \
-r'''
-\end{multicols}
-\end{document}
-'''
 with open('drinker.tex', 'w') as f:
     f.write(document)
 subprocess.Popen(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
