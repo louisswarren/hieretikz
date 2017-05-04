@@ -49,7 +49,7 @@ def evaluate_possible_edge(edge, vertices, edges, disconnections):
     unknown = evaluator(edges, disconnections)
     exists_learned = unknown - evaluator(edges | {edge}, disconnections)
     not_exists_learned = unknown - evaluator(edges, disconnections | {edge})
-    return exists_learned,  not_exists_learned
+    return exists_learned, not_exists_learned
 
 def find_evaluated_connections(vertices, edges, disconnections):
     return {e: evaluate_possible_edge(e, vertices, edges, disconnections)

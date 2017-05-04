@@ -71,4 +71,3 @@ def hieretikz_document(formulae, formula_layout, proofs, counter_models):
     yield r'It remains to investigate:'
     yield make_tikz_questions(evaluated_weak_edges)
     yield r'\end{document}'
-
