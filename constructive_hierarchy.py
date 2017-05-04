@@ -2,13 +2,14 @@
 must be inferred by the disconnectedness of certain vertices. Collect (truthy)
 evidence for boolean function return values.'''
 
-def transitive_closure_dict(vertices, edges):
+def transitive_closure_dict(known_vertices, edges):
     '''Find the transitive closure of a dict mapping vertices to their paths.'''
-    neighbours = {b: vertices[a] + ((a, b),)
-                  for a, b in edges if a in vertices}
-    if set(neighbours).issubset(set(vertices)):
-        return vertices
-    return transitive_closure_dict(dict(neighbours, **vertices), edges)
+    found_vertices = {b: known_vertices[a] + ((a, b),)
+                      for a, b in edges if a in known_vertices}
+    if all(v in known_vertices for v in found_vertices):
+        return known_vertices
+    found_vertices.update(known_vertices)
+    return transitive_closure_dict(found_vertices, edges)
 
 def transitive_closure(vertex, edges):
     closure = transitive_closure_dict({vertex: ()}, edges)
