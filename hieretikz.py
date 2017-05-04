@@ -1,25 +1,23 @@
-import constructive_hierarchy as hierarchy
-from collections import defaultdict
-import itertools
+from constructive_hierarchy import *
 
-accumulate = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
+compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
-@accumulate('\n'.join)
-def make_tikz_nodes(formulae, formula_layout):
+@compose('\n'.join)
+def string_node_layout_to_tikz(formula_layout):
+    formulae = formula_layout.split()
     fmt = r'\node ({}) at ({}, {}) {{{}}};'
-    for j, row in enumerate(formula_layout):
-        i = 0
-        while i < len(row):
-            for formula in formulae:
-                tok = row[i:].split(' ')
-                if tok and tok[0] == formula:
-                    yield fmt.format(formula, i // 5, -j * 2, formula)
-                    i += len(tok[0]) - 1
-                    break
-            i += 1
+    for row_num, row in enumerate(formula_layout.split('\n')):
+        col_num = 0
+        while col_num < len(row):
+            if row[col_num].isspace():
+                col_num += 1
+            else:
+                formula = formulae.pop(0)
+                yield fmt.format(formula, col_num // 5, -row_num * 2, formula)
+                col_num += len(formula)
 
-@accumulate('\n'.join)
-def make_tikz_edges(formulae, strong_edges, weak_edges):
+@compose('\n'.join)
+def make_tikz_edges(strong_edges, weak_edges):
     drawn = set()
     fmt = r'\draw[{}] ({}) to node {{}} ({});'
     for a, b in strong_edges:
@@ -37,21 +35,26 @@ def make_tikz_edges(formulae, strong_edges, weak_edges):
             continue
         if (b, a) in weak_edges:
             yield fmt.format('dashed, <->', a, b)
+        elif (b, a) in drawn:
+            yield fmt.format('dashed, bend left=30, ->', a, b)
         else:
-            if (b, a) in drawn:
-                yield fmt.format('dashed, bend left=30, ->', a, b)
-            else:
-                yield fmt.format('dashed, ->', a, b)
+            yield fmt.format('dashed, ->', a, b)
         weak_drawn.add((a, b))
 
-def make_tikz(formulae, formula_layout, proofs, counter_models):
-    weak_edges = hierarchy.find_possible_connections(formulae, proofs, counter_models)
-    tikz_nodes = make_tikz_nodes(formulae, formula_layout)
-    tikz_edges = make_tikz_edges(formulae, hierarchy.spanning_tree(set(proofs)), weak_edges)
-    return tikz_nodes + tikz_edges
+@compose('\n'.join)
+def make_tikz_diagram(formula_layout, strong_edges, weak_edges):
+    yield r'\begin{tikzpicture}[node distance=1 cm, line width=0.3mm, auto]'
+    yield string_node_layout_to_tikz(formula_layout)
+    yield make_tikz_edges(strong_edges, weak_edges)
+    yield r'\end{tikzpicture}'
 
-@accumulate('\\\\\n'.join)
+@compose('\n'.join)
+def make_tikz(formulae, formula_layout, proofs, counter_models):
+    weak_edges = find_possible_connections(formulae, proofs, counter_models)
+    yield make_tikz_diagram(formula_layout, proofs, weak_edges)
+
+@compose('\\\\\n'.join)
 def assist(formulae, formula_layout, proofs, counter_models):
-    weak_edges = hierarchy.find_possible_connections(formulae, proofs, counter_models)
+    weak_edges = find_possible_connections(formulae, proofs, counter_models)
     for e in weak_edges:
         yield '{:8s} $\implies$ {:8s}'.format(*e)

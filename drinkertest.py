@@ -7,15 +7,15 @@ formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
 
 
 _______ = None
-formula_layout = [
-'          glpoa                                                     ',
-'                              lem                 glpo              ',
-'                                                                    ',
-'             dp                                he                   ',
-'                         gmp                                        ',
-'    dnsu                                                dnse        ',
-'                              wlem                                  ',
-]
+formula_layout = '''\
+          glpoa
+                              lem                 glpo
+
+             dp                                he
+                         gmp
+    dnsu                                                dnse
+                              wlem
+'''
 
 proofs = {
         (lem, wlem):   '', # Not yet
@@ -56,11 +56,9 @@ document = r'''
 \usepackage{fullpage}
 \usepackage{multicol}
 \begin{document}
-\begin{tikzpicture}[node distance=1 cm, line width=0.3mm, auto]
 ''' + \
 make_tikz(formulae, formula_layout, set(proofs), set(counter_models)) + \
 r'''
-\end{tikzpicture}
 \paragraph{}
 It remains to investigate:
 \begin{multicols}{3}
