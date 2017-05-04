@@ -57,8 +57,13 @@ def spanning_tree(edges):
             return spanning_tree(edges - {edge})
     return edges
 
-def rank_possible_edge(edge, vertices, edges, disconnections):
+def evaluate_possible_edge(edge, vertices, edges, disconnections):
     evaluator = lambda x, y: len(find_possible_connections(vertices, x, y))
-    exists_rank = evaluator(edges | {edge}, disconnections)
-    not_exists_rank = evaluator(edges, disconnections | {edge})
-    return abs(exists_rank) + abs(not_exists_rank)
+    unknown = evaluator(edges, disconnections)
+    exists_learned = unknown - evaluator(edges | {edge}, disconnections)
+    not_exists_learned = unknown - evaluator(edges, disconnections | {edge})
+    return exists_learned,  not_exists_learned
+
+def find_evaluated_connections(vertices, edges, disconnections):
+    return {e: evaluate_possible_edge(e, vertices, edges, disconnections)
+            for e in find_possible_connections(vertices, edges, disconnections)}
