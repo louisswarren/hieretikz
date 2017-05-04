@@ -13,19 +13,19 @@ def transitive_closure_dict(vertices, edges):
     new_vertices.update(neighbours)
     return transitive_closure_dict(new_vertices, edges)
 
-def downward_closure(vertex, edges):
-    '''Find the downward closure of a vertex.'''
+def transitive_closure(vertex, edges):
     closure = transitive_closure_dict({vertex: ()}, edges)
     # Use a (truthy) loop instead of an empty path
     closure[vertex] = (vertex, vertex)
     return closure
 
+def downward_closure(vertex, edges):
+    '''Find the downward closure of a vertex.'''
+    return transitive_closure(vertex, edges)
+
 def upward_closure(vertex, edges):
     '''Find the upward closure of a vertex.'''
-    closure = transitive_closure_dict({vertex: ()}, {(b, a) for a, b in edges})
-    # Use a (truthy) loop instead of an empty path
-    closure[vertex] = (vertex, vertex)
-    return closure
+    return transitive_closure(vertex, {(b, a) for a, b in edges})
 
 def is_connected(a, b, edges):
     '''Check if there is a path from a to b.'''
