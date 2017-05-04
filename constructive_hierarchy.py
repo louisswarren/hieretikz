@@ -44,16 +44,16 @@ def find_possible_connections(vertices, edges, disconnections):
     '''Find which edges can be added to create new connections, without
     connecting any pairs in disconnections.'''
     return {(a, b) for a in vertices for b in vertices if
-            is_connected(a, b, edges) is False and
-            is_separated(a, b, edges, disconnections) is False}
+            not is_connected(a, b, edges) and
+            not is_separated(a, b, edges, disconnections)}
 
-def is_nonisthmus(edge, edges):
+def is_redundant_edge(edge, edges):
     '''Give alternate path if one exists.'''
     return is_connected(*edge, edges - {edge})
 
 def spanning_tree(edges):
     for edge in edges:
-        if is_nonisthmus(edge, edges):
+        if is_redundant_edge(edge, edges):
             return spanning_tree(edges - {edge})
     return edges
 
