@@ -8,10 +8,7 @@ def transitive_closure_dict(vertices, edges):
                   for a, b in edges if a in vertices}
     if set(neighbours).issubset(set(vertices)):
         return vertices
-    new_vertices = {}
-    new_vertices.update(vertices)
-    new_vertices.update(neighbours)
-    return transitive_closure_dict(new_vertices, edges)
+    return transitive_closure_dict(dict(vertices, **neighbours), edges)
 
 def transitive_closure(vertex, edges):
     closure = transitive_closure_dict({vertex: ()}, edges)
