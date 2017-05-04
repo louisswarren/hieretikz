@@ -1,4 +1,4 @@
-import hierarchy
+import constructive_hierarchy as hierarchy
 from collections import defaultdict
 import itertools
 

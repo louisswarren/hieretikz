@@ -1,6 +1,6 @@
 from hieretikz import *
 import subprocess
-from hierarchy import *
+from constructive_hierarchy import *
 
 formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
     'lem', 'wlem', 'dp', 'he', 'dnsu', 'dnse', 'glpo', 'glpoa', 'gmp'
@@ -75,3 +75,6 @@ with open('drinker.tex', 'w') as f:
     f.write(document)
 subprocess.Popen(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
 
+
+sep = lambda a, b: is_separated(a, b, set(proofs), set(counter_models))
+con = lambda a, b: is_connected(a, b, set(proofs))
