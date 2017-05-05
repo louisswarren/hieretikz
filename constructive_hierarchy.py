@@ -14,7 +14,7 @@ def transitive_closure_dict(known_vertices, edges):
 def transitive_closure(vertex, edges):
     closure = transitive_closure_dict({vertex: ()}, edges)
     # Use a (truthy) loop instead of an empty path
-    closure[vertex] = (vertex, vertex)
+    closure[vertex] = (vertex, vertex),
     return closure
 
 def downward_closure(vertex, edges):
