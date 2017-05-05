@@ -18,34 +18,34 @@ formula_layout = '''\
 '''
 
 proofs = {
-        (lem, wlem):   '', # Not yet
-        (dp, wlem):    '',
-        (he, wlem):    '',
-        (lem, glpo):   '',
-        (glpo, lem):   '',
-        (glpoa, lem):  '',
-        (glpoa, glpo): '',
-        (dp, dnsu):    '',
-        (glpoa, dnsu): '',
+        (lem, wlem):   'lem-wlem',
+        (dp, wlem):    'dp-wlem',
+        (he, wlem):    'he-wlem',
+        (lem, glpo):   'lem-glpo',
+        (glpo, lem):   'glpo-lem',
+        (glpoa, lem):  'glpoa-lem',
+        (glpoa, glpo): 'glpoa-glpo',
+        (dp, dnsu):    'dp-dnsu',
+        (glpoa, dnsu): 'glpoa-dnsu',
 #
-        (he, dnse): '',
-        (gmp, dnse): '',
-        (gmp, dnsu): '',
+        (he, dnse): 'he-dnse',
+        (gmp, dnse): 'gmp-dnse',
+        (gmp, dnsu): 'gmp-dnsu',
         }
 
 counter_models = {
-        (dp, he):     '',
-        (he, dp):     '',
-        (lem, dp):    '',
-        (lem, he):    '',
-        (lem, glpoa): '',
-        (he, dnsu):   '',
-        (dnsu, dp):   '',
+        (dp, he):     'dp-/-he',
+        (he, dp):     'he-/-dp',
+        (lem, dp):    'lem-/-dp',
+        (lem, he):    'lem-/-he',
+        (lem, glpoa): 'lem-/-glpoa',
+        (he, dnsu):   'he-/-dnsu',
+        (dnsu, dp):   'dnsu-/-dp',
 #
-        (dp, lem): '',
-        (he, lem): '',
-        (dnse, dp): '',
-        (dp, dnse): '',
+        (dp, lem): 'dp-/-lem',
+        (he, lem): 'he-/-lem',
+        (dnse, dp): 'dnse-/-dp',
+        (dp, dnse): 'dp-/-dnse',
         }
 
 document = hieretikz_document(formulae, formula_layout, proofs, counter_models)
