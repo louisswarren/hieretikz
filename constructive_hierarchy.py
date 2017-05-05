@@ -21,9 +21,13 @@ def downward_closure(vertex, edges):
     '''Find the downward closure of a vertex.'''
     return transitive_closure(vertex, edges)
 
+def _reverse_edges(edges):
+    return type(edges)((b, a) for a, b in edges)
+
 def upward_closure(vertex, edges):
     '''Find the upward closure of a vertex.'''
-    return transitive_closure(vertex, {(b, a) for a, b in edges})
+    reversed_paths = transitive_closure(vertex, _reverse_edges(edges))
+    return {v: _reverse_edges(p) for v, p in reversed_paths.items()}
 
 def is_connected(a, b, edges):
     '''Check if there is a path from a to b.'''
@@ -33,11 +37,10 @@ def is_separated(a, b, edges, disconnections):
     '''Check that a and b will remain not connected even if edges are added to
     the graph, as long as the vertex pairs listed in disconnections remain
     disconnected.'''
-    for p, p_path in upward_closure(a, edges).items():
-        for q, q_path in downward_closure(b, edges).items():
+    for p, path_from_p_to_a in upward_closure(a, edges).items():
+        for q, path_from_b_to_q in downward_closure(b, edges).items():
             if (p, q) in disconnections:
-                # Should reverse p_path
-                return p_path, q_path
+                return path_from_p_to_a, path_from_b_to_q
     return False
 
 def find_possible_connections(vertices, edges, disconnections):
