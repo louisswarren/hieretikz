@@ -16,30 +16,27 @@ def string_node_layout_to_tikz(formula_layout):
                 yield fmt.format(formula, col_num // 5, -row_num * 2, formula)
                 col_num += len(formula)
 
-@compose('\n'.join)
-def make_tikz_edges(strong_edges, weak_edges):
+def _generate_tikz_edges(edge_set, arrow_type='', avoid_overlap=()):
+    if arrow_type:
+        fmt = r'\draw[' + arrow_type + r', {}] ({}) to node {{}} ({});'
+    else:
+        fmt = r'\draw[{}] ({}) to node {{}} ({});'
     drawn = set()
-    fmt = r'\draw[{}] ({}) to node {{}} ({});'
-    for a, b in strong_edges:
+    for a, b in edge_set:
         if (b, a) in drawn:
             continue
-        if (b, a) in strong_edges:
+        elif (b, a) in edge_set:
             yield fmt.format('<->', a, b)
+        elif (b, a) in avoid_overlap:
+            yield fmt.format('bend left=30, ->', a, b)
         else:
             yield fmt.format('->', a, b)
         drawn.add((a, b))
-    weak_drawn = set()
-    for a, b in weak_edges:
-        assert((a, b) not in drawn)
-        if (b, a) in weak_drawn:
-            continue
-        if (b, a) in weak_edges:
-            yield fmt.format('dashed, <->', a, b)
-        elif (b, a) in drawn:
-            yield fmt.format('dashed, bend left=30, ->', a, b)
-        else:
-            yield fmt.format('dashed, ->', a, b)
-        weak_drawn.add((a, b))
+
+@compose('\n'.join)
+def make_tikz_edges(strong_edges, weak_edges):
+    yield from _generate_tikz_edges(strong_edges)
+    yield from _generate_tikz_edges(weak_edges, 'dashed', strong_edges)
 
 @compose('\n'.join)
 def make_tikz_diagram(formula_layout, strong_edges, weak_edges):
