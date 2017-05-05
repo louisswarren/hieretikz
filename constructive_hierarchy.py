@@ -22,6 +22,8 @@ def downward_closure(vertex, edges):
     return transitive_closure(vertex, edges)
 
 def _reverse_edges(edges):
+    if isinstance(edges, dict):
+        return {(b, a): edges[(a, b)] for a, b in edges}
     return type(edges)((b, a) for a, b in edges)
 
 def upward_closure(vertex, edges):
