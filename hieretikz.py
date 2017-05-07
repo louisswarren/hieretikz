@@ -35,7 +35,7 @@ def _generate_tikz_edges(edge_set, arrow_type='', avoid_overlap=()):
 
 @compose('\n'.join)
 def make_tikz_edges(strong_edges, weak_edges):
-    yield from _generate_tikz_edges(strong_edges)
+    yield from _generate_tikz_edges(spanning_tree(set(strong_edges)))
     yield from _generate_tikz_edges(weak_edges, 'dashed', strong_edges)
 
 @compose('\n'.join)
