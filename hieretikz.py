@@ -48,7 +48,7 @@ def make_tikz_diagram(formula_layout, strong_edges, weak_edges):
 @compose('\n'.join)
 def make_tikz_questions(evaluated_weak_edges):
     yield r'\begin{multicols}{3} \noindent'
-    order = lambda x: sum(x[1])
+    order = lambda x: min(x[1])
     for edge, rank in sorted(evaluated_weak_edges.items(), key=order, reverse=True):
         yield r'{:8s} $\implies$ {:8s} \quad {}\\'.format(*edge, rank)
     yield r'\end{multicols}'
