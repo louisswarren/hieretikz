@@ -2,17 +2,17 @@ from hieretikz import *
 import subprocess
 from constructive_hierarchy import *
 
-formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp = \
-    'lem', 'wlem', 'dp', 'he', 'dnsu', 'dnse', 'glpo', 'glpoa', 'gmp'
+formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp, dgp = \
+          'lem  wlem  dp  he  dnsu  dnse  glpo  glpoa  gmp  dgp'.split()
 
 
 _______ = None
 formula_layout = '''\
           glpoa
                               lem                 glpo
-
              dp                                he
-                         gmp
+                                    dgp
+                     gmp
     dnsu                                                dnse
                               wlem
 '''
@@ -32,6 +32,9 @@ proofs = {
         (gmp, dnsu): 'gmp-dnsu',
         (dp, gmp): 'dp-gmp',
         (gmp, wlem): 'gmp-wlem',
+        (dp, dgp): 'dp-dgp',
+        (he, dgp): 'he-dgp',
+        (dgp, wlem): 'dgp-wlem',
         }
 
 
@@ -61,7 +64,7 @@ models = {
         {he},
     ),
     'linear': (
-        {wlem},
+        {wlem, dgp},
         {dp, he, lem, dnse},
     ),
     'glpoa-cm': (
@@ -70,12 +73,16 @@ models = {
     ),
     'v-shape-const-term': (
         {dnse, dnsu},
-        {wlem},
+        {wlem, dgp},
     ),
     'dnse-cm': (
         {dp, glpoa},
         {dnse, he},
     ),
+    'v-lobot': (
+        {lem},
+        {dgp},
+    )
 }
 
 counter_models = {(holds, fails): cm for cm, fpair in models.items()
