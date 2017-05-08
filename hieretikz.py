@@ -2,6 +2,11 @@ from constructive_hierarchy import *
 
 compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
+def all_separations(models):
+    return {(holds, fails): cm for cm, fpair in models.items()
+                               for holds in fpair[0]
+                               for fails in fpair[1]}
+
 @compose('\n'.join)
 def string_node_layout_to_tikz(formula_layout):
     formulae = formula_layout.split()
@@ -54,9 +59,9 @@ def make_tikz_questions(evaluated_weak_edges):
     yield r'\end{multicols}'
 
 @compose('\n'.join)
-def hieretikz_document(formulae, formula_layout, proofs, counter_models):
+def hieretikz_document(formulae, formula_layout, proofs, models):
     evaluated_weak_edges = find_evaluated_connections(
-            formulae, set(proofs), set(counter_models))
+            formulae, set(proofs), set(all_separations(models)))
     yield r'\documentclass{article}'
     yield r'\usepackage{tikz}'
     yield r'\usepackage{amsmath}'

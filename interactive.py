@@ -1,18 +1,19 @@
 from constructive_hierarchy import *
+from hieretikz import all_separations
 
 def print_proof_path(path, proofs):
     for x, y in path:
         if x != y:
             print('\t{} => {}{:>20}'.format(x, y, proofs[(x, y)]))
 
-def examine(a, b, proofs, counter_models):
+def examine(a, b, proofs, separations):
     connection = is_connected(a, b, proofs)
     if connection:
         print('{} => {}'.format(a, b))
         print('Proof:')
         print_proof_path(connection, proofs)
         return
-    separation = is_separated(a, b, set(proofs), set(counter_models))
+    separation = is_separated(a, b, set(proofs), set(separations))
     if separation:
         presep, postsep = separation
         start = presep[0][0]
@@ -24,7 +25,7 @@ def examine(a, b, proofs, counter_models):
         print_proof_path(postsep, proofs)
         print('and there is a counter-model showing')
         print('\t{} =/=> {}{:>20}'.format(
-            start, end, counter_models[(start, end)]))
+            start, end, separations[(start, end)]))
         return
     print("Currently unknown.")
     print("A separation requires a model satisfying one of")
@@ -34,7 +35,7 @@ def examine(a, b, proofs, counter_models):
 
 
 
-def repl(proofs, counter_models):
+def repl(proofs, separations):
     while True:
         try:
             cmd = input('? ')
@@ -49,8 +50,9 @@ def repl(proofs, counter_models):
         if len(cmdlist) != 2:
             print('Invalid input.')
         else:
-            examine(*cmdlist, proofs, counter_models)
+            examine(*cmdlist, proofs, separations)
         print()
 
-from drinkertest import proofs, counter_models
-repl(proofs, counter_models)
+from drinkertest import proofs, models
+separations = all_separations(models)
+repl(proofs, separations)

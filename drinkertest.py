@@ -85,16 +85,8 @@ models = {
     )
 }
 
-counter_models = {(holds, fails): cm for cm, fpair in models.items()
-                                     for holds in fpair[0]
-                                     for fails in fpair[1]}
-
-document = hieretikz_document(formulae, formula_layout, proofs, counter_models)
+document = hieretikz_document(formulae, formula_layout, proofs, models)
 
 with open('drinker.tex', 'w') as f:
     f.write(document)
 subprocess.Popen(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
-
-
-sep = lambda a, b: is_separated(a, b, set(proofs), set(counter_models))
-con = lambda a, b: is_connected(a, b, set(proofs))
