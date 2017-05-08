@@ -36,7 +36,10 @@ def examine(a, b, proofs, counter_models):
 
 def repl(proofs, counter_models):
     while True:
-        cmd = input('? ')
+        try:
+            cmd = input('? ')
+        except EOFError:
+            break
         if not cmd:
             break
         if ',' in cmd:
