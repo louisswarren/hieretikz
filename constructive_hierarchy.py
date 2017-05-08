@@ -57,7 +57,8 @@ def is_redundant_edge(edge, edges):
     return is_connected(*edge, edges - {edge})
 
 def spanning_tree(edges):
-    for edge in edges:
+    '''Find a spanning tree for a graph.'''
+    for edge in sorted(edges):
         if is_redundant_edge(edge, edges):
             return spanning_tree(edges - {edge})
     return edges
