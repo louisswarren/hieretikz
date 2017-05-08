@@ -1,6 +1,5 @@
 '''Reason about a directed graph in which the (non-)existence of some edges
-must be inferred by the disconnectedness of certain vertices. Collect (truthy)
-evidence for boolean function return values.'''
+must be inferred by the disconnectedness of certain vertices.'''
 
 def transitive_closure_dict(known_vertices, edges):
     '''Find the transitive closure of a dict mapping vertices to their paths.'''
@@ -12,6 +11,7 @@ def transitive_closure_dict(known_vertices, edges):
     return transitive_closure_dict(found_vertices, edges)
 
 def transitive_closure(vertex, edges):
+    '''Find the transitive closure of a vertex.'''
     closure = transitive_closure_dict({vertex: ()}, edges)
     # Use a (truthy) loop instead of an empty path
     closure[vertex] = (vertex, vertex),
@@ -32,13 +32,17 @@ def upward_closure(vertex, edges):
     return {v: _reverse_edges(p) for v, p in reversed_paths.items()}
 
 def is_connected(a, b, edges):
-    '''Check if there is a path from a to b.'''
+    '''Find a (truthy) path from a to b if one exists.'''
     return downward_closure(a, edges).get(b, False)
 
 def is_separated(a, b, edges, disconnections):
-    '''Check that a and b will remain not connected even if edges are added to
-    the graph, as long as the vertex pairs listed in disconnections remain
-    disconnected.'''
+    '''Find a (truthy) reason why a and b are separated, if one exists.
+
+    Vertices a and b are separated if they will remain not connected even if
+    edges are added to the graph, as long as the vertex pairs listed in
+    disconnections remain disconnected. If there are paths p -> a and b -> q,
+    and p and q are disconnected, then a and b are separated, and the two paths
+    are the reason.'''
     for p, path_from_p_to_a in upward_closure(a, edges).items():
         for q, path_from_b_to_q in downward_closure(b, edges).items():
             if (p, q) in disconnections:
@@ -46,8 +50,10 @@ def is_separated(a, b, edges, disconnections):
     return False
 
 def find_possible_connections(vertices, edges, disconnections):
-    '''Find which edges can be added to create new connections, without
-    connecting any pairs in disconnections.'''
+    '''Find all new consistent connecting edges.
+
+    Finds all edges that would connect currently disconnected vertices, and
+    that can be added without connecting any pairs in disconnections.'''
     return {(a, b) for a in vertices for b in vertices
             if not is_connected(a, b, edges)
             if not is_separated(a, b, edges, disconnections)}
@@ -64,6 +70,11 @@ def spanning_tree(edges):
     return edges
 
 def evaluate_possible_edge(edge, vertices, edges, disconnections):
+    '''Find the value of knowing about the existence of an edge.
+
+    Returns a tuple, giving the number of possible connections eliminated if
+    the edge exists, and the number eliminated if the edge doesn't exist.
+    '''
     evaluator = lambda x, y: len(find_possible_connections(vertices, x, y))
     unknown = evaluator(edges, disconnections)
     exists_learned = unknown - evaluator(edges | {edge}, disconnections)
@@ -71,5 +82,10 @@ def evaluate_possible_edge(edge, vertices, edges, disconnections):
     return exists_learned, not_exists_learned
 
 def find_evaluated_connections(vertices, edges, disconnections):
+    '''Find all new consistent connecting edges and their evaluations.
+
+    Finds all edges that would connect currently disconnected vertices, and
+    that can be added without connecting any pairs in disconnections. The
+    evaluations of the edges are given by evaluate_possible_edge.'''
     return {e: evaluate_possible_edge(e, vertices, edges, disconnections)
             for e in find_possible_connections(vertices, edges, disconnections)}
