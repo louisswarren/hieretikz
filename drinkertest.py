@@ -35,39 +35,47 @@ proofs = {
         }
 
 
-# Dictionary of models, to a pair of tuples. First tuple is formulae which hold
-# in the model, second tuple is formulae which fail.
-# lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp
+# Dictionary of models, to a pair of set. The first set is the formulae which
+# hold in the model as schemes, the second tuple is the formulae which fail for
+# certain instances.
 
 models = {
     'dp-cm-lobot': (
-        (he, lem, wlem, dnsu, dnse, glpo, glpoa, gmp),
-        (dp, )
+        {he, lem, wlem, dnsu, dnse, glpo, glpoa, gmp},
+        {dp},
     ),
     'dp-cm': (
-        (he, wlem),
-        (dp, lem)
+        {he, wlem},
+        {dp, lem},
     ),
     'dp-cm-bottop': (
-        (he, ),
-        (dnsu, )
+        {he, wlem},
+        {dnsu},
     ),
     'he-cm-lobot': (
-        (dp, lem, wlem, dnsu, dnse, glpo, glpoa, gmp),
-        (he, lem)
+        {dp, lem, wlem, dnsu, dnse, glpo, glpoa, gmp},
+        {he, lem},
     ),
     'he-cm': (
-        (dp, wlem),
-        (he, )
+        {dp, wlem},
+        {he},
     ),
     'linear': (
-        (wlem, ),
-        (dp, he, lem)
+        {wlem},
+        {dp, he, lem, dnse},
     ),
     'glpoa-cm': (
-        (lem, wlem),
-        (glpoa, dp, he, gmp),
-    )
+        {lem, wlem},
+        {glpoa, dp, he, gmp},
+    ),
+    'v-shape-const-term': (
+        {dnse, dnsu},
+        {wlem},
+    ),
+    'dnse-cm': (
+        {dp, glpoa},
+        {dnse, he},
+    ),
 }
 
 counter_models = {(holds, fails): cm for cm, fpair in models.items()
