@@ -6,7 +6,6 @@ formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp, dgp = \
           'lem  wlem  dp  he  dnsu  dnse  glpo  glpoa  gmp  dgp'.split()
 
 
-_______ = None
 formula_layout = '''\
           glpoa
                               lem                 glpo
@@ -17,30 +16,27 @@ formula_layout = '''\
                               wlem
 '''
 
+
 proofs = {
-        (lem, wlem):   'lem-wlem',
-        (dp, wlem):    'dp-wlem',
-        (he, wlem):    'he-wlem',
-        (lem, glpo):   'lem-glpo',
-        (glpo, lem):   'glpo-lem',
-        (glpoa, lem):  'glpoa-lem',
-        (glpoa, glpo): 'glpoa-glpo',
-        (dp, dnsu):    'dp-dnsu',
-        (glpoa, dnsu): 'glpoa-dnsu',
-        (he, dnse): 'he-dnse',
-        (gmp, dnse): 'gmp-dnse',
-        (gmp, dnsu): 'gmp-dnsu',
-        (dp, gmp): 'dp-gmp',
-        (gmp, wlem): 'gmp-wlem',
-        (dp, dgp): 'dp-dgp',
-        (he, dgp): 'he-dgp',
-        (dgp, wlem): 'dgp-wlem',
-        }
+    (lem, wlem):   'lem-wlem',
+    (dp, wlem):    'dp-wlem',
+    (he, wlem):    'he-wlem',
+    (lem, glpo):   'lem-glpo',
+    (glpo, lem):   'glpo-lem',
+    (glpoa, lem):  'glpoa-lem',
+    (glpoa, glpo): 'glpoa-glpo',
+    (dp, dnsu):    'dp-dnsu',
+    (glpoa, dnsu): 'glpoa-dnsu',
+    (he, dnse): 'he-dnse',
+    (gmp, dnse): 'gmp-dnse',
+    (gmp, dnsu): 'gmp-dnsu',
+    (dp, gmp): 'dp-gmp',
+    (gmp, wlem): 'gmp-wlem',
+    (dp, dgp): 'dp-dgp',
+    (he, dgp): 'he-dgp',
+    (dgp, wlem): 'dgp-wlem',
+}
 
-
-# Dictionary of models, to a pair of set. The first set is the formulae which
-# hold in the model as schemes, the second tuple is the formulae which fail for
-# certain instances.
 
 models = {
     'dp-cm-lobot': (
@@ -84,6 +80,7 @@ models = {
         {dgp},
     )
 }
+
 
 document = hieretikz_document(formulae, formula_layout, proofs, models)
 

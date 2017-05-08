@@ -1,13 +1,13 @@
 from constructive_hierarchy import *
 
-compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
+_compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
 def all_separations(models):
     return {(holds, fails): cm for cm, fpair in models.items()
                                for holds in fpair[0]
                                for fails in fpair[1]}
 
-@compose('\n'.join)
+@_compose('\n'.join)
 def string_node_layout_to_tikz(formula_layout):
     formulae = formula_layout.split()
     fmt = r'\node ({}) at ({}, {}) {{{}}};'
@@ -38,19 +38,19 @@ def _generate_tikz_edges(edge_set, arrow_type='', avoid_overlap=()):
             yield fmt.format('->', a, b)
         drawn.add((a, b))
 
-@compose('\n'.join)
+@_compose('\n'.join)
 def make_tikz_edges(strong_edges, weak_edges):
     yield from _generate_tikz_edges(spanning_tree(set(strong_edges)))
     yield from _generate_tikz_edges(weak_edges, 'dashed', strong_edges)
 
-@compose('\n'.join)
+@_compose('\n'.join)
 def make_tikz_diagram(formula_layout, strong_edges, weak_edges):
     yield r'\begin{tikzpicture}[line width=0.3mm, auto]'
     yield string_node_layout_to_tikz(formula_layout)
     yield make_tikz_edges(strong_edges, weak_edges)
     yield r'\end{tikzpicture}'
 
-@compose('\n'.join)
+@_compose('\n'.join)
 def make_tikz_questions(evaluated_weak_edges):
     yield r'\begin{multicols}{3} \noindent'
     order = lambda x: (min(x[1]), x[0])
@@ -58,7 +58,7 @@ def make_tikz_questions(evaluated_weak_edges):
         yield r'{:8s} $\implies$ {:8s} \quad {}\\'.format(*edge, rank)
     yield r'\end{multicols}'
 
-@compose('\n'.join)
+@_compose('\n'.join)
 def hieretikz_document(formulae, formula_layout, proofs, models):
     evaluated_weak_edges = find_evaluated_connections(
             formulae, set(proofs), set(all_separations(models)))
