@@ -27,44 +27,52 @@ proofs = {
         (glpoa, glpo): 'glpoa-glpo',
         (dp, dnsu):    'dp-dnsu',
         (glpoa, dnsu): 'glpoa-dnsu',
-#
         (he, dnse): 'he-dnse',
         (gmp, dnse): 'gmp-dnse',
         (gmp, dnsu): 'gmp-dnsu',
         (dp, gmp): 'dp-gmp',
+        (gmp, wlem): 'gmp-wlem',
         }
 
-#counter_models = {
-#        (dp, he):     'dp-/-he',
-#        (he, dp):     'he-/-dp',
-#        (lem, dp):    'lem-/-dp',
-#        (lem, he):    'lem-/-he',
-#        (lem, glpoa): 'lem-/-glpoa',
-#        (he, dnsu):   'he-/-dnsu',
-#        (dnsu, dp):   'dnsu-/-dp',
-##
-#        (dp, lem): 'dp-/-lem',
-#        (he, lem): 'he-/-lem',
-#        (dnse, dp): 'dnse-/-dp',
-#        (dp, dnse): 'dp-/-dnse',
-#        }
 
 # Dictionary of models, to a pair of tuples. First tuple is formulae which hold
 # in the model, second tuple is formulae which fail.
 # lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp
 
 models = {
-    'dp-cm-bot': ((he, lem, wlem, dnsu, dnse, glpo, glpoa, gmp),
-                  (dp)),
-    'he-cm-bot': ((dp, lem, wlem, dnsu, dnse, glpo, glpoa, gmp),
-                  (he)),
-    'linear':    ((wlem, ),
-                  (dp, he, lem)),
+    'dp-cm-lobot': (
+        (he, lem, wlem, dnsu, dnse, glpo, glpoa, gmp),
+        (dp, )
+    ),
+    'dp-cm': (
+        (he, wlem),
+        (dp, lem)
+    ),
+    'dp-cm-bottop': (
+        (he, ),
+        (dnsu, )
+    ),
+    'he-cm-lobot': (
+        (dp, lem, wlem, dnsu, dnse, glpo, glpoa, gmp),
+        (he, lem)
+    ),
+    'he-cm': (
+        (dp, wlem),
+        (he, )
+    ),
+    'linear': (
+        (wlem, ),
+        (dp, he, lem)
+    ),
+    'glpoa-cm': (
+        (lem, wlem),
+        (glpoa, dp, he, gmp),
+    )
 }
 
-counter_models = {(holds, fails) for _, fpair in models.items()
-                                 for holds in fpair[0]
-                                 for fails in fpair[1]}
+counter_models = {(holds, fails): cm for cm, fpair in models.items()
+                                     for holds in fpair[0]
+                                     for fails in fpair[1]}
 
 document = hieretikz_document(formulae, formula_layout, proofs, counter_models)
 
