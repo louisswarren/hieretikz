@@ -2,8 +2,8 @@ from hieretikz import *
 import subprocess
 from constructive_hierarchy import *
 
-formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp, dgp = \
-          'lem  wlem  dp  he  dnsu  dnse  glpo  glpoa  gmp  dgp'.split()
+formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp, dgp, efq = \
+          'lem  wlem  dp  he  dnsu  dnse  glpo  glpoa  gmp  dgp  efq'.split()
 
 
 formula_layout = '''\
@@ -38,13 +38,14 @@ proofs = {
 }
 
 
+
 models = {
     'dp-cm-lobot': (
         {he, lem, wlem, dnsu, dnse, glpo, glpoa, gmp},
         {dp},
     ),
     'dp-cm': (
-        {he, wlem},
+        {efq, he, wlem},
         {dp, lem},
     ),
     'dp-cm-bottop': (
@@ -56,11 +57,11 @@ models = {
         {he, lem},
     ),
     'he-cm': (
-        {dp, wlem},
+        {efq, dp, wlem},
         {he},
     ),
     'linear': (
-        {wlem, dgp},
+        {efq, wlem, dgp},
         {dp, he, lem, dnse},
     ),
     'glpoa-cm': (
@@ -68,19 +69,23 @@ models = {
         {glpoa, dp, he, gmp},
     ),
     'v-shape-const-term': (
-        {dnse, dnsu},
+        {efq, dnse, dnsu},
         {wlem, dgp},
     ),
     'dnse-cm': (
-        {dp, glpoa},
+        {efq, dp, glpoa},
         {dnse, he},
     ),
     'v-lobot': (
-        {lem},
+        {glpoa, lem},
         {dgp},
     )
 }
 
+
+# Over intuitionistic logic,
+#proofs.update({(lem, f): 'classical' for f in formulae})
+#models = {m: t for m, t in models.items() if efq in t[0]}
 
 document = hieretikz_document(formulae, formula_layout, proofs, models)
 

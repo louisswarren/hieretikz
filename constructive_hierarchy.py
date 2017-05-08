@@ -73,8 +73,7 @@ def evaluate_possible_edge(edge, vertices, edges, disconnections):
     '''Find the value of knowing about the existence of an edge.
 
     Returns a tuple, giving the number of possible connections eliminated if
-    the edge exists, and the number eliminated if the edge doesn't exist.
-    '''
+    the edge exists, and the number eliminated if the edge doesn't exist.'''
     evaluator = lambda x, y: len(find_possible_connections(vertices, x, y))
     unknown = evaluator(edges, disconnections)
     exists_learned = unknown - evaluator(edges | {edge}, disconnections)
