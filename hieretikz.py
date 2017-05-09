@@ -63,10 +63,10 @@ def hieretikz_document(formulae, formula_layout, proofs, models):
     evaluated_weak_edges = find_evaluated_connections(
             formulae, set(proofs), set(all_separations(models)))
     drawable_nodes = formula_layout.split()
-    drawable_proofs = ((a, b) for a, b in proofs
-                             if a in drawable_nodes and b in drawable_nodes)
-    drawable_weak = ((a, b) for a, b in evaluated_weak_edges
-                             if a in drawable_nodes and b in drawable_nodes)
+    drawable_proofs = {(a, b) for a, b in proofs
+                             if a in drawable_nodes and b in drawable_nodes}
+    drawable_weak = {(a, b) for a, b in evaluated_weak_edges
+                             if a in drawable_nodes and b in drawable_nodes}
     yield r'\documentclass{article}'
     yield r'\usepackage{tikz}'
     yield r'\usepackage{amsmath}'
