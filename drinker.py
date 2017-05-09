@@ -94,6 +94,8 @@ models = {
 # Over decidable minimal logic,
 #proofs.update({(efq, f): 'classical' for f in formulae})
 #models = {m: t for m, t in models.items() if lem in t[0]}
+#formula_layout = formula_layout.replace('     lem',
+#                                        'efq     ')
 
 document = hieretikz_document(formulae, formula_layout, proofs, models)
 
