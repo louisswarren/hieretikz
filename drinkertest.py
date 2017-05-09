@@ -58,7 +58,7 @@ models = {
     ),
     'he-cm': (
         {efq, dp, wlem},
-        {he},
+        {he, lem},
     ),
     'linear': (
         {efq, wlem, dgp},
@@ -90,6 +90,10 @@ models = {
 # Over intuitionistic logic,
 #proofs.update({(lem, f): 'classical' for f in formulae})
 #models = {m: t for m, t in models.items() if efq in t[0]}
+
+# Over decidable minimal logic,
+#proofs.update({(efq, f): 'classical' for f in formulae})
+#models = {m: t for m, t in models.items() if lem in t[0]}
 
 document = hieretikz_document(formulae, formula_layout, proofs, models)
 
