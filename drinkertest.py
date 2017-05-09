@@ -54,7 +54,7 @@ models = {
     ),
     'he-cm-lobot': (
         {dp, lem, wlem, dnsu, dnse, glpo, glpoa, gmp},
-        {he, lem},
+        {he},
     ),
     'he-cm': (
         {efq, dp, wlem},
