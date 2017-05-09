@@ -79,7 +79,11 @@ models = {
     'v-lobot': (
         {glpoa, lem},
         {dgp},
-    )
+    ),
+    'trivial-lobot': (
+        {f for f in formulae if f is not efq},
+        {efq},
+    ),
 }
 
 
