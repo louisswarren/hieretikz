@@ -91,12 +91,15 @@ models = {
 }
 
 
-# Over intuitionistic logic,
-#proofs.update({(lem, f): 'classical' for f in formulae})
-#models = {m: t for m, t in models.items() if efq in t[0]}
+# Over intuitionistic logic, lem implies every formula above, and efq is
+# derivable
+proofs.update({(lem, f): 'classical' for f in formulae})
+proofs.update({(f, efq): 'intuitionistic' for f in formulae})
+models = {m: t for m, t in models.items() if efq in t[0]}
 
 # Over decidable minimal logic,
 #proofs.update({(efq, f): 'classical' for f in formulae})
+#proofs.update({(f, lem): 'decidable' for f in formulae})
 #models = {m: t for m, t in models.items() if lem in t[0]}
 #formula_layout = formula_layout.replace('     lem',
 #                                        'efq     ')
