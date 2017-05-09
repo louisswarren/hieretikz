@@ -46,7 +46,7 @@ models = {
     ),
     'dp-cm': (
         {efq, he, wlem},
-        {dp, lem},
+        {dp, lem, dnsu},
     ),
     'dp-cm-bottop': (
         {he, wlem},
@@ -72,12 +72,16 @@ models = {
         {efq, dnse, dnsu},
         {wlem, dgp},
     ),
+    'dp-simple-cm': (
+        {lem},
+        {dnsu, dp, he},
+    ),
     'dnse-cm': (
-        {efq, dp, glpoa},
+        {efq, glpoa},
         {dnse, he},
     ),
     'v-lobot': (
-        {glpoa, lem},
+        {glpoa, lem, gmp},
         {dgp},
     ),
     'trivial-lobot': (
