@@ -105,8 +105,13 @@ int_models = {m: t for m, t in models.items() if efq in t[0]}
 
 intuitionistic_tex = hieretikz(formulae, formula_layout, int_proofs, int_models)
 
-document = hieretikz_document_wrap(
-        minimal_tex + '\n\\newpage\n' + intuitionistic_tex)
+document = hieretikz_document_wrap(r'''
+\section{Minimal Logic}
+''' + minimal_tex + r'''
+\newpage
+\section{Intuitionistic Logic}
+''' + intuitionistic_tex
+)
 
 with open('drinker.tex', 'w') as f:
     f.write(document)
