@@ -94,21 +94,19 @@ models = {
     ),
 }
 
+minimal_tex = hieretikz(formulae, formula_layout, proofs, models)
 
 # Over intuitionistic logic, lem implies every formula above, and efq is
 # derivable
-proofs.update({(lem, f): 'classical' for f in formulae})
-proofs.update({(f, efq): 'intuitionistic' for f in formulae})
-models = {m: t for m, t in models.items() if efq in t[0]}
+int_proofs = dict(proofs)
+int_proofs.update({(lem, f): 'classical' for f in formulae})
+int_proofs.update({(f, efq): 'intuitionistic' for f in formulae})
+int_models = {m: t for m, t in models.items() if efq in t[0]}
 
-# Over decidable minimal logic,
-#proofs.update({(efq, f): 'classical' for f in formulae})
-#proofs.update({(f, lem): 'decidable' for f in formulae})
-#models = {m: t for m, t in models.items() if lem in t[0]}
-#formula_layout = formula_layout.replace('     lem',
-#                                        'efq     ')
+intuitionistic_tex = hieretikz(formulae, formula_layout, int_proofs, int_models)
 
-document = hieretikz_document(formulae, formula_layout, proofs, models)
+document = hieretikz_document_wrap(
+        minimal_tex + '\n\\newpage\n' + intuitionistic_tex)
 
 with open('drinker.tex', 'w') as f:
     f.write(document)

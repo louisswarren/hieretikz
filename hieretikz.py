@@ -59,7 +59,7 @@ def make_tikz_questions(evaluated_weak_edges):
     yield r'\end{multicols}'
 
 @_compose('\n'.join)
-def hieretikz_document(formulae, formula_layout, proofs, models):
+def hieretikz(formulae, formula_layout, proofs, models):
     evaluated_weak_edges = find_evaluated_connections(
             formulae, set(proofs), set(all_separations(models)))
     drawable_nodes = formula_layout.split()
@@ -67,14 +67,24 @@ def hieretikz_document(formulae, formula_layout, proofs, models):
                              if a in drawable_nodes and b in drawable_nodes}
     drawable_weak = {(a, b) for a, b in evaluated_weak_edges
                              if a in drawable_nodes and b in drawable_nodes}
+    yield make_tikz_diagram(formula_layout, drawable_proofs, drawable_weak)
+    if evaluated_weak_edges:
+        yield r'\paragraph{}'
+        yield r'It remains to investigate:'
+        yield make_tikz_questions(evaluated_weak_edges)
+
+@_compose('\n'.join)
+def hieretikz_document_wrap(tex):
     yield r'\documentclass{article}'
     yield r'\usepackage{tikz}'
     yield r'\usepackage{amsmath}'
     yield r'\usepackage{fullpage}'
     yield r'\usepackage{multicol}'
     yield r'\begin{document}'
-    yield make_tikz_diagram(formula_layout, drawable_proofs, drawable_weak)
-    yield r'\paragraph{}'
-    yield r'It remains to investigate:'
-    yield make_tikz_questions(evaluated_weak_edges)
+    yield tex
     yield r'\end{document}'
+
+@_compose('\n'.join)
+def hieretikz_output_document(formulae, formula_layout, proofs, models):
+    tex = hieretikz(formulae, formula_layout, proofs, models)
+    yield hieretikz_document_wrap(tex)
