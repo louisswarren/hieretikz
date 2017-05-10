@@ -84,6 +84,10 @@ models = {
         {glpoa, lem, gmp},
         {dgp},
     ),
+    'diamond': (
+        {efq, wlem, gmp},
+        {dgp},
+    ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
         {efq},
