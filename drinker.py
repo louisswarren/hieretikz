@@ -110,4 +110,4 @@ document = hieretikz_document_wrap(
 
 with open('drinker.tex', 'w') as f:
     f.write(document)
-subprocess.Popen(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
+subprocess.call(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
