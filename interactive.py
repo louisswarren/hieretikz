@@ -6,7 +6,8 @@ def print_proof_path(path, proofs):
         if x != y:
             print('\t{} => {}{:>20}'.format(x, y, proofs[(x, y)]))
 
-def examine(a, b, proofs, separations):
+def examine(a, b, proofs, models):
+    separations = all_separations(models)
     connection = is_connected(a, b, proofs)
     if connection:
         print('{} => {}'.format(a, b))
@@ -28,14 +29,20 @@ def examine(a, b, proofs, separations):
             start, end, separations[(start, end)]))
         return
     print("Currently unknown.")
-    print("A separation requires a model satisfying one of")
-    print(set(upward_closure(a, set(proofs))))
-    print("but which is a counter-model for one of")
-    print(set(downward_closure(b, set(proofs))))
+    possible_models = {k for k in models if b in models[k][1]}
+    possible_counter_models = {k for k in models if a in models[k][0]}
+    if possible_models or possible_counter_models:
+        print("A separation would exist if it were shown that")
+        if possible_models:
+            print("{} holds in {}".format(a, ', or '.join(possible_models)))
+        if possible_models and possible_counter_models:
+            print("or")
+        if possible_counter_models:
+            print("{} fails in {}".format(b, ', or '.join(
+                possible_counter_models)))
 
 
-
-def repl(proofs, separations):
+def repl(proofs, models):
     while True:
         try:
             cmd = input('? ')
@@ -50,9 +57,8 @@ def repl(proofs, separations):
         if len(cmdlist) != 2:
             print('Invalid input.')
         else:
-            examine(*cmdlist, proofs, separations)
+            examine(*cmdlist, proofs, models)
         print()
 
-from drinkertest import proofs, models
-separations = all_separations(models)
-repl(proofs, separations)
+from drinker import proofs, models
+repl(proofs, models)
