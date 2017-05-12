@@ -8,13 +8,13 @@ def print_proof_path(path, proofs):
 
 def examine(a, b, proofs, models):
     separations = all_separations(models)
-    connection = is_connected(a, b, proofs)
+    connection = is_connected(a, b, frozenset(proofs))
     if connection:
         print('{} => {}'.format(a, b))
         print('Proof:')
         print_proof_path(connection, proofs)
         return
-    separation = is_separated(a, b, set(proofs), set(separations))
+    separation = is_separated(a, b, frozenset(proofs), frozenset(separations))
     if separation:
         presep, postsep = separation
         start = presep[0][0]
