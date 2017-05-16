@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from constructive_hierarchy import *
 from hieretikz import all_separations
 
@@ -49,6 +51,10 @@ def repl(proofs, models):
         try:
             cmd = input('? ')
         except EOFError:
+            print()
+            break
+        except KeyboardInterrupt:
+            print()
             break
         if not cmd:
             break
