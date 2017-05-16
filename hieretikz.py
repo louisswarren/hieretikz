@@ -68,7 +68,7 @@ def make_questions(evaluated_weak_edges):
 def hieretikz(formulae, formula_layout, proofs, models):
     '''Get hieretikz output.'''
     evaluated_weak_edges = find_evaluated_connections(
-            formulae, set(proofs), set(all_separations(models)))
+            formulae, frozenset(proofs), frozenset(all_separations(models)))
     drawable_nodes = formula_layout.split()
     drawable_proofs = {(a, b) for a, b in proofs
                              if a in drawable_nodes and b in drawable_nodes}

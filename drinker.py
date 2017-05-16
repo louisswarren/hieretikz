@@ -2,9 +2,10 @@ from hieretikz import *
 import subprocess
 from constructive_hierarchy import *
 
-formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp, dgp, efq = \
-          'lem  wlem  dp  he  dnsu  dnse  glpo  glpoa  gmp  dgp  efq'.split()
+formulae = lem, wlem, dp, dpn, he, dnsu, dnse, glpo, glpoa, gmp, wgmp, dgp, efq = \
+          'lem  wlem  dp  dpn  he  dnsu  dnse  glpo  glpoa  gmp  wgmp  dgp  efq'.split()
 
+formulae.remove(dpn)
 
 formula_layout = '''\
           glpoa
@@ -12,6 +13,7 @@ formula_layout = '''\
              dp                                he
                                     dgp
                      gmp
+                    wgmp
     dnsu                                                dnse
                               wlem
 '''
@@ -35,25 +37,29 @@ proofs = {
     (dp, dgp): 'dp-dgp',
     (he, dgp): 'he-dgp',
     (dgp, wlem): 'dgp-wlem',
+    (dp, dpn): 'dp-dpn',
+    (he, dpn): 'he-dpn',
+    (gmp, wgmp): 'gmp-wgmp',
+    (glpoa, wgmp): 'glpoa-wgmp',
 }
 
 
 
 models = {
     'dp-cm-lobot': (
-        {he, lem, wlem, dnsu, dnse, glpo, glpoa, gmp},
+        {he, lem, wlem, dnsu, dnse, glpo, glpoa, gmp, dpn},
         {dp},
     ),
     'dp-cm': (
         {efq, he, wlem},
-        {dp, lem, dnsu},
+        {dp, lem, dnsu, wgmp},
     ),
     'dp-cm-bottop': (
         {he, wlem},
         {dnsu},
     ),
     'he-cm-lobot': (
-        {dp, lem, wlem, dnsu, dnse, glpo, glpoa, gmp},
+        {dp, lem, wlem, dnsu, dnse, glpo, glpoa, gmp, dpn},
         {he},
     ),
     'he-cm': (
@@ -65,12 +71,12 @@ models = {
         {dp, he, lem, dnse},
     ),
     'glpoa-cm': (
-        {lem, wlem},
-        {glpoa, dp, he, gmp},
+        {lem, wlem, dpn},
+        {glpoa, dp, he, gmp, wgmp},
     ),
     'v-shape-const-term': (
         {efq, dnse, dnsu},
-        {wlem, dgp},
+        {wlem, dgp, wgmp},
     ),
     'dp-simple-cm': (
         {lem},
@@ -78,10 +84,10 @@ models = {
     ),
     'dnse-cm': (
         {efq, glpoa},
-        {dnse, he},
+        {dnse, dp, he},
     ),
     'v-lobot': (
-        {glpoa, lem, gmp},
+        {glpoa, lem, gmp, dpn},
         {dgp},
     ),
     'diamond': (
