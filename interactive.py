@@ -29,8 +29,10 @@ def examine(a, b, proofs, models):
             start, end, separations[(start, end)]))
         return
     print("Currently unknown.")
-    possible_models = {k for k in models if b in models[k][1]}
-    possible_counter_models = {k for k in models if a in models[k][0]}
+    possible_models = {k for k in models
+                       if b in models[k][1] and a not in models[k][1]}
+    possible_counter_models = {k for k in models
+                               if a in models[k][0] and b not in models[k][0]}
     if possible_models or possible_counter_models:
         print("A separation would exist if it were shown that")
         if possible_models:
