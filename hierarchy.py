@@ -23,30 +23,65 @@ class Multiedge:
         yield from self.tails
         yield self.head
 
-@compose(frozenset)
-def multiedge_set(*edge_args):
-    for edge_arg in edge_args:
-        yield Multiedge(*edge_arg)
+class MultiedgeSet:
+    def __init__(self, *edge_args):
+        self.edges = frozenset(Multiedge(*edge_arg) for edge_arg in edge_args)
 
+    def __iter__(self):
+        return iter(self.edges)
 
-def transient_closure_paths(paths, edges):
+def downward_closure_paths(paths, edges):
     found = {head: ((*tails, head), *(paths[t] for t in tails if paths[t]))
-             for *tails, head in edges if frozenset(tails).issubset(frozenset(paths))}
+             for *tails, head in edges if all(t in paths for t in tails)}
     if all(v in paths for v in found):
         return paths
     found.update(paths)
-    return transient_closure_paths(found, edges)
+    return downward_closure_paths(found, edges)
+
+def downward_closure(vertices, edges):
+    '''Find the downward closure of a set of vertices.
+
+    Returns a dictionary mapping each vertex in the downward closure to the
+    shortest tree path to that vertex. A tree path has the form
+
+        ((t1, ..., tn, d), treepath(vertices, t1), ..., treepath(vertices, tn))
+
+    where d is the vertex corresponding to the path, (t1, ..., tn, d) is
+    the last multiedge in the path, and treepath(vertex, tk) is a tree path
+    from the supplied vertex to the tk.'''
+    return downward_closure_paths({v: () for v in vertices}, edges)
 
 
+@compose(dict)
+def upward_closure(vertex, edges, visited=None):
+    yield vertex, ()
+    if not visited:
+        visited = (vertex,)
+    for *tails, head in edges:
+        if head == vertex:
+            for t in tails:
+                if t not in visited:
+                    for node, pathtree in upward_closure(t, edges, visited):
+                        pass
 
-
-
-edges = multiedge_set(
+edges = MultiedgeSet(
     (1, 2, 3),
     (4, 5),
     (2, 4),
     (3, 5, 6),
 )
+'''
+1   2
+ \ / \
+  v   \
+  |    4
+  3    |
+   \   5
+    \ /
+     v
+     |
+     6
+'''
 
 def print_path(path, level=0):
     print("Unpacking,", path)
@@ -55,17 +90,17 @@ def print_path(path, level=0):
     for s in successors:
         print_path(s, level + 1)
 
-print(transient_closure_paths({1: (), 2: ()}, edges))
+print(downward_closure_paths({1: (), 2: ()}, edges))
 import sys
 sys.exit()
-for v, v_path in (transient_closure_paths({1: ((1, 1),), 2: ((2, 2),)}, edges)).items():
+for v, v_path in (downward_closure_paths({1: ((1, 1),), 2: ((2, 2),)}, edges)).items():
     if v_path:
         print('{}:'.format(v))
         print_path(v_path)
     else:
         print('{}: trivial'.format(v))
 print()
-for v, v_path in (transient_closure_paths({2: ()}, edges)).items():
+for v, v_path in (downward_closure_paths({2: ()}, edges)).items():
     if v_path:
         print('{}:'.format(v))
         print_path(v_path)
