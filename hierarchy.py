@@ -60,14 +60,6 @@ def all_edges(edges):
         if len(b) > 1:
             for root in common_roots(a, flattened):
                 yield root, b
-# NOT SUFFICIENT: DOES NOT GIVE {1,2} -> {3,4}
-'''
-We convert a multigraph (graph in which edges have multiple tails, and
-connection is conjunctive) into a graph, where vertices correspond to sets of vertices in the multigraph. Conversion occurs in three stages:
-(1) Flattening the edges
-    - For each multiedge (t1, ..., tn, h) create an edge ({t1, ... tn}, {h})
-    - For each occupiable superposition of vertices in the multigraph (i.e. sets
-'''
 
 
 for e in flat_edges(edges):
