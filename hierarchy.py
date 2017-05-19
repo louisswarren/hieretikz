@@ -21,6 +21,33 @@ def downward_closure(vertices, edges):
     from the supplied vertex to the tk.'''
     return downward_closure_paths({v: () for v in vertices}, edges)
 
+def is_subset_of_downward_closure(vertices, wertices, edges):
+    '''Checks if vertices is a subset of the downward closure of wertices.
+
+    Returns a (truthy) pathtree if it is, or False otherwise. Result is
+    calculated lazily.'''
+    raise NotImplementedError
+
+def is_superior(vertices, wertices, edges):
+    dc = downward_closure(vertices, edges)
+    if wertices.issubset(frozenset(dc)):
+        return tuple(dc[w] for w in wertices)
+    else:
+        return False
+
+def is_separated(vertices, wertices, edges, separations):
+    for low_tier, high_tier in separations:
+        vpath = is_superior(low_tier, vertices, edges)
+        if vpath is False:
+            continue
+        for high in high_tier:
+            wpath = is_superior(wertices, frozenset({high}), edges)
+            if wpath is not False:
+                return vpath, wpath
+    return False
+
+
+
 def multiedgeset(*edge_tuples):
     return frozenset((frozenset(tails), head) for *tails, head in edge_tuples)
 
@@ -67,3 +94,8 @@ for dest, pathtree in sorted(dc.items()):
     print('{}:'.format(dest))
     if pathtree:
         print(str_pathtree(pathtree, 1))
+
+print(is_superior({1,2}, {6}, edges))
+assert(is_superior({1,2}, {6}, edges))
+assert(is_separated({5}, {2}, edges, [({3, 5}, {4})]))
+assert(is_separated({6}, {2}, edges, [({3, 5}, {4})]))
