@@ -1,8 +1,8 @@
 compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
 def downward_closure_paths(paths, edges):
-    found = {head: ((tails, head), *(paths[t] for t in tails if paths[t]))
-             for tails, head in edges if all(t in paths for t in tails)}
+    found = {head: ((*tails, head), *(paths[t] for t in tails if paths[t]))
+             for *tails, head in edges if all(t in paths for t in tails)}
     if all(v in paths for v in found):
         return paths
     found.update(paths)
@@ -46,17 +46,12 @@ def is_separated(vertices, wertices, edges, separations):
                 return vpath, wpath
     return False
 
-
-
-def multiedgeset(*edge_tuples):
-    return frozenset((frozenset(tails), head) for *tails, head in edge_tuples)
-
-edges = multiedgeset(
+edges = frozenset((
     (1, 2, 3),
     (4, 5),
     (2, 4),
     (3, 5, 6),
-)
+))
 
 # edges represent the following hierarchy:
 #
@@ -73,7 +68,7 @@ edges = multiedgeset(
 #
 
 def str_edge(edge):
-    tails, head = edge
+    *tails, head = edge
     return '{{{}}} -> {}'.format(', '.join(sorted(map(str, tails))), head)
 
 @compose('\n'.join)
@@ -84,18 +79,20 @@ def str_pathtree(pathtree, level=0):
         yield from (str_pathtree(s, level + 1) for s in successors)
 
 
-print("Using edges:")
-for edge in sorted(edges):
-    print(str_edge(edge))
+if __name__ == '__main__':
+    print("Using edges:")
+    for edge in sorted(edges):
+        print(str_edge(edge))
 
 
-dc = downward_closure(frozenset((1, 2)), edges)
-for dest, pathtree in sorted(dc.items()):
-    print('{}:'.format(dest))
-    if pathtree:
-        print(str_pathtree(pathtree, 1))
+    dc = downward_closure(frozenset((1, 2)), edges)
+    for dest, pathtree in sorted(dc.items()):
+        print('{}:'.format(dest))
+        if pathtree:
+            print(str_pathtree(pathtree, 1))
 
-print(is_superior({1,2}, {6}, edges))
-assert(is_superior({1,2}, {6}, edges))
-assert(is_separated({5}, {2}, edges, [({3, 5}, {4})]))
-assert(is_separated({6}, {2}, edges, [({3, 5}, {4})]))
+    print(is_superior({1,2}, {6}, edges))
+    print(is_separated({6}, {2}, edges, [({3, 5}, {4})]))
+    assert(is_superior({1,2}, {6}, edges))
+    assert(is_separated({5}, {2}, edges, [({3, 5}, {4})]))
+    assert(is_separated({6}, {2}, edges, [({3, 5}, {4})]))

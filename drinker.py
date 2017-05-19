@@ -94,7 +94,7 @@ models = {
     ),
 }
 
-minimal_tex = hieretikz(formulae, formula_layout, proofs, models)
+minimal_tex = hieretikz(formulae, formula_layout, proofs, models.values())
 
 # Over intuitionistic logic, lem implies every formula above, and efq is
 # derivable
@@ -103,7 +103,7 @@ int_proofs.update({(lem, f): 'classical' for f in formulae})
 int_proofs.update({(f, efq): 'intuitionistic' for f in formulae})
 int_models = {m: t for m, t in models.items() if efq in t[0]}
 
-intuitionistic_tex = hieretikz(formulae, formula_layout, int_proofs, int_models)
+intuitionistic_tex = hieretikz(formulae, formula_layout, int_proofs, int_models.values())
 
 document = hieretikz_document_wrap(r'''
 \section{Minimal Logic}
