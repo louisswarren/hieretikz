@@ -57,9 +57,8 @@ def all_edges(edges):
     flattened = flat_edges(edges)
     yield from flattened
     for a, b in flattened:
-        if len(b) > 1:
-            for root in common_roots(a, flattened):
-                yield root, b
+        for root in common_roots(a, flattened):
+            yield root, b
 
 
 for e in flat_edges(edges):
