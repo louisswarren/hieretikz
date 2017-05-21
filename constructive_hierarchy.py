@@ -43,9 +43,7 @@ def find_possible_connections(vertices, edges, models):
 
     Finds all edges that would connect currently disconnected vertices, and
     that can be added without connecting any pairs in disconnections.'''
-    return {(a, b) for a in vertices for b in vertices
-            if not is_connected(a, b, edges)
-            if not hierarchy.is_separated({a}, {b}, edges, models)}
+    return hierarchy.find_possible_connections(vertices, edges, models)
 
 def is_redundant_edge(edge, edges):
     '''Give alternate path if one exists.'''

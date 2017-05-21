@@ -58,7 +58,7 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
     return {(*free, *tails, head)
             for r in range(1, order + 1)
             for head in vertices
-            for tails in itertools.product(vertices, repeat=r)
+            for tails in itertools.combinations(vertices, r)
             if not is_superior({*free, *tails}, {head}, edges)
             if not is_separated({*free, *tails}, {head}, edges, separations)}
 
@@ -97,19 +97,19 @@ if __name__ == '__main__':
             yield from (str_pathtree(s, level + 1) for s in successors)
 
 
-    print("Using edges:")
-    for edge in sorted(edges):
-        print(str_edge(edge))
-
-
-    dc = downward_closure(frozenset((1, 2)), edges)
-    for dest, pathtree in sorted(dc.items()):
-        print('{}:'.format(dest))
-        if pathtree:
-            print(str_pathtree(pathtree, 1))
-
-    print(is_superior({1,2}, {6}, edges))
-    print(is_separated({6}, {2}, edges, [({3, 5}, {4})]))
+    models = [({3, 5}, {4})]
     assert(is_superior({1,2}, {6}, edges))
-    assert(is_separated({5}, {2}, edges, [({3, 5}, {4})]))
-    assert(is_separated({6}, {2}, edges, [({3, 5}, {4})]))
+    assert(is_separated({5}, {2}, edges, models))
+
+    models = [
+            ({3, 4, 5, 6}, {1, 2}),
+            ({3, 5, 6}, {1, 2, 4}),
+            ({4, 5, 6}, {1, 2, 3}),
+            ({6}, {1, 2, 3, 4, 5}),
+            ({3}, {5}),
+            ({5}, {3}),
+    ]
+    assert(is_separated({6}, {2}, edges, models))
+    for con in sorted(find_possible_connections(range(1, 7), edges, models, (), 2)):
+        print(str_edge(con))
+
