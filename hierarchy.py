@@ -1,3 +1,5 @@
+import itertools
+
 compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
 def downward_closure_paths(paths, edges):
@@ -51,9 +53,14 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
 
     An edge can be added if it does not connect any separated vertices.
     Searches only for edges with up to order-many tails. Vertices listed in
-    free do not count towards the number of tails. 
+    free do not count towards the number of tails.
     '''
-    raise NotImplementedError
+    return {(*free, *tails, head)
+            for r in range(1, order + 1)
+            for head in vertices
+            for tails in itertools.product(vertices, repeat=r)
+            if not is_superior({*free, *tails}, {head}, edges)
+            if not is_separated({*free, *tails}, {head}, edges, separations)}
 
 
 if __name__ == '__main__':
