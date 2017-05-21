@@ -46,40 +46,50 @@ def is_separated(vertices, wertices, edges, separations):
                 return vpath, wpath
     return False
 
-edges = frozenset((
-    (1, 2, 3),
-    (4, 5),
-    (2, 4),
-    (3, 5, 6),
-))
+def find_possible_connections(vertices, edges, separations, free=(), order=1):
+    '''Find edges which can be added to the hierarchy.
 
-# edges represent the following hierarchy:
-#
-#   1   2
-#    \ / \
-#     v   \
-#     |    4
-#     3    |
-#      \   5
-#       \ /
-#        v
-#        |
-#        6
-#
-
-def str_edge(edge):
-    *tails, head = edge
-    return '{{{}}} -> {}'.format(', '.join(sorted(map(str, tails))), head)
-
-@compose('\n'.join)
-def str_pathtree(pathtree, level=0):
-    if pathtree:
-        edge, *successors = pathtree
-        yield '\t' * level + str_edge(edge)
-        yield from (str_pathtree(s, level + 1) for s in successors)
+    An edge can be added if it does not connect any separated vertices.
+    Searches only for edges with up to order-many tails. Vertices listed in
+    free do not count towards the number of tails. 
+    '''
+    raise NotImplementedError
 
 
 if __name__ == '__main__':
+    edges = frozenset((
+        (1, 2, 3),
+        (4, 5),
+        (2, 4),
+        (3, 5, 6),
+    ))
+
+    # edges represent the following hierarchy:
+    #
+    #   1   2
+    #    \ / \
+    #     v   \
+    #     |    4
+    #     3    |
+    #      \   5
+    #       \ /
+    #        v
+    #        |
+    #        6
+    #
+
+    def str_edge(edge):
+        *tails, head = edge
+        return '{{{}}} -> {}'.format(', '.join(sorted(map(str, tails))), head)
+
+    @compose('\n'.join)
+    def str_pathtree(pathtree, level=0):
+        if pathtree:
+            edge, *successors = pathtree
+            yield '\t' * level + str_edge(edge)
+            yield from (str_pathtree(s, level + 1) for s in successors)
+
+
     print("Using edges:")
     for edge in sorted(edges):
         print(str_edge(edge))
