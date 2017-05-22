@@ -28,13 +28,12 @@ def tikzify_edges(edge_set, arrow_type='', avoid_overlap=()):
     '''
     avoid_overlap = list(avoid_overlap)
     if arrow_type:
-        fmt = r'\draw[' + arrow_type + r', {}] ({}) to node {{}} ({});'
+        fmt = r'\draw[' + arrow_type + r', {}] ({}) -- ({}) node[midway,sloped,left,rotate=270] {{{}}};'
     else:
-        fmt = r'\draw[{}] ({}) to node {{}} ({});'
+        fmt = r'\draw[{}] ({}) -- ({}) node[midway,sloped,left,rotate=270] {{{}}};'
     drawn = set()
-    for a, *labels, b in edge_set:
-        if labels:
-            print("Failed to draw label")
+    for a, *label_names, b in edge_set:
+        label = ', '.join(label_names)
         if (b, a) in drawn:
             continue
         elif (b, a) in edge_set:
@@ -44,9 +43,9 @@ def tikzify_edges(edge_set, arrow_type='', avoid_overlap=()):
         if (a, b) in avoid_overlap or (b, a) in avoid_overlap:
             count = avoid_overlap.count((a, b)) + avoid_overlap.count((b, a))
             bend = 'bend left={},'.format(20 * count)
-            yield fmt.format(bend + arrow, a, b)
+            yield fmt.format(bend + arrow, a, b, label)
         else:
-            yield fmt.format(arrow, a, b)
+            yield fmt.format(arrow, a, b, label)
         drawn.add((a, b))
 
 @_compose('\n'.join)
