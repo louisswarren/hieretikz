@@ -1,4 +1,4 @@
-from constructive_hierarchy import *
+from hierarchy import *
 
 _compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 

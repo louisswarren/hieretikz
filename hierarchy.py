@@ -52,10 +52,10 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
     '''Find edges which can be added to the hierarchy.
 
     An edge can be added if it does not connect any separated vertices.
-    Searches only for edges with up to order-many tails. Vertices listed in
-    free do not count towards the number of tails.
+    Searches only for edges with order-many tails. Vertices listed in free do
+    not count towards the number of tails.
     '''
-    return {(*free, *tails, head)
+    return {(*tails, *free, head)
             for r in range(1, order + 1)
             for head in vertices
             for tails in itertools.combinations(vertices, r)
@@ -63,53 +63,31 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
             if not is_separated({*free, *tails}, {head}, edges, separations)}
 
 
-if __name__ == '__main__':
-    edges = frozenset((
-        (1, 2, 3),
-        (4, 5),
-        (2, 4),
-        (3, 5, 6),
-    ))
+def is_redundant_edge(edge, edges):
+    '''Give alternate path if one exists.'''
+    a, b = edge
+    return is_superior({a}, {b}, frozenset(edges) - {edge})
 
-    # edges represent the following hierarchy:
-    #
-    #   1   2
-    #    \ / \
-    #     v   \
-    #     |    4
-    #     3    |
-    #      \   5
-    #       \ /
-    #        v
-    #        |
-    #        6
-    #
-
-    def str_edge(edge):
-        *tails, head = edge
-        return '{{{}}} -> {}'.format(', '.join(sorted(map(str, tails))), head)
-
-    @compose('\n'.join)
-    def str_pathtree(pathtree, level=0):
-        if pathtree:
-            edge, *successors = pathtree
-            yield '\t' * level + str_edge(edge)
-            yield from (str_pathtree(s, level + 1) for s in successors)
+def spanning_tree(edges):
+    '''Find a spanning tree for a graph.'''
+    for edge in sorted(edges):
+        if is_redundant_edge(edge, edges):
+            return spanning_tree(frozenset(edges) - {edge})
+    return edges
 
 
-    models = [({3, 5}, {4})]
-    assert(is_superior({1,2}, {6}, edges))
-    assert(is_separated({5}, {2}, edges, models))
+def evaluate_possible_edge(edge, vertices, edges, models):
+    '''Find the value of knowing about the existence of an edge.
 
-    models = [
-            ({3, 4, 5, 6}, {1, 2}),
-            ({3, 5, 6}, {1, 2, 4}),
-            ({4, 5, 6}, {1, 2, 3}),
-            ({6}, {1, 2, 3, 4, 5}),
-            ({3}, {5}),
-            ({5}, {3}),
-    ]
-    assert(is_separated({6}, {2}, edges, models))
-    for con in sorted(find_possible_connections(range(1, 7), edges, models, (), 2)):
-        print(str_edge(con))
+    Returns a tuple, giving the number of possible connections eliminated if
+    the edge exists, and the number eliminated if the edge doesn't exist.'''
+    return 0, 0
 
+def find_evaluated_connections(vertices, edges, models):
+    '''Find all new consistent connecting edges and their evaluations.
+
+    Finds all edges that would connect currently disconnected vertices, and
+    that can be added without connecting any pairs in disconnections. The
+    evaluations of the edges are given by evaluate_possible_edge.'''
+    return {e: evaluate_possible_edge(e, vertices, edges, models)
+            for e in find_possible_connections(vertices, edges, models)}
