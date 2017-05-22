@@ -2,8 +2,9 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = lem, wlem, dp, he, dnsu, dnse, glpo, glpoa, gmp, dgp, efq = \
-          'lem  wlem  dp  he  dnsu  dnse  glpo  glpoa  gmp  dgp  efq'.split()
+formulae = 'lem wlem dp he dnsu dnse glpo glpoa gmp dgp'.split()
+globals().update({f: f for f in formulae})
+efq = 'efq'
 
 
 formula_layout = '''\
