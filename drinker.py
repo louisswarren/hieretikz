@@ -38,8 +38,7 @@ proofs = {
     (dgp, wlem): 'dgp-wlem',
 }
 
-proofs.update({(lem, efq, f): 'classical' for f in formulae})
-
+int_only_proofs = {(lem, efq, f): 'classical' for f in formulae}
 
 models = {
     'dp-cm-lobot': (
@@ -87,7 +86,7 @@ models = {
         {dgp},
     ),
     'diamond': (
-        {efq, wlem, gmp},
+        {wlem, gmp},
         {dgp},
     ),
     'trivial-lobot': (
@@ -96,38 +95,31 @@ models = {
     ),
 }
 
-#minimal_tex = hieretikz(formulae, formula_layout, proofs, models.values())
-#
-## Over intuitionistic logic, lem implies every formula above, and efq is
-## derivable
-#int_proofs = dict(proofs)
-#int_proofs.update({(lem, f): 'classical' for f in formulae})
-#int_proofs.update({(f, efq): 'intuitionistic' for f in formulae})
-#int_models = {m: t for m, t in models.items() if efq in t[0]}
-#
-#intuitionistic_tex = hieretikz(formulae, formula_layout, int_proofs, int_models.values())
-#
-#document = hieretikz_document_wrap(r'''
-#\section{Minimal Logic}
-#''' + minimal_tex + r'''
-#\newpage
-#\section{Intuitionistic Logic}
-#''' + intuitionistic_tex
-#)
+int_models = {k: v for k, v in models.items() if efq in v[0]}
 
 span_proofs = list(spanning_tree(proofs.keys()))
 weak_edges = list(find_possible_connections(formulae, proofs, models.values()))
+span_int_only_proofs = list(spanning_tree(int_only_proofs.keys()))
 weak_int_edges = list(find_possible_connections(
-    formulae, proofs, models.values(), (efq, )))
+    formulae, set(proofs) | set(int_only_proofs), models.values(), (efq, )))
 
 tikz_nodes = string_node_layout_to_tikz(formula_layout)
+
 tikz_pf_edges = tikzify_edges(span_proofs)
-tikz_weak_edges = tikzify_edges(weak_edges, 'dashed', span_proofs)
-tikz_weak_int_edges = tikzify_edges(weak_int_edges, 'dotted', span_proofs)
+drawn = span_proofs
+
+tikz_pf_int_only_edges = tikzify_edges(span_int_only_proofs, '', drawn)
+drawn += span_int_only_proofs
+
+tikz_weak_edges = tikzify_edges(weak_edges, 'dashed', drawn)
+drawn += weak_edges
+
+tikz_weak_int_edges = tikzify_edges(weak_int_edges, 'dotted', drawn)
+drawn += weak_int_edges
 
 diagram = make_tikz_diagram(tikz_nodes, tikz_pf_edges, tikz_weak_edges, tikz_weak_int_edges)
 document = make_latex_document(diagram)
 
 with open('drinker.tex', 'w') as f:
     f.write(document)
-subprocess.call(['pdflatex', 'drinker.tex'])#, stdout=subprocess.DEVNULL)
+subprocess.call(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
