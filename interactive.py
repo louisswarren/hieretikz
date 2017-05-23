@@ -62,6 +62,8 @@ def repl(proofs, models):
             cmdlist = list(map(str.strip, cmd.split(',')))
         elif ' ' in cmd:
             cmdlist = cmd.split()
+        else:
+            cmdlist = []
         if len(cmdlist) != 2:
             print('Invalid input.')
         else:
