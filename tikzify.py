@@ -26,11 +26,12 @@ def tikzify_edges(edge_set, arrow_type='', avoid_overlap=()):
     avoid_overlap, by bending arrows. Duplicate listings in avoid_overlap will
     cause further avoidance by further bending.
     '''
-    avoid_overlap = list(avoid_overlap)
+    avoid_overlap = [(a, b) for a, *t, b in avoid_overlap]
     if arrow_type:
         fmt = r'\draw[' + arrow_type + r', {}] ({}) -- ({}) node[midway,sloped,left,rotate=270] {{{}}};'
     else:
-        fmt = r'\draw[{}] ({}) -- ({}) node[midway,sloped,left,rotate=270] {{{}}};'
+        fmt = r'\draw[{}] ({}) -- ({}) node[midway,left] {{{}}};'
+#\draw[dotted, ->] (wlem) to[bend left=30] node[midway, sloped] {efq} (dgp);
     drawn = set()
     for a, *label_names, b in edge_set:
         label = ', '.join(label_names)
@@ -44,8 +45,14 @@ def tikzify_edges(edge_set, arrow_type='', avoid_overlap=()):
             count = avoid_overlap.count((a, b)) + avoid_overlap.count((b, a))
             bend = 'bend left={},'.format(20 * count)
             yield fmt.format(bend + arrow, a, b, label)
+            if a in ('wlem', 'dgp') and b in ('wlem', 'dgp'):
+                print('drawing with', count)
+                print(fmt.format(bend + arrow, a, b, label))
         else:
             yield fmt.format(arrow, a, b, label)
+            if a in ('wlem', 'dgp') and b in ('wlem', 'dgp'):
+                print('drawing', a, label_names, b)
+                print(avoid_overlap)
         drawn.add((a, b))
 
 @_compose('\n'.join)
