@@ -2,7 +2,7 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'lem wlem dp he dnsu dnse glpo glpoa gmp dgp'.split()
+formulae = 'lem wlem dp he dnsu dnse glpo glpoa gmp wgmp dgp'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
@@ -13,6 +13,7 @@ formula_layout = '''\
              dp                                he
                                     dgp
                      gmp
+                     wgmp
     dnsu                                                dnse
                               wlem
 '''
@@ -36,6 +37,8 @@ proofs = {
     (dp, dgp): 'dp-dgp',
     (he, dgp): 'he-dgp',
     (dgp, wlem): 'dgp-wlem',
+    (gmp, wgmp): 'gmp-wgmp',
+    (glpoa, wgmp): 'glpoa-wgmp',
 }
 
 models = {
@@ -45,7 +48,7 @@ models = {
     ),
     'dp-cm': (
         {efq, he, wlem},
-        {dp, lem, dnsu},
+        {dp, lem, dnsu, wgmp},
     ),
     'dp-cm-bottop': (
         {he, wlem},
@@ -65,11 +68,11 @@ models = {
     ),
     'glpoa-cm': (
         {lem, wlem},
-        {glpoa, dp, he, gmp},
+        {glpoa, dp, he, gmp, wgmp},
     ),
     'v-shape-const-term': (
         {efq, dnse, dnsu},
-        {wlem, dgp},
+        {wlem, dgp, wgmp},
     ),
     'dp-simple-cm': (
         {lem},
@@ -96,9 +99,9 @@ models = {
 possible_edges = find_possible_connections(formulae, proofs, models.values())
 
 int_models = {k: v for k, v in models.items() if efq in v[0]}
-dne_proofs = {(lem, efq, f): 'classical' for f in formulae}
+
 int_proofs = dict(proofs)
-int_proofs.update(dne_proofs)
+int_proofs.update({(lem, f): 'classical' for f in formulae})
 int_possible_edges = find_possible_connections(
                      formulae, int_proofs, int_models.values())
 
@@ -108,7 +111,8 @@ minimal_diagram.add_edges(spanning_tree(set(proofs)))
 minimal_diagram.add_edges(possible_edges, 'dashed')
 
 efq_diagram = TikzHierarchy(minimal_diagram)
-efq_diagram.add_edges(spanning_tree(set(dne_proofs), set(proofs)), 'dotted')
+efq_proofs = {(lem, efq, f): 'classical' for f in formulae}
+efq_diagram.add_edges(spanning_tree(set(efq_proofs), set(proofs)), 'dotted')
 
 int_diagram = TikzHierarchy()
 int_diagram.add_string_node_layout(formula_layout)
