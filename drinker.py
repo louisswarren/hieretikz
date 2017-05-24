@@ -90,6 +90,10 @@ models = {
         {efq, wlem, gmp},
         {dgp},
     ),
+    'const-term-two-world': (
+        {efq, dp, he},
+        {lem},
+    ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
         {efq},
@@ -97,28 +101,34 @@ models = {
 }
 
 possible_edges = find_possible_connections(formulae, proofs, models.values())
-
-int_models = {k: v for k, v in models.items() if efq in v[0]}
-
-int_proofs = dict(proofs)
-int_proofs.update({(lem, f): 'classical' for f in formulae})
-int_possible_edges = find_possible_connections(
-                     formulae, int_proofs, int_models.values())
-
 minimal_diagram = TikzHierarchy()
 minimal_diagram.add_string_node_layout(formula_layout)
 minimal_diagram.add_edges(spanning_tree(set(proofs)))
 minimal_diagram.add_edges(possible_edges, 'dashed')
 
+
 efq_diagram = TikzHierarchy(minimal_diagram)
 efq_proofs = {(lem, efq, f): 'classical' for f in formulae}
 efq_diagram.add_edges(spanning_tree(set(efq_proofs), set(proofs)), 'dotted')
 
+
+int_proofs = dict(proofs)
+int_models = {k: v for k, v in models.items() if efq in v[0]}
+int_proofs.update({(lem, f): 'classical' for f in formulae})
+int_possible_edges = find_possible_connections(
+                     formulae, int_proofs, int_models.values())
 int_diagram = TikzHierarchy()
 int_diagram.add_string_node_layout(formula_layout)
 int_diagram.add_edges(spanning_tree(set(int_proofs)))
 int_diagram.add_edges(int_possible_edges, 'dashed')
 
+
+two_possible_edges = find_possible_connections(
+                         formulae, proofs, models.values(), free=(), order=2)
+two_diagram = TikzHierarchy()
+two_diagram.add_string_node_layout(formula_layout)
+two_diagram.add_edges(spanning_tree(set(proofs)))
+two_diagram.add_edges(two_possible_edges, 'dashed')
 
 tex = R'''
 \section*{Minimal Logic}
@@ -126,7 +136,9 @@ tex = R'''
 \section*{Minimal Logic with EFQ links}
 ''' + str(efq_diagram) + R'''
 \section*{Intuitionistic Logic}
-''' + str(int_diagram)
+''' + str(int_diagram) + '''
+\section*{Minimal Logic - Two-premise Possibilities}
+''' + str(two_diagram)
 
 document = make_latex_document(tex)
 
