@@ -4,13 +4,23 @@ class TikzException(Exception):
     pass
 
 class TikzHierarchy:
-    def __init__(self, options='line width=0.3mm, auto'):
-        self.tikz = []
-        self.nodes = []
-        self.edges = []
-        self.options = options
+    '''Represent a hierarchy using Tikz.'''
+
+    def __init__(self, hierarchy=None, *, options='line width=0.3mm, auto'):
+        '''Initialize, creating a copy of the hierarchy if provided.'''
+        if hierarchy:
+            self.tikz = list(hierarchy.tikz)
+            self.nodes = list(hierarchy.nodes)
+            self.edges = list(hierarchy.edges)
+            self.options = options if options else hierarchy.options
+        else:
+            self.tikz = []
+            self.nodes = []
+            self.edges = []
+            self.options = options
 
     def add_node(self, node, x, y, node_str=None):
+        '''Add a node to the hierarchy diagram.'''
         if node in self.nodes:
             raise TikzException('Node already in diagram')
         node_str = node_str or node
@@ -19,6 +29,7 @@ class TikzHierarchy:
         self.nodes.append(node)
 
     def add_string_node_layout(self, node_layout):
+        '''Add all nodes and positions from a string diagram.'''
         nodes = node_layout.split()
         for row_num, row in enumerate(node_layout.split('\n')):
             col_num = 0
@@ -31,17 +42,23 @@ class TikzHierarchy:
                     col_num += len(node)
 
     def add_edge(self, a, b, arrow_type='->', label=''):
+        '''Add an edge to the hierarchy diagram, avoiding overlapping.'''
         if label:
             fmt = ('\\draw[{}] ({}) to[{}] node[midway, sloped] {{' +
                    label + '}} ({});')
         else:
             fmt = '\\draw[{}] ({}) to[{}] ({});'
         count = self.edges.count((a, b)) + self.edges.count((b, a))
-        bend = 'bend left={}'.format(count) if count else ''
+        bend = 'bend left={}'.format(count * 20) if count else ''
         self.tikz.append(fmt.format(arrow_type, a, bend, b))
         self.edges.append((a, b))
 
-    def add_labelled_edges(self, edges, arrow_extras='', labeller=', '.join):
+    def add_edges(self, edges, arrow_extras='', labeller=', '.join):
+        '''Add a set of (labelled) edges to the hierarchy diagram.
+
+        A labelled edge is a tuple (a, label0, ..., labeln, b), where a is the
+        tail, b is the head and (optional) label0 ... labeln are labels for the
+        edge.'''
         drawn = set()
         for a, *label_args, b in edges:
             label = labeller(label_args)
@@ -65,7 +82,6 @@ class TikzHierarchy:
 
     def __str__(self):
         return self.make_diagram()
-
 
 @_compose('\n'.join)
 def make_columned_text(*text, fmt='{}', columns=3):

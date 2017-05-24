@@ -84,7 +84,7 @@ models = {
         {dgp},
     ),
     'diamond': (
-        {wlem, gmp},
+        {efq, wlem, gmp},
         {dgp},
     ),
     'trivial-lobot': (
@@ -93,26 +93,38 @@ models = {
     ),
 }
 
+possible_edges = find_possible_connections(formulae, proofs, models.values())
+
 int_models = {k: v for k, v in models.items() if efq in v[0]}
-int_only_proofs = {(lem, efq, f): 'classical' for f in formulae}
+dne_proofs = {(lem, efq, f): 'classical' for f in formulae}
 int_proofs = dict(proofs)
-int_proofs.update(int_only_proofs)
+int_proofs.update(dne_proofs)
+int_possible_edges = find_possible_connections(
+                     formulae, int_proofs, int_models.values())
 
-span_proofs = spanning_tree(proofs.keys())
-span_int_only_proofs = spanning_tree(int_proofs) - set(span_proofs)
-weak_edges = list(find_possible_connections(formulae, proofs, models.values()))
-weak_int_edges = list(find_possible_connections(
-    formulae, set(proofs) | set(int_only_proofs), models.values(), (efq, )))
+minimal_diagram = TikzHierarchy()
+minimal_diagram.add_string_node_layout(formula_layout)
+minimal_diagram.add_edges(spanning_tree(set(proofs)))
+minimal_diagram.add_edges(possible_edges, 'dashed')
 
-diagram = TikzHierarchy()
-diagram.add_string_node_layout(formula_layout)
-diagram.add_labelled_edges(span_proofs, 'dotted')
-diagram.add_labelled_edges(span_int_only_proofs)
-diagram.add_labelled_edges(weak_edges, 'dashed')
-#diagram.add_labelled_edges(weak_int_edges, 'dashed')
+efq_diagram = TikzHierarchy(minimal_diagram)
+efq_diagram.add_edges(spanning_tree(set(dne_proofs), set(proofs)), 'dotted')
+
+int_diagram = TikzHierarchy()
+int_diagram.add_string_node_layout(formula_layout)
+int_diagram.add_edges(spanning_tree(set(int_proofs)))
+int_diagram.add_edges(int_possible_edges, 'dashed')
 
 
-document = make_latex_document(diagram.make_diagram())
+tex = R'''
+\section*{Minimal Logic}
+''' + str(minimal_diagram) + R'''
+\section*{Minimal Logic with EFQ links}
+''' + str(efq_diagram) + R'''
+\section*{Intuitionistic Logic}
+''' + str(int_diagram)
+
+document = make_latex_document(tex)
 
 with open('drinker.tex', 'w') as f:
     f.write(document)

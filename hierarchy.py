@@ -66,13 +66,13 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
 def is_redundant_edge(edge, edges):
     '''Give alternate path if one exists.'''
     a, *t, b = edge
-    return is_superior({a}, {b}, frozenset(edges) - {edge})
+    return is_superior({a}, {b}, frozenset(edges))
 
-def spanning_tree(edges):
+def spanning_tree(edges, basis=set()):
     '''Find a spanning tree for a graph.'''
     for edge in sorted(edges):
-        if is_redundant_edge(edge, edges):
-            return spanning_tree(frozenset(edges) - {edge})
+        if is_redundant_edge(edge, (edges - {edge}) | basis):
+            return spanning_tree(frozenset(edges) - {edge}, basis)
     return edges
 
 
