@@ -38,8 +38,6 @@ proofs = {
     (dgp, wlem): 'dgp-wlem',
 }
 
-int_only_proofs = {(lem, efq, f): 'classical' for f in formulae}
-
 models = {
     'dp-cm-lobot': (
         {he, lem, wlem, dnsu, dnse, glpo, glpoa, gmp},
@@ -96,29 +94,25 @@ models = {
 }
 
 int_models = {k: v for k, v in models.items() if efq in v[0]}
+int_only_proofs = {(lem, efq, f): 'classical' for f in formulae}
+int_proofs = dict(proofs)
+int_proofs.update(int_only_proofs)
 
-span_proofs = list(spanning_tree(proofs.keys()))
+span_proofs = spanning_tree(proofs.keys())
+span_int_only_proofs = spanning_tree(int_proofs) - set(span_proofs)
 weak_edges = list(find_possible_connections(formulae, proofs, models.values()))
-span_int_only_proofs = list(spanning_tree(int_only_proofs.keys()))
 weak_int_edges = list(find_possible_connections(
     formulae, set(proofs) | set(int_only_proofs), models.values(), (efq, )))
 
-tikz_nodes = string_node_layout_to_tikz(formula_layout)
+diagram = TikzHierarchy()
+diagram.add_string_node_layout(formula_layout)
+diagram.add_labelled_edges(span_proofs, 'dotted')
+diagram.add_labelled_edges(span_int_only_proofs)
+diagram.add_labelled_edges(weak_edges, 'dashed')
+#diagram.add_labelled_edges(weak_int_edges, 'dashed')
 
-tikz_pf_edges = tikzify_edges(span_proofs)
-drawn = span_proofs
 
-tikz_pf_int_only_edges = tikzify_edges(span_int_only_proofs, '', drawn)
-drawn += span_int_only_proofs
-
-tikz_weak_edges = tikzify_edges(weak_edges, 'dashed', drawn)
-drawn += weak_edges
-
-tikz_weak_int_edges = tikzify_edges(weak_int_edges, 'dotted', drawn)
-drawn += weak_int_edges
-
-diagram = make_tikz_diagram(tikz_nodes, tikz_pf_edges, tikz_weak_edges, tikz_weak_int_edges)
-document = make_latex_document(diagram)
+document = make_latex_document(diagram.make_diagram())
 
 with open('drinker.tex', 'w') as f:
     f.write(document)
