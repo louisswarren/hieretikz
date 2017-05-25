@@ -38,20 +38,31 @@ class TikzHierarchy:
                     col_num += 1
                 else:
                     node = nodes.pop(0)
-                    self.add_node(node, col_num // 5, -row_num * 2)
+                    self.add_node(node, col_num // 3, -row_num * 3)
                     col_num += len(node)
 
+    @staticmethod
+    def _color_parameter(obj):
+        '''Get a color for an object, ready to pass to tikz as a parameter.'''
+        n = hash(obj)
+        r = n % 256
+        g = (n // 256) % 256
+        b = (n // 256 // 256) % 256
+        return 'color={{rgb:red,{};green,{};blue,{}}}'.format(r, g, b)
+
     def add_edge(self, a, b, arrow_type='->', label=''):
-        '''Add an edge to the hierarchy diagram, avoiding overlapping.'''
+        fmt = '\\draw[{}] ({}) to[{}] {}({});'
         if label:
-            fmt = ('\\draw[{}] ({}) to[{}] node[midway, sloped] {{' +
-                   label + '}} ({});')
+            options = arrow_type + ', ' + TikzHierarchy._color_parameter(label)
+            nodelabel = 'node[midway, sloped] {{{}}} '.format(label)
         else:
-            fmt = '\\draw[{}] ({}) to[{}] ({});'
+            options = arrow_type
+            nodelabel = ''
         count = self.edges.count((a, b)) + self.edges.count((b, a))
         bend = 'bend left={}'.format(count * 20) if count else ''
-        self.tikz.append(fmt.format(arrow_type, a, bend, b))
+        self.tikz.append(fmt.format(options, a, bend, nodelabel, b))
         self.edges.append((a, b))
+
 
     def add_edges(self, edges, arrow_extras='', labeller=', '.join):
         '''Add a set of (labelled) edges to the hierarchy diagram.
@@ -60,7 +71,7 @@ class TikzHierarchy:
         tail, b is the head and (optional) label0 ... labeln are labels for the
         edge.'''
         drawn = set()
-        for a, *label_args, b in edges:
+        for a, *label_args, b in sorted(edges):
             label = labeller(label_args)
             if (b, a) in drawn:
                 continue
@@ -76,9 +87,11 @@ class TikzHierarchy:
 
     @_compose('\n'.join)
     def make_diagram(self):
+        yield '\\begin{centering}'
         yield '\\begin{tikzpicture}[' + self.options + ']\n'
         yield from self.tikz
         yield '\\end{tikzpicture}'
+        yield '\\end{centering}'
 
     def __str__(self):
         return self.make_diagram()
@@ -91,9 +104,9 @@ def make_columned_text(*text, fmt='{}', columns=3):
 
 @_compose('\n'.join)
 def make_latex_document(body, extra_packages=()):
-    yield r'\documentclass{article}'
+    yield r'\documentclass[a4paper]{article}'
     yield r'\usepackage{tikz}'
-    yield r'\usepackage{fullpage}'
+    yield r'\usepackage[margin=1cm]{geometry}'
     yield r'\usepackage{multicol}'
     yield from (r'\usepackage{' + package + '}' for package in extra_packages)
     yield r'\begin{document}'
