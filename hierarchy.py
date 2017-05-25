@@ -55,12 +55,15 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
     Searches only for edges with order-many tails. Vertices listed in free do
     not count towards the number of tails.
     '''
+    # Precompute downward closures of lower tiers, for efficiency
+    pc_separations = [(downward_closure(lower, edges), upper)
+                      for lower, upper in separations]
     return {(*tails, *free, head)
             for r in range(1, order + 1)
             for head in vertices
             for tails in itertools.combinations(vertices, r)
             if not is_superior({*free, *tails}, {head}, edges)
-            if not is_separated({*free, *tails}, {head}, edges, separations)}
+            if not is_separated({*free, *tails}, {head}, edges, pc_separations)}
 
 
 def is_redundant_edge(edge, edges):
