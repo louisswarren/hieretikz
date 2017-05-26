@@ -59,16 +59,16 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
     # Precompute downward closures of lower tiers, for efficiency
     pc_separations = [(downward_closure(lower, edges), upper)
                       for lower, upper in separations]
-    pc_dc_heads = {v: downward_closure({v}, edges) for v in vertices}
+    pc_vertex_closures = {v: downward_closure({v}, edges) for v in vertices}
     for r in range(1, order + 1):
-        for head in vertices:
-            for tails in itertools.combinations(vertices, r):
+        for tails in itertools.combinations(vertices, r):
+            for head in vertices:
                 premise = {*free, *tails}
-                if is_superior(premise, {head}, edges):
+                if head in downward_closure(premise, edges):
                     continue
                 for lower, upper in pc_separations:
                     if all(p in lower for p in premise):
-                        if any(u in pc_dc_heads[head] for u in upper):
+                        if any(u in pc_vertex_closures[head] for u in upper):
                             break
                 else:
                     yield (*tails, *free, head)
