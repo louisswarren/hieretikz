@@ -47,7 +47,7 @@ class TikzHierarchy:
     @staticmethod
     def _color_parameter(obj):
         '''Get a color for an object, ready to pass to tikz as a parameter.'''
-        n = hash(obj)
+        n = sum(ord(c) * 2**(5*i) for i, c in enumerate(obj))
         r = n % 256
         g = (n // 256) % 256
         b = (n // 256 // 256) % 256
