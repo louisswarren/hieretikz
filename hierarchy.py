@@ -1,6 +1,6 @@
 import itertools
 
-compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
+_compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
 def downward_closure_paths(paths, edges):
     found = {head: ((*tails, head), *(paths[t] for t in tails if paths[t]))
@@ -48,6 +48,16 @@ def is_separated(vertices, wertices, edges, separations):
                 return vpath, wpath
     return False
 
+def get_dict_all(d, keys):
+    if all(k in d for k in keys):
+        return tuple(d[k] for k in keys)
+
+def get_dict_first(d, keys):
+    for k in keys:
+        if k in d:
+            return d[k]
+
+@_compose(frozenset)
 def find_possible_connections(vertices, edges, separations, free=(), order=1):
     '''Find edges which can be added to the hierarchy.
 
@@ -58,12 +68,19 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
     # Precompute downward closures of lower tiers, for efficiency
     pc_separations = [(downward_closure(lower, edges), upper)
                       for lower, upper in separations]
-    return {(*tails, *free, head)
-            for r in range(1, order + 1)
-            for head in vertices
-            for tails in itertools.combinations(vertices, r)
-            if not is_superior({*free, *tails}, {head}, edges)
-            if not is_separated({*free, *tails}, {head}, edges, pc_separations)}
+    pc_dc_heads = {v: downward_closure({v}, edges) for v in vertices}
+    for r in range(1, order + 1):
+        for head in vertices:
+            for tails in itertools.combinations(vertices, r):
+                if is_superior({*free, *tails}, {head}, edges):
+                    continue
+                A = {*free, *tails}
+                for lower, upper in pc_separations:
+                    if get_dict_all(lower, A):
+                        if get_dict_first(pc_dc_heads[head], upper) is not None:
+                            break
+                else:
+                    yield (*tails, *free, head)
 
 
 def is_redundant_edge(edge, edges):
