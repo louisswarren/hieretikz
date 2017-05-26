@@ -6,17 +6,19 @@ class TikzException(Exception):
 class TikzHierarchy:
     '''Represent a hierarchy using Tikz.'''
 
-    def __init__(self, hierarchy=None, *, options='line width=0.3mm, auto'):
+    def __init__(self, hierarchy=None, *, options='auto', name_dict=None):
         '''Initialize, creating a copy of the hierarchy if provided.'''
         if hierarchy:
             self.tikz = list(hierarchy.tikz)
             self.nodes = list(hierarchy.nodes)
             self.edges = list(hierarchy.edges)
+            self.name_dict = dict(hierarchy.name_dict)
             self.options = options if options else hierarchy.options
         else:
             self.tikz = []
             self.nodes = []
             self.edges = []
+            self.name_dict = name_dict or {}
             self.options = options
 
     def add_node(self, node, x, y, node_str=None):
@@ -38,7 +40,8 @@ class TikzHierarchy:
                     col_num += 1
                 else:
                     node = nodes.pop(0)
-                    self.add_node(node, col_num // 3, -row_num * 3)
+                    node_str = self.name_dict.get(node, node)
+                    self.add_node(node, col_num // 3, -row_num * 3, node_str)
                     col_num += len(node)
 
     @staticmethod
@@ -63,13 +66,19 @@ class TikzHierarchy:
         self.tikz.append(fmt.format(options, a, bend, nodelabel, b))
         self.edges.append((a, b))
 
+    @_compose(', '.join)
+    def default_labeller(self, labels):
+        for label in labels:
+            yield self.name_dict.get(label, label)
 
-    def add_edges(self, edges, arrow_extras='', labeller=', '.join):
+    def add_edges(self, edges, arrow_extras='', labeller=None):
         '''Add a set of (labelled) edges to the hierarchy diagram.
 
         A labelled edge is a tuple (a, label0, ..., labeln, b), where a is the
         tail, b is the head and (optional) label0 ... labeln are labels for the
         edge.'''
+        if not labeller:
+            labeller = self.default_labeller
         drawn = set()
         for a, *label_args, b in sorted(edges):
             label = labeller(label_args)
