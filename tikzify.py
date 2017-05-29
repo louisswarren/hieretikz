@@ -53,10 +53,12 @@ class TikzHierarchy:
         b = (n // 256 // 256) % 256
         return 'color={{rgb:red,{};green,{};blue,{}}}'.format(r, g, b)
 
-    def add_edge(self, a, b, arrow_type='->', label=''):
+    def add_edge(self, a, b, arrow_type='->', label='', *, color=True):
         fmt = '\\draw[{}] ({}) to[{}] {}({});'
         if label:
-            options = arrow_type + ', ' + TikzHierarchy._color_parameter(label)
+            options = arrow_type
+            if color:
+                options += ', ' + TikzHierarchy._color_parameter(label)
             nodelabel = 'node[midway, sloped] {{{}}} '.format(label)
         else:
             options = arrow_type
@@ -71,7 +73,7 @@ class TikzHierarchy:
         for label in labels:
             yield self.name_dict.get(label, label)
 
-    def add_edges(self, edges, arrow_extras='', labeller=None):
+    def add_edges(self, edges, arrow_extras='', *, color=True, labeller=None):
         '''Add a set of (labelled) edges to the hierarchy diagram.
 
         A labelled edge is a tuple (a, label0, ..., labeln, b), where a is the
@@ -89,9 +91,10 @@ class TikzHierarchy:
             else:
                 arrow = '->'
             if arrow_extras:
-                self.add_edge(a, b, arrow + ', ' + arrow_extras, label)
+                arrow_style = arrow + ', ' + arrow_extras
+                self.add_edge(a, b, arrow_style, label, color=color)
             else:
-                self.add_edge(a, b, arrow, label)
+                self.add_edge(a, b, arrow, label, color=color)
             drawn.add((a, b))
 
     @_compose('\n'.join)
