@@ -117,10 +117,18 @@ def make_connections_list(evaluated_connections):
         yield R'{} $\implies$ {} {}\\'.format(', '.join(tails), head, val)
 
 @_compose('\n'.join)
-def make_columned_text(*text, fmt='{}', columns=3):
+def make_columns(*text, fmt='{}', columns=3):
     yield r'\begin{multicols}{' + str(columns) + r'} \noindent'
     yield from ((fmt + '\\').format(t) for t in text)
     yield r'\end{multicols}'
+
+@_compose('\n'.join)
+def make_section(section_name, text, sublevel=0):
+    yield R'\{}section*{{{}}}'.format('sub' * sublevel, section_name)
+    yield str(text)
+
+def make_sections(*arglists):
+    return '\n'.join(make_section(*arglist) for arglist in arglists)
 
 @_compose('\n'.join)
 def make_latex_document(body, extra_packages=()):

@@ -23,29 +23,30 @@ formula_strs[dnsu] = R'DNS$\forall$'
 formula_strs[glpoa] = "GLPO$'$"
 
 
-proofs = {
-    (lem, wlem):   'lem-wlem',
-    (dp, wlem):    'dp-wlem',
-    (he, wlem):    'he-wlem',
-    (lem, glpo):   'lem-glpo',
-    (glpo, lem):   'glpo-lem',
-    (glpoa, lem):  'glpoa-lem',
-    (glpoa, glpo): 'glpoa-glpo',
-    (dp, dnsu):    'dp-dnsu',
-    (glpoa, dnsu): 'glpoa-dnsu',
-    (he, dnse): 'he-dnse',
-    (gmp, dnse): 'gmp-dnse',
-    (gmp, dnsu): 'gmp-dnsu',
-    (dp, gmp): 'dp-gmp',
-    (gmp, wlem): 'gmp-wlem',
-    (dp, dgp): 'dp-dgp',
-    (he, dgp): 'he-dgp',
-    (dgp, wlem): 'dgp-wlem',
-    (gmp, wgmp): 'gmp-wgmp',
-    (glpoa, wgmp): 'glpoa-wgmp',
-    (dp, lem, glpoa): '',
-    (he, lem, glpo): '',
+unnamed_proofs = {
+    (lem, wlem),
+    (dp, wlem),
+    (he, wlem),
+    (lem, glpo),
+    (glpo, lem),
+    (glpoa, lem),
+    (glpoa, glpo),
+    (dp, dnsu),
+    (glpoa, dnsu),
+    (he, dnse),
+    (gmp, dnse),
+    (gmp, dnsu),
+    (dp, gmp),
+    (gmp, wlem),
+    (dp, dgp),
+    (he, dgp),
+    (dgp, wlem),
+    (gmp, wgmp),
+    (glpoa, wgmp),
+    (dp, lem, glpoa),
+    (he, lem, glpo),
 }
+proofs = {p: '{}-{}'.format(*p) for p in unnamed_proofs}
 
 named_models = {
     'dp-cm-lobot': (
@@ -105,7 +106,7 @@ named_models = {
         {efq},
     ),
 }
-models = {(frozenset(v[0]), frozenset(v[1])): k for k, v in named_models.items()}
+models = {tuple(map(frozenset, v)): k for k, v in named_models.items()}
 
 if __name__ == '__main__':
     possible_edges = find_possible_connections(formulae, proofs, models)
@@ -138,23 +139,21 @@ if __name__ == '__main__':
     two_diagram.add_edges(spanning_tree(set(proofs)), color=False)
     two_diagram.add_edges(set(two_possible_edges), 'dashed')
 
-    tex = R'''
-    \section*{Minimal Logic}
-    ''' + str(minimal_diagram) + R'''
-    \section*{Minimal Logic with EFQ links}
-    ''' + str(efq_diagram) + R'''
-    \section*{Intuitionistic Logic}
-    ''' + str(int_diagram) + '''
-    \section*{Minimal Logic - Two-premise Possibilities}
-    ''' + str(two_diagram) + '''
-    \subsection*{Investigations (''' + str(len(two_possible_edges)) + ''')}
-    ''' + make_columned_text(make_connections_list(two_possible_edges))
+
+    tex = make_sections(
+        ('Minimal Logic', minimal_diagram),
+        ('Minimal Logic with EFQ links', efq_diagram),
+        ('Intuitionistic Logic', int_diagram),
+        ('Minimal Logic Two-premise Possibilities', two_diagram),
+        ('Investigations ({})'.format(len(two_possible_edges)),
+            make_columns(make_connections_list(two_possible_edges)), 1)
+    )
 
     document = make_latex_document(tex)
 
     with open('drinker.tex', 'w') as f:
         f.write(document)
-    subprocess.call(['pdflatex', 'drinker.tex'])#, stdout=subprocess.DEVNULL)
-    with open('backdrinker.tex') as f:
-        assert(f.read() == document)
-    print("Good!")
+    subprocess.call(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
+    #with open('backdrinker.tex') as f:
+    #    assert(f.read() == document)
+    #print("Good!")
