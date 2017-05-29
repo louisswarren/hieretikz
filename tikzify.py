@@ -106,6 +106,14 @@ class TikzHierarchy:
         return self.make_diagram()
 
 @_compose('\n'.join)
+def make_connections_list(evaluated_connections):
+    key = lambda k: min(evaluated_connections[k])
+    for conn in sorted(evaluated_connections, key=key, reverse=True):
+        *tails, head = conn
+        val = evaluated_connections[conn]
+        yield R'{} $\implies$ {} {}\\'.format(', '.join(tails), head, val)
+
+@_compose('\n'.join)
 def make_columned_text(*text, fmt='{}', columns=3):
     yield r'\begin{multicols}{' + str(columns) + r'} \noindent'
     yield from ((fmt + '\\').format(t) for t in text)
@@ -115,6 +123,7 @@ def make_columned_text(*text, fmt='{}', columns=3):
 def make_latex_document(body, extra_packages=()):
     yield r'\documentclass[a4paper]{article}'
     yield r'\usepackage{tikz}'
+    yield r'\usepackage{amsmath}'
     yield r'\usepackage[margin=1cm]{geometry}'
     yield r'\usepackage{multicol}'
     yield from (r'\usepackage{' + package + '}' for package in extra_packages)

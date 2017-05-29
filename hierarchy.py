@@ -86,19 +86,29 @@ def spanning_tree(edges, basis=set()):
             return spanning_tree(frozenset(edges) - {edge}, basis)
     return edges
 
-
-def evaluate_possible_edge(edge, vertices, edges, models):
+@_compose(tuple)
+def evaluate_possible_edge(edge, vertices, edges, separations, free=(), order=1):
     '''Find the value of knowing about the existence of an edge.
 
-    Returns a tuple, giving the number of possible connections eliminated if
-    the edge exists, and the number eliminated if the edge doesn't exist.'''
-    return 0, 0
+    Returns a tuple, giving the number of possible connections if the edge
+    exists, and the number if the edge doesn't exist.'''
+    ne = edges | {edge}
+    *tails, head = edge
+    ns = separations + [({*tails}, {head})]
+    yield len(find_possible_connections(vertices, ne, separations, free, order))
+    yield len(find_possible_connections(vertices, edges, ns, free, order))
 
-def find_evaluated_connections(vertices, edges, models):
+@_compose(dict)
+def find_evaluated_connections(vertices, edges, separations, free=(), order=1):
     '''Find all new consistent connecting edges and their evaluations.
 
     Finds all edges that would connect currently disconnected vertices, and
     that can be added without connecting any pairs in disconnections. The
     evaluations of the edges are given by evaluate_possible_edge.'''
-    return {e: evaluate_possible_edge(e, vertices, edges, models)
-            for e in find_possible_connections(vertices, edges, models)}
+    current = len(find_possible_connections(vertices, edges, separations,
+                                            free, order))
+    conns = find_possible_connections(vertices, edges, separations, free, order)
+    for edge in conns:
+        ev = evaluate_possible_edge(edge, vertices, edges, separations,
+                                    free, order)
+        yield edge, (current - ev[0], current - ev[1])

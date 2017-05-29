@@ -43,6 +43,8 @@ proofs = {
     (dgp, wlem): 'dgp-wlem',
     (gmp, wgmp): 'gmp-wgmp',
     (glpoa, wgmp): 'glpoa-wgmp',
+    (dp, lem, glpoa): '',
+    (he, lem, glpo): '',
 }
 
 models = {
@@ -127,12 +129,12 @@ int_diagram.add_edges(spanning_tree(set(int_proofs)))
 int_diagram.add_edges(int_possible_edges, 'dashed')
 
 
-two_possible_edges = find_possible_connections(
-                         formulae, proofs, models.values(), free=(), order=2)
+two_possible_edges = find_evaluated_connections(
+                         formulae, set(proofs), list(models.values()), free=(), order=2)
 two_diagram = TikzHierarchy(name_dict=formula_strs)
 two_diagram.add_string_node_layout(formula_layout)
 two_diagram.add_edges(spanning_tree(set(proofs)))
-two_diagram.add_edges(two_possible_edges, 'dashed')
+two_diagram.add_edges(set(two_possible_edges), 'dashed')
 
 tex = R'''
 \section*{Minimal Logic}
@@ -142,7 +144,9 @@ tex = R'''
 \section*{Intuitionistic Logic}
 ''' + str(int_diagram) + '''
 \section*{Minimal Logic - Two-premise Possibilities}
-''' + str(two_diagram)
+''' + str(two_diagram) + '''
+\subsection*{Investigations (''' + str(len(two_possible_edges)) + ''')}
+''' + make_columned_text(make_connections_list(two_possible_edges))
 
 document = make_latex_document(tex)
 
