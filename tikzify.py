@@ -107,7 +107,7 @@ class TikzHierarchy:
 
 @_compose('\n'.join)
 def make_connections_list(evaluated_connections):
-    key = lambda k: min(evaluated_connections[k])
+    key = lambda k: (min(evaluated_connections[k]), k)
     for conn in sorted(evaluated_connections, key=key, reverse=True):
         *tails, head = conn
         val = evaluated_connections[conn]
