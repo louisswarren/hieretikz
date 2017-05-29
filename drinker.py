@@ -47,7 +47,7 @@ proofs = {
     (he, lem, glpo): '',
 }
 
-models = {
+named_models = {
     'dp-cm-lobot': (
         {he, lem, dgp, wlem, dnsu, dnse, glpo, glpoa, gmp},
         {dp},
@@ -105,9 +105,13 @@ models = {
         {efq},
     ),
 }
+models = {(frozenset(v[0]), frozenset(v[1])): k for k, v in named_models.items()}
+int_proofs = dict(proofs)
+int_models = {k: v for k, v in models.items() if efq in k[0]}
+int_proofs.update({(lem, f): 'classical' for f in formulae})
 
 if __name__ == '__main__':
-    possible_edges = find_possible_connections(formulae, proofs, models.values())
+    possible_edges = find_possible_connections(formulae, proofs, models)
     minimal_diagram = TikzHierarchy(name_dict=formula_strs)
     minimal_diagram.add_string_node_layout(formula_layout)
     minimal_diagram.add_edges(spanning_tree(set(proofs)), color=False)
@@ -120,10 +124,10 @@ if __name__ == '__main__':
 
 
     int_proofs = dict(proofs)
-    int_models = {k: v for k, v in models.items() if efq in v[0]}
+    int_models = {k: v for k, v in models.items() if efq in k[0]}
     int_proofs.update({(lem, f): 'classical' for f in formulae})
     int_possible_edges = find_possible_connections(
-                         formulae, int_proofs, int_models.values())
+                         formulae, int_proofs, int_models)
     int_diagram = TikzHierarchy(name_dict=formula_strs)
     int_diagram.add_string_node_layout(formula_layout)
     int_diagram.add_edges(spanning_tree(set(int_proofs)), color=False)
@@ -131,7 +135,7 @@ if __name__ == '__main__':
 
 
     two_possible_edges = find_evaluated_connections(
-                             formulae, set(proofs), list(models.values()), free=(), order=2)
+                             formulae, set(proofs), list(models), free=(), order=2)
     two_diagram = TikzHierarchy(name_dict=formula_strs)
     two_diagram.add_string_node_layout(formula_layout)
     two_diagram.add_edges(spanning_tree(set(proofs)), color=False)
@@ -154,6 +158,6 @@ if __name__ == '__main__':
     with open('drinker.tex', 'w') as f:
         f.write(document)
     subprocess.call(['pdflatex', 'drinker.tex'])#, stdout=subprocess.DEVNULL)
-    #with open('backdrinker.tex') as f:
-    #    assert(f.read() == document)
-    #print("Good!")
+    with open('backdrinker.tex') as f:
+        assert(f.read() == document)
+    print("Good!")
