@@ -6,46 +6,57 @@ def print_proof_path(path, proofs):
         if x != y:
             print('\t{} => {}{:>20}'.format(x, y, proofs[(x, y)]))
 
+def print_proof_tree(path, proofs, level=0):
+    edge, *successors = path
+    *tails, head = edge
+    print(('    '*level + '{} => {}{:>40}').format(
+                       ', '.join(tails), head, 'by ' + str(proofs[edge])))
+    for s in successors:
+        print_proof_tree(s, proofs, level + 1)
+
 def examine(tails, head, proofs, models):
-    separations = all_separations(models)
+    print("Examining")
     connection = is_superior({*tails}, {head}, frozenset(proofs))
     if connection:
         print('{} => {}'.format(', '.join(tails), head))
         print('Proof:')
-        print_proof_path(connection, proofs)
+        print_proof_tree(connection[0], proofs)
         return
-    separation = is_separated({*tails}, {head}, frozenset(proofs), frozenset(separations))
+    separation = is_separated({*tails}, {head}, frozenset(proofs), models)
     if separation:
-        presep, postsep = separation
-        start = presep[0][0]
-        end = postsep[-1][1]
-        print('{} =/=> {}'.format(a, b))
-        print('Since {} => {}'.format(start, a))
-        print_proof_path(presep, proofs)
-        print('and {} => {}'.format(b, end))
-        print_proof_path(postsep, proofs)
-        print('and there is a counter-model showing')
-        print('\t{} =/=> {}{:>20}'.format(
-            start, end, separations[(start, end)]))
+        print('{} =/=> {}'.format(', '.join(tails), head))
+        sepname, presep, postsep = separation
+        print('Since {} holds in {}'.format(', '.join(tails), sepname))
+        for tree in presep:
+            if tree:
+                print_proof_tree(tree, proofs)
+        print('but {} fails'.format(head))
+        for tree in postsep:
+            if tree:
+                print_proof_tree(tree, proofs)
         return
     print("Currently unknown.")
-    possible_models = {k for k in models if b in models[k][1]}
-    possible_counter_models = {k for k in models if a in models[k][0]}
+    possible_models = {v for k, v in models.items()
+                       if head in k[1]
+                       if not any(t in k[1] for t in tails)}
+    possible_counter_models = {v for k, v in models.items()
+                               if all(t in k[0] for t in tails)
+                               if head not in k[0]}
     if possible_models or possible_counter_models:
         print("A separation would exist if it were shown that")
         if possible_models:
-            print("{} holds in {}".format(a, ', or '.join(possible_models)))
+            print("{} holds in {}".format(', '.join(tails), ', or '.join(possible_models)))
         if possible_models and possible_counter_models:
             print("or")
         if possible_counter_models:
-            print("{} fails in {}".format(b, ', or '.join(
+            print("{} fails in {}".format(head, ', or '.join(
                 possible_counter_models)))
 
 
 def repl(proofs, models):
     while True:
         try:
-            cmd = input('? ')
+            cmd = 'wlem lem' or input('? ')
         except EOFError:
             break
         if not cmd:
@@ -54,11 +65,11 @@ def repl(proofs, models):
             cmdlist = list(map(str.strip, cmd.split(',')))
         elif ' ' in cmd:
             cmdlist = cmd.split()
-        if len(cmdlist) != 2:
-            print('Invalid input.')
-        else:
-            examine(*cmdlist, proofs, models)
+        *tails, head = cmdlist
+        examine(tails, head, proofs, models)
         print()
+        break
 
-from drinker import proofs, models
-repl(proofs, models)
+if __name__ == '__main__':
+    from drinker import proofs, models
+    repl(proofs, models)

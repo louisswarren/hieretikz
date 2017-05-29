@@ -45,7 +45,7 @@ def is_separated(vertices, wertices, edges, separations):
         for high in high_tier:
             wpath = is_superior(wertices, frozenset({high}), edges)
             if wpath is not False:
-                return vpath, wpath
+                return separations[(low_tier, high_tier)], vpath, wpath
     return False
 
 @_compose(frozenset)
