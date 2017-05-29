@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from hierarchy import *
 from hieretikz import all_separations
 
@@ -56,7 +58,7 @@ def examine(tails, head, proofs, models):
 def repl(proofs, models):
     while True:
         try:
-            cmd = 'wlem lem' or input('? ')
+            cmd = input('? ')
         except EOFError:
             break
         if not cmd:
@@ -68,7 +70,6 @@ def repl(proofs, models):
         *tails, head = cmdlist
         examine(tails, head, proofs, models)
         print()
-        break
 
 if __name__ == '__main__':
     from drinker import proofs, models
