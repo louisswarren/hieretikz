@@ -1,4 +1,4 @@
-from constructive_hierarchy import *
+from hierarchy import *
 from hieretikz import all_separations
 
 def print_proof_path(path, proofs):
@@ -6,15 +6,15 @@ def print_proof_path(path, proofs):
         if x != y:
             print('\t{} => {}{:>20}'.format(x, y, proofs[(x, y)]))
 
-def examine(a, b, proofs, models):
+def examine(tails, head, proofs, models):
     separations = all_separations(models)
-    connection = is_connected(a, b, frozenset(proofs))
+    connection = is_superior({*tails}, {head}, frozenset(proofs))
     if connection:
-        print('{} => {}'.format(a, b))
+        print('{} => {}'.format(', '.join(tails), head))
         print('Proof:')
         print_proof_path(connection, proofs)
         return
-    separation = is_separated(a, b, frozenset(proofs), frozenset(separations))
+    separation = is_separated({*tails}, {head}, frozenset(proofs), frozenset(separations))
     if separation:
         presep, postsep = separation
         start = presep[0][0]

@@ -8,12 +8,12 @@ efq = 'efq'
 
 
 formula_layout = '''\
-          glpoa
+    glpoa
                               lem                 glpo
-             dp                                he
+                dp                             he
                                     dgp
                      gmp
-                     wgmp
+                   wgmp
     dnsu                                                dnse
                               wlem
 '''
@@ -80,8 +80,8 @@ named_models = {
         {efq, dnse, dnsu},
         {wlem, dgp, wgmp},
     ),
-    'dp-simple-cm': (
-        {efq, lem, dgp, wlem},
+    'dp-simple-cm-with-bot': (
+        {lem, dgp, wlem},
         {dnsu, dp, he},
     ),
     'dnse-cm': (
@@ -106,9 +106,6 @@ named_models = {
     ),
 }
 models = {(frozenset(v[0]), frozenset(v[1])): k for k, v in named_models.items()}
-int_proofs = dict(proofs)
-int_models = {k: v for k, v in models.items() if efq in k[0]}
-int_proofs.update({(lem, f): 'classical' for f in formulae})
 
 if __name__ == '__main__':
     possible_edges = find_possible_connections(formulae, proofs, models)
