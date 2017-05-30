@@ -45,7 +45,9 @@ unnamed_proofs = {
     (glpoa, wgmp),
     (dp, lem, glpoa),
     (he, dnsu, gmp), #hen suffices ...
-#    (he, lem, glpo), #This should be eliminated automatically
+    (he, lem, glpo),
+    (wgmp, dnsu),
+    (dnsu, wgmp),
 }
 proofs = {p: '{}-{}'.format(*p) for p in unnamed_proofs}
 
@@ -79,8 +81,8 @@ named_models = {
         {glpoa, dp, he, gmp, wgmp},
     ),
     'v-shape-const-term': (
-        {efq, dnse, dnsu},
-        {wlem, dgp, wgmp},
+        {efq, dnse, dnsu, wgmp},
+        {wlem, dgp},
     ),
     'dp-simple-cm-with-bot': (
         {lem, dgp, wlem},
