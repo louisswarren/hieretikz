@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from hierarchy import *
-from hieretikz import all_separations
 
 def print_proof_path(path, proofs):
     for x, y in path:
