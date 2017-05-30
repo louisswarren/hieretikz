@@ -109,11 +109,11 @@ class TikzHierarchy:
         return self.make_diagram()
 
 @_compose('\n'.join)
-def make_connections_list(evaluated_connections):
-    key = lambda k: (min(evaluated_connections[k]), evaluated_connections[k], k)
-    for conn in sorted(evaluated_connections, key=key, reverse=True):
+def make_connections_list(ev_connections):
+    key = lambda k: (min(ev_connections[k]), max(ev_connections[k]), k)
+    for conn in sorted(ev_connections, key=key, reverse=True):
         *tails, head = conn
-        val = evaluated_connections[conn]
+        val = ev_connections[conn]
         yield R'{} $\implies$ {} {}\\'.format(', '.join(tails), head, val)
 
 @_compose('\n'.join)
