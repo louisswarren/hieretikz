@@ -1,6 +1,14 @@
 import itertools
 
 _compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
+_cache_dict = {}
+def _cache(f):
+    def inner(*args):
+        key = tuple(args)
+        if key not in _cache_dict:
+            _cache_dict[key] = f(*args)
+        return _cache_dict[key]
+    return inner
 
 def downward_closure_paths(paths, edges):
     found = {head: ((*tails, head), *(paths[t] for t in tails if paths[t]))
@@ -10,7 +18,8 @@ def downward_closure_paths(paths, edges):
     found.update(paths)
     return downward_closure_paths(found, edges)
 
-def downward_closure(vertices, edges):
+@_cache
+def _uncached_downward_closure(vertices, edges):
     '''Find the downward closure of a set of vertices.
 
     Returns a dictionary mapping each vertex in the downward closure to the
@@ -22,6 +31,10 @@ def downward_closure(vertices, edges):
     the last multiedge in the path, and treepath(vertex, tk) is a tree path
     from the supplied vertex to the tk.'''
     return downward_closure_paths({v: () for v in vertices}, edges)
+
+def downward_closure(vertices, edges):
+    return _uncached_downward_closure(frozenset(vertices), frozenset(edges))
+
 
 def is_subset_of_downward_closure(vertices, wertices, edges):
     '''Checks if vertices is a subset of the downward closure of wertices.
