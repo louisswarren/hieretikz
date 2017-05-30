@@ -44,7 +44,8 @@ unnamed_proofs = {
     (gmp, wgmp),
     (glpoa, wgmp),
     (dp, lem, glpoa),
-    (he, lem, glpo),
+    (he, dnsu, gmp), #hen suffices ...
+#    (he, lem, glpo), #This should be eliminated automatically
 }
 proofs = {p: '{}-{}'.format(*p) for p in unnamed_proofs}
 
@@ -89,7 +90,11 @@ named_models = {
         {efq, wlem, dgp, glpoa},
         {dnse, he},
     ),
-    'v-lobot': (
+    'v-const-term': (
+        {wgmp},
+        {wlem, dgp},
+    ),
+    'v-const-term-lobot': (
         {glpoa, lem, gmp},
         {dgp},
     ),
@@ -154,6 +159,3 @@ if __name__ == '__main__':
     with open('drinker.tex', 'w') as f:
         f.write(document)
     subprocess.call(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
-    #with open('backdrinker.tex') as f:
-    #    assert(f.read() == document)
-    #print("Good!")
