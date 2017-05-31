@@ -53,57 +53,49 @@ unnamed_proofs = {
 proofs = {p: '{}-{}'.format(*p) for p in unnamed_proofs}
 
 named_models = {
-    'dp-cm-lobot': (
-        {he, lem, dgp, wlem, dnsu, dnse, glpo, glpoa, gmp},
-        {dp},
-    ),
     'dp-cm': (
         {efq, he, dgp, wlem},
         {dp, lem, dnsu, wgmp},
     ),
-    'dp-cm-bottop': (
-        {he, wlem, dgp},
-        {dnsu},
+    'dp-cm-lobot': (
+        {he, lem, dgp, wlem, dnsu, dnse, glpo, glpoa, gmp},
+        {dp},
+    ),
+    'he-cm': (
+        {efq, dp, dgp, wlem},
+        {he, lem},
     ),
     'he-cm-lobot': (
         {dp, lem, dgp, wlem, dnsu, dnse, glpo, glpoa, gmp},
         {he},
     ),
-    'he-cm': (
-        {efq, dgp, dp, wlem},
-        {he, lem},
-    ),
-    'linear': (
+    'linear-growing-terms': (
         {efq, wlem, dgp},
         {dp, he, lem, dnse},
     ),
-    'glpoa-cm': (
+    'two-world-constant-terms': (
+        {efq, dp, he, wlem, dgp},
+        {lem},
+    ),
+    'two-world-growing-terms': (
+        {efq, wlem, dgp, glpoa}, #NO THIS IS WRONG NO GLPOA
+        {dnse, he}, #GLPOA GOES HERE
+    ),
+    'two-world-growing-terms-with-bot': (
         {lem, wlem, dgp},
         {glpoa, dp, he, gmp, wgmp},
     ),
     'v-const-term': (
-        {efq, dnsu, wgmp},
+        {efq, dnsu},
         {wlem, dgp},
-    ),
-    'dp-simple-cm-with-bot': (
-        {lem, dgp, wlem},
-        {dnsu, dp, he},
-    ),
-    'dnse-cm': (
-        {efq, wlem, dgp, glpoa},
-        {dnse, he},
     ),
     'v-const-term-lobot': (
         {glpoa, lem, gmp},
         {dgp},
     ),
-    'diamond': (
+    'diamond-constant-terms': (
         {efq, wlem, gmp},
         {dgp, lem},
-    ),
-    'const-term-two-world': (
-        {efq, dp, he, wlem, dgp},
-        {lem},
     ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
@@ -158,5 +150,5 @@ if __name__ == '__main__':
     with open('drinker.tex', 'w') as f:
         f.write(document)
     subprocess.call(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
-    #with open('backdrinker.tex', 'r') as f:
-        #assert(f.read() == document)
+    with open('backdrinker.tex', 'r') as f:
+        assert(f.read() == document)
