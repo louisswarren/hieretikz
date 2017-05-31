@@ -48,6 +48,7 @@ unnamed_proofs = {
     (he, lem, glpo),
     (wgmp, dnsu),
     (dnsu, wgmp),
+    (wgmp, dnse, gmp),
 }
 proofs = {p: '{}-{}'.format(*p) for p in unnamed_proofs}
 
@@ -80,8 +81,8 @@ named_models = {
         {lem, wlem, dgp},
         {glpoa, dp, he, gmp, wgmp},
     ),
-    'v-shape-const-term': (
-        {efq, dnse, dnsu, wgmp},
+    'v-const-term': (
+        {efq, dnse}, #, dnsu},???????????????????????????????????????????
         {wlem, dgp},
     ),
     'dp-simple-cm-with-bot': (
@@ -91,10 +92,6 @@ named_models = {
     'dnse-cm': (
         {efq, wlem, dgp, glpoa},
         {dnse, he},
-    ),
-    'v-const-term': (
-        {wgmp},
-        {wlem, dgp},
     ),
     'v-const-term-lobot': (
         {glpoa, lem, gmp},
@@ -161,3 +158,5 @@ if __name__ == '__main__':
     with open('drinker.tex', 'w') as f:
         f.write(document)
     subprocess.call(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
+    #with open('backdrinker.tex', 'r') as f:
+        #assert(f.read() == document)
