@@ -71,7 +71,7 @@ named_models = {
     ),
     'linear-growing-terms': (
         {efq, wlem, dgp},
-        {dp, he, lem, dnse},
+        {dp, he, lem, dnse, glpoa},
     ),
     'two-world-constant-terms': (
         {efq, dp, he, wlem, dgp},
@@ -90,7 +90,7 @@ named_models = {
         {wlem, dgp},
     ),
     'v-const-term-lobot': (
-        {glpoa, lem, gmp},
+        {glpoa, lem, gmp, dnse},
         {dgp},
     ),
     'diamond-constant-terms': (
@@ -150,3 +150,5 @@ if __name__ == '__main__':
     with open('drinker.tex', 'w') as f:
         f.write(document)
     subprocess.call(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
+    #with open('backdrinker.tex', 'r') as f:
+    #    assert(f.read() == document)
