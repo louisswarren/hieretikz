@@ -43,6 +43,8 @@ unnamed_proofs = {
     (dgp, wlem),
     (gmp, wgmp),
     (glpoa, wgmp),
+    (glpoa, dnse),
+    (glpo, dnse),
     (dp, lem, glpoa),
     (he, dnsu, gmp), #hen suffices ...
     (he, lem, glpo),
