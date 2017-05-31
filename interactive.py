@@ -16,7 +16,6 @@ def print_proof_tree(path, proofs, level=0):
         print_proof_tree(s, proofs, level + 1)
 
 def examine(tails, head, proofs, models):
-    print("Examining")
     connection = is_superior({*tails}, {head}, frozenset(proofs))
     if connection:
         print('{} => {}'.format(', '.join(tails), head))
