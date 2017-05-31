@@ -78,8 +78,8 @@ named_models = {
         {lem},
     ),
     'two-world-growing-terms': (
-        {efq, wlem, dgp, glpoa}, #NO THIS IS WRONG NO GLPOA
-        {dnse, he}, #GLPOA GOES HERE
+        {efq, wlem, dgp},
+        {dnse, he, glpoa},
     ),
     'two-world-growing-terms-with-bot': (
         {lem, wlem, dgp},
@@ -150,5 +150,3 @@ if __name__ == '__main__':
     with open('drinker.tex', 'w') as f:
         f.write(document)
     subprocess.call(['pdflatex', 'drinker.tex'], stdout=subprocess.DEVNULL)
-    with open('backdrinker.tex', 'r') as f:
-        assert(f.read() == document)
