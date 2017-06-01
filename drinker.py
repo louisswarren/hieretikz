@@ -42,6 +42,7 @@ unnamed_proofs = {
     (he, dgp),
     (dgp, wlem),
     (gmp, wgmp),
+    (dnse, wlem),
     (glpoa, wgmp),
     (glpoa, dnse),
     (glpo, dnse),
@@ -89,7 +90,7 @@ named_models = {
     ),
     'v-const-term': (
         {efq, dnsu},
-        {wlem, dgp},
+        {wlem, dgp, dnse},
     ),
     'v-const-term-lobot': (
         {glpoa, lem, gmp, dnse},
