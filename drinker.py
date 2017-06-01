@@ -25,8 +25,8 @@ formula_strs[glpoa] = "GLPO$'$"
 
 unnamed_proofs = {
     (lem, wlem),
-    (dp, wlem),
-    (he, wlem),
+    (dp, wlem), #This actually assumes multiple terms
+    (he, wlem), #This actually assumes multiple terms
     (lem, glpo),
     (glpo, lem),
     (glpoa, lem),
