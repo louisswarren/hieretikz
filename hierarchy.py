@@ -1,14 +1,6 @@
 import itertools
 
 _compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
-_cache_dict = {}
-def _cache(f):
-    def inner(*args):
-        key = tuple(args)
-        if key not in _cache_dict:
-            _cache_dict[key] = f(*args)
-        return _cache_dict[key]
-    return inner
 
 def downward_closure_paths(paths, edges):
     found = {head: ((*tails, head), *(paths[t] for t in tails if paths[t]))
@@ -18,8 +10,8 @@ def downward_closure_paths(paths, edges):
     found.update(paths)
     return downward_closure_paths(found, edges)
 
-@_cache
-def _uncached_downward_closure(vertices, edges):
+_downward_closure_cache = {}
+def downward_closure(vertices, edges):
     '''Find the downward closure of a set of vertices.
 
     Returns a dictionary mapping each vertex in the downward closure to the
@@ -30,10 +22,11 @@ def _uncached_downward_closure(vertices, edges):
     where d is the vertex corresponding to the path, (t1, ..., tn, d) is
     the last multiedge in the path, and treepath(vertex, tk) is a tree path
     from the supplied vertex to the tk.'''
-    return downward_closure_paths({v: () for v in vertices}, edges)
-
-def downward_closure(vertices, edges):
-    return _uncached_downward_closure(frozenset(vertices), frozenset(edges))
+    key = frozenset(vertices), frozenset(edges)
+    if key not in _downward_closure_cache:
+        val = downward_closure_paths({v: () for v in vertices}, edges)
+        _downward_closure_cache[key] = val
+    return _downward_closure_cache[key]
 
 @_compose(list)
 def completed_separations(separations, vertices, edges):
@@ -45,28 +38,16 @@ def completed_separations(separations, vertices, edges):
                        if h in vertex_closures[v]}
         yield closed_low, closed_high
 
+def is_superior(generation, child, edges):
+    return downward_closure(generation, edges).get(next(iter(child)), False)
 
-def is_subset_of_downward_closure(vertices, wertices, edges):
-    '''Checks if vertices is a subset of the downward closure of wertices.
-
-    Returns a (truthy) pathtree if it is, or False otherwise. Result is
-    calculated lazily.'''
-    raise NotImplementedError
-
-def is_superior(vertices, wertices, edges):
-    dc = downward_closure(vertices, edges)
-    if wertices.issubset(frozenset(dc)):
-        return tuple(dc[w] for w in wertices)
-    else:
-        return False
-
-def is_separated(vertices, wertices, edges, separations):
+def is_separated(tails, head, edges, separations):
     for low_tier, high_tier in separations:
-        vpath = is_superior(low_tier, vertices, edges)
+        vpath = is_superior(low_tier, tails, edges)
         if vpath is False:
             continue
         for high in high_tier:
-            wpath = is_superior(wertices, frozenset({high}), edges)
+            wpath = is_superior({head}, frozenset({high}), edges)
             if wpath is not False:
                 return separations[(low_tier, high_tier)], vpath, wpath
     return False
@@ -98,7 +79,7 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
 def is_redundant_edge(edge, edges):
     '''Give alternate path if one exists.'''
     *tails, head = edge
-    return any(is_superior(a, {head}, frozenset(edges))
+    return any(is_superior(a, {head}, frozenset(edges)) is not False
                for r in range(1, len(tails) + 1)
                for a in itertools.combinations(tails, r))
 
