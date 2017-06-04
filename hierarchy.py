@@ -35,6 +35,16 @@ def _uncached_downward_closure(vertices, edges):
 def downward_closure(vertices, edges):
     return _uncached_downward_closure(frozenset(vertices), frozenset(edges))
 
+@_compose(list)
+def completed_separations(separations, vertices, edges):
+    '''Complete separations by adding all implicitly-separated vertices.'''
+    vertex_closures = {v: downward_closure({v}, edges) for v in vertices}
+    for low, high in separations:
+        closed_low = downward_closure(low, edges)
+        closed_high = {v: vertex_closures[v][h] for v in vertices for h in high
+                       if h in vertex_closures[v]}
+        yield closed_low, closed_high
+
 
 def is_subset_of_downward_closure(vertices, wertices, edges):
     '''Checks if vertices is a subset of the downward closure of wertices.
@@ -70,18 +80,16 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
     not count towards the number of tails.
     '''
     # Precompute downward closures of lower tiers, for efficiency
-    pc_separations = [(downward_closure(lower, edges), upper)
-                      for lower, upper in separations]
-    pc_vertex_closures = {v: downward_closure({v}, edges) for v in vertices}
+    completed = completed_separations(separations, vertices, edges)
     for r in range(1, order + 1):
         for tails in itertools.combinations(vertices, r):
             for head in vertices:
                 premise = {*free, *tails}
                 if head in downward_closure(premise, edges):
                     continue
-                for lower, upper in pc_separations:
+                for lower, upper in completed:
                     if all(p in lower for p in premise):
-                        if any(u in pc_vertex_closures[head] for u in upper):
+                        if head in upper:
                             break
                 else:
                     yield (*tails, *free, head)
