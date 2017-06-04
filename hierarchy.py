@@ -22,7 +22,7 @@ def downward_closure(vertices, edges):
     where d is the vertex corresponding to the path, (t1, ..., tn, d) is
     the last multiedge in the path, and treepath(vertex, tk) is a tree path
     from the supplied vertex to the tk.'''
-    key = frozenset(vertices), frozenset(edges)
+    key = vertices, edges
     if key not in _downward_closure_cache:
         val = downward_closure_paths({v: () for v in vertices}, edges)
         _downward_closure_cache[key] = val
@@ -31,7 +31,8 @@ def downward_closure(vertices, edges):
 @_compose(list)
 def completed_separations(separations, vertices, edges):
     '''Complete separations by adding all implicitly-separated vertices.'''
-    vertex_closures = {v: downward_closure({v}, edges) for v in vertices}
+    vertex_closures = {v: downward_closure(frozenset({v}), edges)
+                       for v in vertices}
     for low, high in separations:
         closed_low = downward_closure(low, edges)
         closed_high = {v: vertex_closures[v][h] for v in vertices for h in high
@@ -39,17 +40,12 @@ def completed_separations(separations, vertices, edges):
         yield closed_low, closed_high
 
 def is_superior(generation, child, edges):
-    return downward_closure(generation, edges).get(next(iter(child)), False)
+    return downward_closure(generation, edges).get(child, False)
 
-def is_separated(tails, head, edges, separations):
-    for low_tier, high_tier in separations:
-        vpath = is_superior(low_tier, tails, edges)
-        if vpath is False:
-            continue
-        for high in high_tier:
-            wpath = is_superior({head}, frozenset({high}), edges)
-            if wpath is not False:
-                return separations[(low_tier, high_tier)], vpath, wpath
+def is_separated(tails, head, completed_separations):
+    for lower, upper in completed_separations:
+        if head in upper and all(t in lower for t in tails):
+            return True
     return False
 
 @_compose(frozenset)
@@ -61,17 +57,15 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
     not count towards the number of tails.
     '''
     # Precompute downward closures of lower tiers, for efficiency
-    completed = completed_separations(separations, vertices, edges)
+    completed = completed_separations(separations, vertices, frozenset(edges))
     for r in range(1, order + 1):
         for tails in itertools.combinations(vertices, r):
             for head in vertices:
-                premise = {*free, *tails}
-                if head in downward_closure(premise, edges):
+                premise = frozenset({*free, *tails})
+                if is_superior(premise, head, frozenset(edges)) is not False:
                     continue
-                for lower, upper in completed:
-                    if all(p in lower for p in premise):
-                        if head in upper:
-                            break
+                elif is_separated(premise, head, completed):
+                    continue
                 else:
                     yield (*tails, *free, head)
 
@@ -79,7 +73,7 @@ def find_possible_connections(vertices, edges, separations, free=(), order=1):
 def is_redundant_edge(edge, edges):
     '''Give alternate path if one exists.'''
     *tails, head = edge
-    return any(is_superior(a, {head}, frozenset(edges)) is not False
+    return any(is_superior(a, head, frozenset(edges)) is not False
                for r in range(1, len(tails) + 1)
                for a in itertools.combinations(tails, r))
 
@@ -98,7 +92,7 @@ def evaluate_possible_edge(edge, vertices, edges, separations, free=(), order=1)
     exists, and the number if the edge doesn't exist.'''
     ne = edges | {edge}
     *tails, head = edge
-    ns = separations + [({*tails}, {head})]
+    ns = separations + [(frozenset({*tails}), frozenset({head}))]
     yield len(find_possible_connections(vertices, ne, separations, free, order))
     yield len(find_possible_connections(vertices, edges, ns, free, order))
 
