@@ -2,11 +2,6 @@
 
 from hierarchy import *
 
-def print_proof_path(path, proofs):
-    for x, y in path:
-        if x != y:
-            print('\t{} => {}{:>20}'.format(x, y, proofs[(x, y)]))
-
 def print_proof_tree(path, proofs, level=0):
     edge, *successors = path
     *tails, head = edge
@@ -20,7 +15,7 @@ def examine(tails, head, proofs, models):
     if connection:
         print('{} => {}'.format(', '.join(tails), head))
         print('Proof:')
-        print_proof_tree(connection[0], proofs)
+        print_proof_tree(connection, proofs)
         return
     separation = is_separated(frozenset({*tails}), head, models)
     if separation:
