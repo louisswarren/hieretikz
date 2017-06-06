@@ -52,6 +52,7 @@ unnamed_proofs = {
     (wgmp, dnsu),
     (dnsu, wgmp),
     (wgmp, dnse, gmp),
+    (lem, gmp, glpoa),
 }
 proofs = {p: '{}-{}'.format(*p) for p in unnamed_proofs}
 
