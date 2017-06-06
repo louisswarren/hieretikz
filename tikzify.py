@@ -86,7 +86,7 @@ class TikzHierarchy:
             label = labeller(label_args)
             if (b, *label_args, a) in drawn:
                 continue
-            elif (b, a) in edges:
+            elif (b, *label_args, a) in edges:
                 arrow = '<->'
             else:
                 arrow = '->'
