@@ -82,8 +82,8 @@ named_models = {
         {lem},
     ),
     'two-world-growing-terms': (
-        {efq, wlem, dgp},
-        {dnse, he, glpoa},
+        {efq, wlem, dgp, wgmp},
+        {glpoa, dp, he, gmp, dnse},
     ),
     'two-world-growing-terms-with-bot': (
         {lem, wlem, dgp},
