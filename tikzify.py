@@ -84,7 +84,7 @@ class TikzHierarchy:
         drawn = set()
         for a, *label_args, b in sorted(edges):
             label = labeller(label_args)
-            if (b, a) in drawn:
+            if (b, *label_args, a) in drawn:
                 continue
             elif (b, a) in edges:
                 arrow = '<->'
@@ -95,7 +95,7 @@ class TikzHierarchy:
                 self.add_edge(a, b, arrow_style, label, color=color)
             else:
                 self.add_edge(a, b, arrow, label, color=color)
-            drawn.add((a, b))
+            drawn.add((a, *label_args, b))
 
     @_compose('\n'.join)
     def make_diagram(self):
