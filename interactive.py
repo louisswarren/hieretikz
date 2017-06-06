@@ -35,12 +35,12 @@ def examine(tails, head, proofs, models):
             print_proof_tree(postsep, proofs)
         return
     print("Currently unknown.")
-    possible_models = {v for k, v in models.items()
-                       if head in k[1]
-                       if not any(t in k[1] for t in tails)}
-    possible_counter_models = {v for k, v in models.items()
-                               if all(t in k[0] for t in tails)
-                               if head not in k[0]}
+    possible_models = {name for name, low, high in models
+                       if head in high
+                       if not any(t in high for t in tails)}
+    possible_counter_models = {name for name, low, high in models
+                               if all(t in low for t in tails)
+                               if head not in low}
     if possible_models or possible_counter_models:
         print("A separation would exist if it were shown that")
         if possible_models:
