@@ -33,19 +33,19 @@ def completed_separations(separations, vertices, edges):
     '''Complete separations by adding all implicitly-separated vertices.'''
     vertex_closures = {v: downward_closure(frozenset({v}), edges)
                        for v in vertices}
-    for low, high in separations:
+    for *name, low, high in separations:
         closed_low = downward_closure(low, edges)
         closed_high = {v: vertex_closures[v][h] for v in vertices for h in high
                        if h in vertex_closures[v]}
-        yield closed_low, closed_high
+        yield (*name, closed_low, closed_high)
 
 def is_superior(generation, child, edges):
     return downward_closure(generation, edges).get(child, False)
 
 def is_separated(tails, head, completed_separations):
-    for lower, upper in completed_separations:
+    for *name, lower, upper in completed_separations:
         if head in upper and all(t in lower for t in tails):
-            return True
+            return (name[0] if name else ''), (lower[t] for t in tails), upper[head]
     return False
 
 @_compose(frozenset)
@@ -92,7 +92,7 @@ def evaluate_possible_edge(edge, vertices, edges, separations, free=(), order=1)
     exists, and the number if the edge doesn't exist.'''
     ne = edges | {edge}
     *tails, head = edge
-    ns = separations + [(frozenset({*tails}), frozenset({head}))]
+    ns = separations + [(None, frozenset({*tails}), frozenset({head}))]
     yield len(find_possible_connections(vertices, ne, separations, free, order))
     yield len(find_possible_connections(vertices, edges, ns, free, order))
 

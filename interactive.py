@@ -16,13 +16,13 @@ def print_proof_tree(path, proofs, level=0):
         print_proof_tree(s, proofs, level + 1)
 
 def examine(tails, head, proofs, models):
-    connection = is_superior({*tails}, {head}, frozenset(proofs))
+    connection = is_superior(frozenset({*tails}), head, frozenset(proofs))
     if connection:
         print('{} => {}'.format(', '.join(tails), head))
         print('Proof:')
         print_proof_tree(connection[0], proofs)
         return
-    separation = is_separated({*tails}, {head}, frozenset(proofs), models)
+    separation = is_separated(frozenset({*tails}), head, models)
     if separation:
         print('{} =/=> {}'.format(', '.join(tails), head))
         sepname, presep, postsep = separation
@@ -31,9 +31,8 @@ def examine(tails, head, proofs, models):
             if tree:
                 print_proof_tree(tree, proofs)
         print('but {} fails'.format(head))
-        for tree in postsep:
-            if tree:
-                print_proof_tree(tree, proofs)
+        if postsep:
+            print_proof_tree(postsep, proofs)
         return
     print("Currently unknown.")
     possible_models = {v for k, v in models.items()
@@ -74,5 +73,5 @@ def repl(proofs, models):
         print()
 
 if __name__ == '__main__':
-    from drinker import proofs, models
-    repl(proofs, models)
+    from drinker import formulae, proofs, models
+    repl(proofs, completed_separations(models, formulae, frozenset(proofs.keys())))

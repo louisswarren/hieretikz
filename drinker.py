@@ -106,7 +106,7 @@ named_models = {
         {efq},
     ),
 }
-models = {tuple(map(frozenset, v)): k for k, v in named_models.items()}
+models = [(k, *map(frozenset, v)) for k, v in named_models.items()]
 
 if __name__ == '__main__':
     possible_edges = find_possible_connections(formulae, proofs, models)
@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
 
     int_proofs = dict(proofs)
-    int_models = {k: v for k, v in models.items() if efq in k[0]}
+    int_models = {m for m in models if efq in m[1]}
     int_proofs.update({(lem, f): 'classical' for f in formulae})
     int_possible_edges = find_possible_connections(
                          formulae, int_proofs, int_models)
