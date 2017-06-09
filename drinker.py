@@ -2,7 +2,7 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'lem wlem dp he dnsu dnse glpo glpoa gmp wgmp dgp'.split()
+formulae = 'lem wlem dp dpn he hen dnsu dnse glpo glpoa gmp wgmp dgp'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
@@ -11,6 +11,7 @@ formula_layout = '''\
     glpoa
                               lem                 glpo
                 dp                             he
+                dpn                            hen
                                     dgp
                      gmp
                    wgmp
@@ -21,6 +22,8 @@ formula_strs = {f: f.upper() for f in formulae}
 formula_strs[dnse] = R'DNS$\exists$'
 formula_strs[dnsu] = R'DNS$\forall$'
 formula_strs[glpoa] = "GLPO$'$"
+formula_strs[dpn] = R'DP$_\lnot$'
+formula_strs[hen] = R'HE$_\lnot$'
 
 
 unnamed_proofs = {
@@ -47,12 +50,16 @@ unnamed_proofs = {
     (glpoa, dnse),
     (glpo, dnse),
     (dp, lem, glpoa),
-    (he, dnsu, gmp), #hen suffices ...
+    (hen, dnsu, gmp), #hen suffices ...
     (he, lem, glpo),
     (wgmp, dnsu),
     (dnsu, wgmp),
     (wgmp, dnse, gmp),
     (lem, gmp, glpoa),
+    (dp, dpn),
+    (he, hen),
+    (dp, hen),
+    (he, dpn),
 }
 proofs = {p: '{}-{}'.format(*p) for p in unnamed_proofs}
 
@@ -62,7 +69,7 @@ named_models = {
         {dp, lem, dnsu, wgmp},
     ),
     'dp-cm-lobot': (
-        {he, lem, dgp, wlem, dnsu, dnse, glpo, glpoa, gmp},
+        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, gmp},
         {dp},
     ),
     'he-cm': (
@@ -70,7 +77,7 @@ named_models = {
         {he, lem},
     ),
     'he-cm-lobot': (
-        {dp, lem, dgp, wlem, dnsu, dnse, glpo, glpoa, gmp},
+        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, gmp},
         {he},
     ),
     'linear-growing-terms': (
@@ -94,7 +101,7 @@ named_models = {
         {wlem, dgp, dnse},
     ),
     'v-const-term-lobot': (
-        {glpoa, lem, gmp, dnse},
+        {glpoa, lem, dpn, hen, gmp, dnse},
         {dgp},
     ),
     'diamond-constant-terms': (
@@ -109,44 +116,46 @@ named_models = {
 models = [(k, *map(frozenset, v)) for k, v in named_models.items()]
 
 if __name__ == '__main__':
-    possible_edges = find_possible_connections(formulae, proofs, models)
+    possible_edges = find_evaluated_connections(formulae, set(proofs), list(models))
     minimal_diagram = TikzHierarchy(name_dict=formula_strs)
     minimal_diagram.add_string_node_layout(formula_layout)
     minimal_diagram.add_edges(spanning_tree(set(proofs)), color=False)
-    minimal_diagram.add_edges(possible_edges, 'dashed')
+    minimal_diagram.add_edges(set(possible_edges), 'dashed')
 
 
-    efq_diagram = TikzHierarchy(minimal_diagram)
-    efq_proofs = {(lem, efq, f): 'classical' for f in formulae}
-    efq_diagram.add_edges(spanning_tree(set(efq_proofs), set(proofs)), 'dotted')
-
-
-    int_proofs = dict(proofs)
-    int_models = {m for m in models if efq in m[1]}
-    int_proofs.update({(lem, f): 'classical' for f in formulae})
-    int_possible_edges = find_possible_connections(
-                         formulae, int_proofs, int_models)
-    int_diagram = TikzHierarchy(name_dict=formula_strs)
-    int_diagram.add_string_node_layout(formula_layout)
-    int_diagram.add_edges(spanning_tree(set(int_proofs)), color=False)
-    int_diagram.add_edges(int_possible_edges, 'dashed')
-
-
-    two_possible_edges = find_evaluated_connections(
-                             formulae, set(proofs), list(models), free=(), order=2)
-    two_diagram = TikzHierarchy(name_dict=formula_strs)
-    two_diagram.add_string_node_layout(formula_layout)
-    two_diagram.add_edges(spanning_tree(set(proofs)), color=False)
-    two_diagram.add_edges(set(two_possible_edges), 'dashed')
+#    efq_diagram = TikzHierarchy(minimal_diagram)
+#    efq_proofs = {(lem, efq, f): 'classical' for f in formulae}
+#    efq_diagram.add_edges(spanning_tree(set(efq_proofs), set(proofs)), 'dotted')
+#
+#
+#    int_proofs = dict(proofs)
+#    int_models = {m for m in models if efq in m[1]}
+#    int_proofs.update({(lem, f): 'classical' for f in formulae})
+#    int_possible_edges = find_possible_connections(
+#                         formulae, int_proofs, int_models)
+#    int_diagram = TikzHierarchy(name_dict=formula_strs)
+#    int_diagram.add_string_node_layout(formula_layout)
+#    int_diagram.add_edges(spanning_tree(set(int_proofs)), color=False)
+#    int_diagram.add_edges(int_possible_edges, 'dashed')
+#
+#
+#    two_possible_edges = find_evaluated_connections(
+#                             formulae, set(proofs), list(models), free=(), order=2)
+#    two_diagram = TikzHierarchy(name_dict=formula_strs)
+#    two_diagram.add_string_node_layout(formula_layout)
+#    two_diagram.add_edges(spanning_tree(set(proofs)), color=False)
+#    two_diagram.add_edges(set(two_possible_edges), 'dashed')
 
 
     tex = make_sections(
         ('Minimal Logic', minimal_diagram),
-        ('Minimal Logic with EFQ links', efq_diagram),
-        ('Intuitionistic Logic', int_diagram),
-        ('Minimal Logic Two-premise Possibilities', two_diagram),
-        ('Investigations ({})'.format(len(two_possible_edges)),
-            make_columns(make_connections_list(two_possible_edges)), 1)
+        ('Investigations ({})'.format(len(possible_edges)),
+            make_columns(make_connections_list(possible_edges)), 1),
+#        ('Minimal Logic with EFQ links', efq_diagram),
+#        ('Intuitionistic Logic', int_diagram),
+#        ('Minimal Logic Two-premise Possibilities', two_diagram),
+#        ('Investigations ({})'.format(len(two_possible_edges)),
+#            make_columns(make_connections_list(two_possible_edges)), 1)
     )
 
     document = make_latex_document(tex)
