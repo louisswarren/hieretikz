@@ -64,6 +64,10 @@ unnamed_proofs = {
     (he, hen),
     (dp, hen),
     (he, dpn),
+    (dpn, hen),
+    (hen, dpn),
+    (dpn, wlem),
+    (hen, wlem),
     (lem, glpon),
     (glpon, wlem),
     (glpo, dpn),
@@ -97,7 +101,7 @@ named_models = {
     ),
     'two-world-growing-terms': (
         {efq, wlem, dgp, wgmp},
-        {glpoa, dp, he, gmp, dnse, glpon},
+        {glpoa, dp, he, dpn, hen, gmp, dnse, glpon},
     ),
     'two-world-growing-terms-with-bot': (
         {lem, wlem, dgp},
