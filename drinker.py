@@ -14,8 +14,7 @@ formula_layout = '''\
                 dpn                            hen
                                     dgp
                      gmp
-                   dnsu       glpon
-                                                        dnse
+                   dnsu       glpon                    dnse
                               wlem
 '''
 formula_strs = {f: f.upper() for f in formulae}
@@ -67,8 +66,9 @@ unnamed_proofs = {
     (he, dpn),
     (lem, glpon),
     (glpon, wlem),
+    (glpo, dpn),
 }
-proofs = {p: '{}-{}'.format(*p) for p in unnamed_proofs}
+proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
 named_models = {
     'dp-cm': (
