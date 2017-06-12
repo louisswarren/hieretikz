@@ -2,7 +2,7 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'lem wlem dp dpn he hen dnsu dnse glpon glpoa gmp dgp'.split()
+formulae = 'lem wlem dp dpn he dnsu dnse glpon glpoa gmp dgp'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
@@ -11,7 +11,7 @@ formula_layout = '''\
     glpoa
                               lem
                 dp                             he
-                dpn                            hen
+                                    dpn
                                     dgp
                      gmp
                    dnsu       glpon                    dnse
@@ -21,13 +21,13 @@ formula_strs = {f: f.upper() for f in formulae}
 formula_strs[dnse] = R'DNS$\exists$'
 formula_strs[glpoa] = "GLPO$'$"
 formula_strs[glpon] = R'GLPO$_\neg$'
-formula_strs[dpn] = R'DP$_\lnot$'
-formula_strs[hen] = R'HE$_\lnot$'
 
 wgmp = dnsu
 glpo = lem
+hen = dpn
 formula_strs[dnsu] = R'DNS$\forall$,WGMP'
 formula_strs[lem] = R'LEM,GLPO'
+formula_strs[dpn] = R'DP$_\lnot$,HE$_\lnot$'
 
 
 unnamed_proofs = {
