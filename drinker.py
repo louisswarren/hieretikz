@@ -2,7 +2,7 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'lem wlem dp dpn he dnsu dnse glpon glpoa gmp dgp'.split()
+formulae = 'dxp lem wlem dp dpn he dnsu dnse glpon glpoa gmp dgp'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
@@ -12,7 +12,7 @@ formula_layout = '''\
                               lem
                 dp                             he
                                     dpn
-                                    dgp
+                dxp                 dgp
                      gmp
                    dnsu       glpon                    dnse
                               wlem
@@ -76,47 +76,51 @@ proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
 named_models = {
     'dp-cm': (
-        {efq, he, dgp, wlem, glpon},
+        {efq, he, dgp, wlem, glpon, dxp},
         {dp, lem, dnsu, wgmp},
     ),
     'dp-cm-lobot': (
-        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp},
+        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, dxp},
         {dp},
     ),
     'he-cm': (
-        {efq, dp, dgp, wlem, glpon},
+        {efq, dp, dgp, wlem, glpon, dxp},
         {he, lem},
     ),
     'he-cm-lobot': (
-        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp},
+        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, dxp},
         {he},
     ),
     'linear-growing-terms': (
         {efq, wlem, dgp},
-        {dp, he, lem, dnse, glpoa},
+        {dp, he, lem, dnse, glpoa, dxp},
     ),
     'two-world-constant-terms': (
-        {efq, dp, he, wlem, dgp},
+        {efq, dp, he, wlem, dgp, dxp},
         {lem},
     ),
     'two-world-growing-terms': (
         {efq, wlem, dgp, wgmp},
-        {glpoa, dp, he, dpn, hen, gmp, dnse, glpon},
+        {glpoa, dp, he, dpn, hen, gmp, dnse, glpon, dxp},
+    ),
+    'two-world-growing-terms-lobot': (
+        {gmp, glpoa},
+        {dxp},
     ),
     'two-world-growing-terms-with-bot': (
         {lem, wlem, dgp},
-        {glpoa, dp, he, gmp, wgmp},
+        {glpoa, dp, he, gmp, wgmp, dxp},
     ),
     'v-const-term': (
-        {efq, dnsu},
+        {efq, dnsu, dxp},
         {wlem, dgp, dnse},
     ),
     'v-const-term-lobot': (
-        {glpoa, lem, dpn, hen, gmp, dnse, glpon},
+        {glpoa, lem, dpn, hen, gmp, dnse, glpon, dxp},
         {dgp},
     ),
     'diamond-constant-terms': (
-        {efq, wlem, gmp},
+        {efq, wlem, gmp, dxp},
         {dgp, lem},
     ),
     'trivial-lobot': (
