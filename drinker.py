@@ -71,6 +71,7 @@ unnamed_proofs = {
     (lem, glpon),
     (glpon, wlem),
     (glpo, dpn),
+    (dp, dxp),
 }
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
