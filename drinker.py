@@ -2,7 +2,7 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'dxp lem wlem dp dpn he dnsu dnse glpon glpoa gmp dgp'.split()
+formulae = 'uds udsn lem wlem dp dpn he dnsu dnse glpon glpoa gmp dgp'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
@@ -12,11 +12,12 @@ formula_layout = '''\
                               lem
                 dp                             he
                                     dpn
-                dxp                 dgp
-                     gmp
-                   dnsu       glpon                    dnse
+                uds  gmp            dgp
+               udsn
+            dnsu       glpon                    dnse
                               wlem
 '''
+
 formula_strs = {f: f.upper() for f in formulae}
 formula_strs[dnse] = R'DNS$\exists$'
 formula_strs[glpoa] = "GLPO$'$"
@@ -71,59 +72,65 @@ unnamed_proofs = {
     (lem, glpon),
     (glpon, wlem),
     (glpo, dpn),
-    (dp, dxp),
-    (lem, dxp, glpoa),
+    (dp, uds),
+    (lem, uds, glpoa),
+    (uds, udsn),
+    (gmp, udsn),
 }
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
 named_models = {
     'dp-cm': (
-        {efq, he, dgp, wlem, glpon, dxp},
+        {efq, he, dgp, wlem, glpon, uds},
         {dp, lem, dnsu, wgmp},
     ),
     'dp-cm-lobot': (
-        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, dxp},
+        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, uds},
         {dp},
     ),
     'he-cm': (
-        {efq, dp, dgp, wlem, glpon, dxp},
+        {efq, dp, dgp, wlem, glpon, uds},
         {he, lem},
     ),
     'he-cm-lobot': (
-        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, dxp},
+        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, uds},
         {he},
     ),
     'linear-growing-terms': (
         {efq, wlem, dgp},
-        {dp, he, lem, dnse, glpoa, dxp},
+        {dp, he, lem, dnse, glpoa, uds},
     ),
     'two-world-constant-terms': (
-        {efq, dp, he, wlem, dgp, dxp},
+        {efq, dp, he, wlem, dgp, uds},
         {lem},
     ),
     'two-world-growing-terms': (
         {efq, wlem, dgp, wgmp},
-        {glpoa, dp, he, dpn, hen, gmp, dnse, glpon, dxp},
+        {glpoa, dp, he, dpn, hen, gmp, dnse, glpon, uds},
     ),
     'two-world-growing-terms-lobot': (
         {gmp, glpoa},
-        {dxp},
+        {uds},
     ),
     'two-world-growing-terms-with-bot': (
         {lem, wlem, dgp},
-        {glpoa, dp, he, gmp, wgmp, dxp},
+        {glpoa, dp, he, gmp, wgmp, uds},
     ),
     'v-const-term': (
-        {efq, dnsu, dxp},
+        {efq, dnsu, uds},
         {wlem, dgp, dnse},
     ),
     'v-const-term-lobot': (
-        {glpoa, lem, dpn, hen, gmp, dnse, glpon, dxp},
+        {glpoa, lem, dpn, hen, gmp, dnse, glpon, uds},
         {dgp},
     ),
     'diamond-constant-terms': (
-        {efq, wlem, gmp, dxp},
+        {efq, wlem, gmp, uds},
         {dgp, lem},
+    ),
+    'beth-width-two': (
+        {lem, he, dp},
+        {uds, udsn, glpon},
     ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
@@ -131,6 +138,7 @@ named_models = {
     ),
 }
 models = [(k, *map(frozenset, v)) for k, v in named_models.items()]
+
 
 if __name__ == '__main__':
     possible_edges = find_evaluated_connections(formulae, set(proofs), list(models))
