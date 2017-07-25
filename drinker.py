@@ -130,7 +130,7 @@ named_models = {
     ),
     'beth-width-two': (
         {lem, he, dp},
-        {uds, udsn, glpon},
+        set(),
     ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
