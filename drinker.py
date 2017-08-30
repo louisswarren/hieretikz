@@ -2,7 +2,7 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'uds udsn lem wlem dp dpn he dnsu dnse glpon glpoa gmp dgp'.split()
+formulae = 'uds udsn lem wlem dp dpn he dnsu dnse glpon glpoa gmp mgmp dgp'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
@@ -12,8 +12,8 @@ formula_layout = '''\
                               lem
                 dp                             he
                                     dpn
-                uds  gmp            dgp
-               udsn
+                uds  gmp   mgmp     dgp
+             udsn
             dnsu       glpon                    dnse
                               wlem
 '''
@@ -76,13 +76,14 @@ unnamed_proofs = {
     (lem, uds, glpoa),
     (uds, udsn),
     (gmp, udsn),
+    (glpoa, mgmp),
 }
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
 named_models = {
     'dp-cm': (
         {efq, he, dgp, wlem, glpon, uds},
-        {dp, lem, dnsu, wgmp},
+        {dp, lem, dnsu, wgmp, mgmp},
     ),
     'dp-cm-lobot': (
         {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, uds},
