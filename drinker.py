@@ -77,6 +77,7 @@ unnamed_proofs = {
     (uds, udsn),
     (gmp, udsn),
     (glpoa, mgmp),
+    (mgmp, wlem),
 }
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
@@ -115,7 +116,7 @@ named_models = {
     ),
     'two-world-growing-terms-with-bot': (
         {lem, wlem, dgp},
-        {glpoa, dp, he, gmp, wgmp, uds},
+        {glpoa, dp, he, gmp, wgmp, uds, mgmp},
     ),
     'v-const-term': (
         {efq, dnsu, uds},
