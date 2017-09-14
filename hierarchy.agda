@@ -10,6 +10,12 @@ true and false = false
 false and true = false
 false and false = false
 
+_or_ : Bool → Bool → Bool
+true or true = true
+true or false = true
+false or true = true
+false or false = false
+
 
 data ℕ : Set where
   zero : ℕ
@@ -40,15 +46,22 @@ _⊂_ : List ℕ → List ℕ → Bool
 ...               | false = false
 
 
-_++_ : List ℕ → List ℕ → List ℕ
+_++_ : {A : Set} → List A → List A → List A
 [] ++ ys        = ys
-(x :: xs) ++ ys with (x ∈ ys)
-...               | true  = xs ++ ys
-...               | false = x :: (xs ++ ys)
+(x :: xs) ++ ys = x :: (xs ++ ys)
 
 map : {A : Set} → (A → A) → List A → List A
 map f []        = []
 map f (x :: xs) = (f x) :: (map f xs)
+
+
+any : {A : Set} → (A → Bool) → List A → Bool
+any _ []        = false
+any f (x :: xs) = (f x) or (any f xs)
+
+all : {A : Set} → (A → Bool) → List A → Bool
+all _ []        = true
+all f (x :: xs) = (f x) and (all f xs)
 
 
 data Arrow : Set where
@@ -70,37 +83,17 @@ _⊂⊂_ : List Arrow → List Arrow → Bool
 ...                | false = false
 
 
--- SingleClosure : Arrow → List ℕ → List ℕ
--- SingleClosure (ts ⇒ h) ps with ts ⊂ ps
--- ...                     | true  = h :: ps
--- ...                     | false = ps
---
--- Closure' : List Arrow → List ℕ → List ℕ
--- Closure' [] roots = roots
--- Closure' (c :: cs) roots = (SingleClosure c roots) ++ (Closure' cs roots)
---
--- Closure : List Arrow → List ℕ → List ℕ
--- Closure arrows roots with (Closure' arrows roots) ⊂ roots
--- ...                     | true = roots
--- ...                     | false = Closure arrows (Closure' arrows roots)
---
---
--- _,_⊢_ : List Arrow → List ℕ → ℕ → Bool
--- _ , [] ⊢ _ = false
--- thms , p :: premises ⊢ conc = true
---
+ArrowSearch : List Arrow → List Arrow → ℕ → Bool
+ArrowSearch [] ds g = false
+ArrowSearch (([] ⇒ h) :: cs) ds g with (h == g)
+...         | true  = true
+...         | false = ArrowSearch cs (([] ⇒ h) :: ds) g
+ArrowSearch ((ts ⇒ h) :: cs) ds g with (h == g)
+...         | true  = (all (ArrowSearch (cs ++ ds) []) ts)
+                  or (ArrowSearch cs ((ts ⇒ h) :: ds) g)
+...         | false = ArrowSearch cs ((ts ⇒ h) :: ds) g
 
-ArrowIntro : ℕ → Arrow → Arrow
-ArrowIntro n (ts ⇒ h) = (n :: ts) ⇒ h
 
-ArrowElim : ℕ → Arrow → Arrow
-ArrowElim _ ([] ⇒ h) = [] ⇒ h
-ArrowElim n ((t :: ts) ⇒ h) with (t == n)
-...                            | true  = ArrowElim  n (ts ⇒ h)
-...                            | false = ArrowIntro t (ArrowElim n (ts ⇒ h))
-
-Reduce : List Arrow → List ℕ → List Arrow
-Reduce cs [] = cs
-Reduce cs (n :: ns) with (map (ArrowElim n) cs) ⊂⊂ cs
-...                    | true  = cs
-...                    | false = Reduce (map (ArrowElim n) cs) (n :: ns)
+_⊢_ : List Arrow → Arrow → Bool
+cs ⊢ ((t :: ts) ⇒ h) = (([] ⇒ t) :: cs) ⊢ (ts ⇒ h)
+cs ⊢ ([] ⇒ h)        = ArrowSearch cs [] h
