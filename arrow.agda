@@ -59,3 +59,7 @@ search ((n ⇒ q) ∷ rst) with (n ∈ (search rst))
 ...                       | true  = search (q ∷ rst)
 ...                       | false = search rst
 
+
+_⊢_ : List Arrow → Arrow → Bool
+cs ⊢ (⇒ q) = q ∈ (search cs)
+cs ⊢ (p ⇒ q) = ((⇒ p) ∷ cs) ⊢ q
