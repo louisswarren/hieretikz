@@ -39,31 +39,23 @@ data Arrow : Set where
   ⇒_  : ℕ → Arrow
   _⇒_ : ℕ → Arrow → Arrow
 
-_trivialIn_ : ℕ → List Arrow → Bool
-n trivialIn ∘ = false
-n trivialIn ((⇒ m) ∷ cs) with n ≡ m
-...                         | true  = true
-...                         | false = n trivialIn cs
-n trivialIn (_ ∷ cs) = n trivialIn cs
 
---------------------
-
-Simplify : Arrow → List ℕ → Arrow
-Simplify (⇒ q) _ = ⇒ q
-Simplify (p ⇒ q) cs with p ∈ cs
-...                    | true  = Simplify q cs
-...                    | false = p ⇒ (Simplify q cs)
+modusponens : ℕ → Arrow → Arrow
+modusponens n (⇒ q)   = (⇒ q)
+modusponens n (p ⇒ q) with (n ≡ p)
+...                      | true  = modusponens n q
+...                      | false = p ⇒ (modusponens n q)
 
 
-Closure₁ : List Arrow → List Arrow → List Arrow
-Closure₁ ((p ⇒ q) ∷ cs) ds with (p trivialIn cs)
-...                           | true  = Closure₂ 
+reduce : ℕ → List Arrow → List Arrow
+reduce n ∘ = ∘
+reduce n (arr ∷ rst) = (modusponens n arr) ∷ (reduce n rst)
 
 
-Closure : List Arrow → List Arrow
-Closure cs = Closure₁ cs ∘
+search : List Arrow → List ℕ
+search ∘ = ∘
+search ((⇒ n) ∷ rst)   = n ∷ (search (reduce n rst))
+search ((n ⇒ q) ∷ rst) with (n ∈ (search rst))
+...                       | true  = search (q ∷ rst)
+...                       | false = search rst
 
-
---_⊢_ : List Arrow → Arrow → Bool
---cs ⊢ (p ⇒ q) = ((⇒ p) ∷ cs) ⊢ q
---cs ⊢ (⇒ q) = false
