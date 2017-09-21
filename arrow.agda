@@ -4,11 +4,14 @@ data Bool : Set where
 
 
 _or_ : Bool → Bool → Bool
-true or true   = true
-true or false  = true
-false or true  = true
+true or _      = true
+_ or true      = true
 false or false = false
 
+_and_ : Bool → Bool → Bool
+false and _   = false
+_ and false   = false
+true and true = true
 
 
 ----------------------------------------
@@ -65,6 +68,16 @@ data Arrow : Set where
   ⇒_  : ℕ → Arrow
   _⇒_ : ℕ → Arrow → Arrow
 
+_≡≡_ : Arrow → Arrow → Bool
+(⇒ q) ≡≡ (⇒ s)     = q ≡ s
+(p ⇒ q) ≡≡ (r ⇒ s) = (p ≡ r) and (q ≡≡ s)
+_ ≡≡ _             = false
+
+_∈∈_ : Arrow → List Arrow → Bool
+x ∈∈ ∘        = false
+x ∈∈ (y ∷ ys) with x ≡≡ y
+...              | true  = true
+...              | false = x ∈∈ ys
 
 
 closure : List Arrow → List ℕ → List ℕ
@@ -95,15 +108,39 @@ data Separation : Set where
 modelsupports : Separation → List Arrow → ℕ → Bool
 modelsupports (model holds _) cs n = cs , holds ⊢ n
 
+
 modeldenies : Separation → List Arrow → ℕ → Bool
 modeldenies (model _ fails) cs n = any (_∋_ (closure cs (n ∷ ∘))) fails
 
 
-_,_,_¬⊨_ : List Separation → List Arrow → List ℕ → ℕ → Bool
---(m ∷ ms) , cs , ps ¬⊨ n    with (modelsupports m cs 
+_⟪!_⟫_ : List Arrow → Separation → Arrow → Bool
+cs ⟪! m ⟫ (⇒ q) = modeldenies m cs q
+cs ⟪! m ⟫ (p ⇒ q) = (modelsupports m cs p) and (cs ⟪! m ⟫ q)
 
 
-_,_¬⊨_ : List Separation → List Arrow → Arrow → Bool
+_⟪_⟫_ : List Arrow → List Separation → Arrow → Bool
+cs ⟪ ∘ ⟫ arr = false
+cs ⟪ m ∷ ms ⟫ arr = (cs ⟪! m ⟫ arr) or (cs ⟪ ms ⟫ arr)
 
 
+
+----------------------------------------
+
+
+
+data Relation : Set where
+  Proved    : Relation
+  Derivable : Relation
+  Separated : Relation
+  Unknown   : Relation
+
+
+consider : List Arrow → List Separation → Arrow → Relation
+consider cs ms arr with (arr ∈∈ cs)
+...                   | true  = Proved
+...                   | false with (cs ⊢ arr)
+...                              | true  = Derivable
+...                              | false with (cs ⟪ ms ⟫ arr)
+...                                         | true  = Separated
+...                                         | false = Unknown
 
