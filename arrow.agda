@@ -37,6 +37,16 @@ data List (A : Set) : Set where
   _∷_ : A → List A → List A
 
 
+any : {A : Set} → (A → Bool) → List A → Bool
+any _ ∘        = false
+any f (x ∷ xs) = (f x) or (any f xs)
+
+
+apply : {A B : Set} → (A → B) → List A → List B
+apply _ ∘        = ∘
+apply f (x ∷ xs) = (f x) ∷ (apply f xs)
+
+
 _∈_ : ℕ → List ℕ → Bool
 x ∈ ∘        = false
 x ∈ (y ∷ ys) with x ≡ y
@@ -44,6 +54,8 @@ x ∈ (y ∷ ys) with x ≡ y
 ...             | false = x ∈ ys
 
 
+_∋_ : List ℕ → ℕ → Bool
+xs ∋ y = y ∈ xs
 
 ----------------------------------------
 
@@ -63,6 +75,30 @@ closure ((n ⇒ q) ∷ rest) found with (n ∈ found) or (n ∈ (closure rest fo
 ...                               | false = closure rest found
 
 
-_⊢_ : List Arrow → Arrow → Bool
-cs ⊢ (⇒ q)   = q ∈ (closure cs ∘)
-cs ⊢ (p ⇒ q) = ((⇒ p) ∷ cs) ⊢ q
+
+_,_⊢_ : List Arrow → List ℕ → ℕ → Bool
+cs , ps ⊢ q = q ∈ (closure cs ps)
+
+
+
+----------------------------------------
+
+
+
+data Separation : Set where
+  model : List ℕ → List ℕ → Separation
+
+
+_,_⊨_ : Separation → List Arrow → ℕ → Bool
+((model holds _) , cs ⊨ n) = (cs , holds ⊢ n)
+
+_,_¬⊨_ : Separation → List Arrow → ℕ → Bool
+((model _ fails) , cs ¬⊨ n) = any (_∋_ (closure cs (n ∷ ∘))) fails
+
+
+
+
+--_,_,_¬⊨_ : List Separation → List Arrow → List ℕ → ℕ → Bool
+
+
+
