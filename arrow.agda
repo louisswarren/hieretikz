@@ -198,7 +198,7 @@ testp : Arrow
 testp = (5 ⇒ (⇒ 10))
 
 testd : Arrow
-testd = (5 ⇒ (⇒ 7))
+testd = (5 ⇒ (⇒ 4))
 
 tests : Arrow
 tests = (5 ⇒ (⇒ 3))
