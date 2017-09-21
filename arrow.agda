@@ -79,6 +79,9 @@ closure ((n ⇒ q) ∷ rest) found with (n ∈ found) or (n ∈ (closure rest fo
 _,_⊢_ : List Arrow → List ℕ → ℕ → Bool
 cs , ps ⊢ q = q ∈ (closure cs ps)
 
+_⊢_ : List Arrow → Arrow → Bool
+cs ⊢ (⇒ q)   = q ∈ (closure cs ∘)
+cs ⊢ (p ⇒ q) = ((⇒ p) ∷ cs) ⊢ q
 
 
 ----------------------------------------
@@ -89,16 +92,18 @@ data Separation : Set where
   model : List ℕ → List ℕ → Separation
 
 
-_,_⊨_ : Separation → List Arrow → ℕ → Bool
-((model holds _) , cs ⊨ n) = (cs , holds ⊢ n)
+modelsupports : Separation → List Arrow → ℕ → Bool
+modelsupports (model holds _) cs n = cs , holds ⊢ n
 
-_,_¬⊨_ : Separation → List Arrow → ℕ → Bool
-((model _ fails) , cs ¬⊨ n) = any (_∋_ (closure cs (n ∷ ∘))) fails
-
-
+modeldenies : Separation → List Arrow → ℕ → Bool
+modeldenies (model _ fails) cs n = any (_∋_ (closure cs (n ∷ ∘))) fails
 
 
---_,_,_¬⊨_ : List Separation → List Arrow → List ℕ → ℕ → Bool
+_,_,_¬⊨_ : List Separation → List Arrow → List ℕ → ℕ → Bool
+--(m ∷ ms) , cs , ps ¬⊨ n    with (modelsupports m cs 
+
+
+_,_¬⊨_ : List Separation → List Arrow → Arrow → Bool
 
 
 
