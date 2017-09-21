@@ -3,7 +3,16 @@ data Bool : Set where
   false : Bool
 
 
---------------------
+_or_ : Bool → Bool → Bool
+true or true   = true
+true or false  = true
+false or true  = true
+false or false = false
+
+
+
+----------------------------------------
+
 
 
 data ℕ : Set where
@@ -11,13 +20,16 @@ data ℕ : Set where
   suc  : ℕ → ℕ
 {-# BUILTIN NATURAL ℕ #-}
 
+
 _≡_ : ℕ → ℕ → Bool
 zero ≡ zero   = true
 suc n ≡ suc m = n ≡ m
 _ ≡ _         = false
 
 
---------------------
+
+----------------------------------------
+
 
 
 data List (A : Set) : Set where
@@ -26,13 +38,15 @@ data List (A : Set) : Set where
 
 
 _∈_ : ℕ → List ℕ → Bool
-x ∈ ∘ = false
+x ∈ ∘        = false
 x ∈ (y ∷ ys) with x ≡ y
 ...             | true  = true
 ...             | false = x ∈ ys
 
 
---------------------
+
+----------------------------------------
+
 
 
 data Arrow : Set where
@@ -40,26 +54,15 @@ data Arrow : Set where
   _⇒_ : ℕ → Arrow → Arrow
 
 
-modusponens : ℕ → Arrow → Arrow
-modusponens n (⇒ q)   = (⇒ q)
-modusponens n (p ⇒ q) with (n ≡ p)
-...                      | true  = modusponens n q
-...                      | false = p ⇒ (modusponens n q)
 
-
-reduce : ℕ → List Arrow → List Arrow
-reduce n ∘ = ∘
-reduce n (arr ∷ rst) = (modusponens n arr) ∷ (reduce n rst)
-
-
-search : List Arrow → List ℕ
-search ∘ = ∘
-search ((⇒ n) ∷ rst)   = n ∷ (search (reduce n rst))
-search ((n ⇒ q) ∷ rst) with (n ∈ (search rst))
-...                       | true  = search (q ∷ rst)
-...                       | false = search rst
+closure : List Arrow → List ℕ → List ℕ
+closure ∘ found                = found
+closure ((⇒ n) ∷ rest) found   = n ∷ (closure rest (n ∷ found))
+closure ((n ⇒ q) ∷ rest) found with (n ∈ found) or (n ∈ (closure rest found))
+...                               | true  = closure (q ∷ rest) found
+...                               | false = closure rest found
 
 
 _⊢_ : List Arrow → Arrow → Bool
-cs ⊢ (⇒ q) = q ∈ (search cs)
+cs ⊢ (⇒ q)   = q ∈ (closure cs ∘)
 cs ⊢ (p ⇒ q) = ((⇒ p) ∷ cs) ⊢ q
