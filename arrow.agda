@@ -3,15 +3,14 @@ data Bool : Set where
   false : Bool
 
 
-_or_ : Bool → Bool → Bool
-true or _      = true
-_ or true      = true
-false or false = false
+_∨_ : Bool → Bool → Bool
+true ∨ _  = true
+false ∨ b = b
 
-_and_ : Bool → Bool → Bool
-false and _   = false
-_ and false   = false
-true and true = true
+
+_∧_ : Bool → Bool → Bool
+false ∧ _ = false
+true ∧ b  = b
 
 
 ----------------------------------------
@@ -24,37 +23,43 @@ data ℕ : Set where
 {-# BUILTIN NATURAL ℕ #-}
 
 
-_≡_ : ℕ → ℕ → Bool
-zero ≡ zero   = true
-suc n ≡ suc m = n ≡ m
-_ ≡ _         = false
+_==_ : ℕ → ℕ → Bool
+zero == zero   = true
+suc n == suc m = n == m
+_ == _         = false
 
 
 
 ----------------------------------------
 
 
-infixr 5 _∷_
 
 data List (A : Set) : Set where
-  ∘   : List A
+  []  : List A
   _∷_ : A → List A → List A
+infixr 5 _∷_
+
+
+[_] : {A : Set} → A → List A
+[ x ] = x ∷ []
 
 
 any : {A : Set} → (A → Bool) → List A → Bool
-any _ ∘        = false
-any f (x ∷ xs) = (f x) or (any f xs)
+any _ []       = false
+any f (x ∷ xs) = (f x) ∨ (any f xs)
 
 
 _∈_ : ℕ → List ℕ → Bool
-x ∈ ∘        = false
-x ∈ (y ∷ ys) with x ≡ y
+x ∈ []       = false
+x ∈ (y ∷ ys) with x == y
 ...             | true  = true
 ...             | false = x ∈ ys
 
 
 _∋_ : List ℕ → ℕ → Bool
 xs ∋ y = y ∈ xs
+
+
 
 ----------------------------------------
 
@@ -64,33 +69,36 @@ data Arrow : Set where
   ⇒_  : ℕ → Arrow
   _⇒_ : ℕ → Arrow → Arrow
 
+
 _≡≡_ : Arrow → Arrow → Bool
-(⇒ q) ≡≡ (⇒ s)     = q ≡ s
-(p ⇒ q) ≡≡ (r ⇒ s) = (p ≡ r) and (q ≡≡ s)
+(⇒ q) ≡≡ (⇒ s)     = q == s
+(p ⇒ q) ≡≡ (r ⇒ s) = (p == r) ∧ (q ≡≡ s)
 _ ≡≡ _             = false
 
+
 _∈∈_ : Arrow → List Arrow → Bool
-x ∈∈ ∘        = false
+x ∈∈ []       = false
 x ∈∈ (y ∷ ys) with x ≡≡ y
 ...              | true  = true
 ...              | false = x ∈∈ ys
 
 
 closure : List Arrow → List ℕ → List ℕ
-closure ∘ found                = found
+closure [] found               = found
 closure ((⇒ n) ∷ rest) found   = n ∷ (closure rest (n ∷ found))
-closure ((n ⇒ q) ∷ rest) found with (n ∈ found) or (n ∈ (closure rest found))
+closure ((n ⇒ q) ∷ rest) found with (n ∈ found) ∨ (n ∈ (closure rest found))
 ...                               | true  = closure (q ∷ rest) found
 ...                               | false = closure rest found
-
 
 
 _,_⊢_ : List Arrow → List ℕ → ℕ → Bool
 cs , ps ⊢ q = q ∈ (closure cs ps)
 
+
 _⊢_ : List Arrow → Arrow → Bool
-cs ⊢ (⇒ q)   = q ∈ (closure cs ∘)
+cs ⊢ (⇒ q)   = q ∈ (closure cs [])
 cs ⊢ (p ⇒ q) = ((⇒ p) ∷ cs) ⊢ q
+
 
 
 ----------------------------------------
@@ -106,17 +114,17 @@ modelsupports (model holds _) cs n = cs , holds ⊢ n
 
 
 modeldenies : Separation → List Arrow → ℕ → Bool
-modeldenies (model _ fails) cs n = any (_∋_ (closure cs (n ∷ ∘))) fails
+modeldenies (model _ fails) cs n = any (_∋_ (closure cs ([ n ]))) fails
 
 
 _⟪!_⟫_ : List Arrow → Separation → Arrow → Bool
 cs ⟪! m ⟫ (⇒ q) = modeldenies m cs q
-cs ⟪! m ⟫ (p ⇒ q) = (modelsupports m cs p) and (cs ⟪! m ⟫ q)
+cs ⟪! m ⟫ (p ⇒ q) = (modelsupports m cs p) ∧ (cs ⟪! m ⟫ q)
 
 
 _⟪_⟫_ : List Arrow → List Separation → Arrow → Bool
-cs ⟪ ∘ ⟫ arr = false
-cs ⟪ m ∷ ms ⟫ arr = (cs ⟪! m ⟫ arr) or (cs ⟪ ms ⟫ arr)
+cs ⟪ [] ⟫ arr     = false
+cs ⟪ m ∷ ms ⟫ arr = (cs ⟪! m ⟫ arr) ∨ (cs ⟪ ms ⟫ arr)
 
 
 
@@ -175,24 +183,24 @@ proofs =
    (5 ⇒ (⇒ 1)) ∷
    (3 ⇒ (1 ⇒ (⇒ 9))) ∷
    (1 ⇒ (⇒ 2)) ∷
-   (10 ⇒ (⇒ 2)) ∷ ∘
+   (10 ⇒ (⇒ 2)) ∷ []
 
 cms : List Separation
 cms =
-  (model (12 ∷ 6 ∷ 11 ∷ 4 ∷ 1 ∷ ∘) (5 ∷ 3 ∷ 7 ∷ 7 ∷ ∘)) ∷
-  (model (6 ∷ 3 ∷ 11 ∷ 4 ∷ 7 ∷ 8 ∷ 3 ∷ 9 ∷ 10 ∷ 1 ∷ ∘) (5 ∷ ∘)) ∷
-  (model (12 ∷ 5 ∷ 11 ∷ 4 ∷ 1 ∷ ∘) (6 ∷ 3 ∷ ∘)) ∷
-  (model (5 ∷ 3 ∷ 11 ∷ 4 ∷ 7 ∷ 8 ∷ 3 ∷ 9 ∷ 10 ∷ 1 ∷ ∘) (6 ∷ ∘)) ∷
-  (model (12 ∷ 4 ∷ 11 ∷ ∘) (5 ∷ 6 ∷ 3 ∷ 8 ∷ 9 ∷ 1 ∷ ∘)) ∷
-  (model (12 ∷ 5 ∷ 6 ∷ 4 ∷ 11 ∷ 1 ∷ ∘) (3 ∷ ∘)) ∷
-  (model (12 ∷ 4 ∷ 11 ∷ 7 ∷ ∘) (9 ∷ 5 ∷ 6 ∷ 10 ∷ 8 ∷ 1 ∷ ∘)) ∷
-  (model (10 ∷ 9 ∷ ∘) (1 ∷ ∘)) ∷
-  (model (3 ∷ 4 ∷ 11 ∷ ∘) (9 ∷ 5 ∷ 6 ∷ 10 ∷ 7 ∷ 1 ∷ ∘)) ∷
-  (model (12 ∷ 7 ∷ 1 ∷ ∘) (4 ∷ 11 ∷ 8 ∷ ∘)) ∷
-  (model (9 ∷ 3 ∷ 10 ∷ 8 ∷ 1 ∷ ∘) (11 ∷ ∘)) ∷
-  (model (12 ∷ 4 ∷ 10 ∷ 1 ∷ ∘) (11 ∷ 3 ∷ ∘)) ∷
-  (model (3 ∷ 6 ∷ 5 ∷ ∘) (∘)) ∷
-  (model (1 ∷ 2 ∷ 3 ∷ 4 ∷ 5 ∷ 6 ∷ 7 ∷ 8 ∷ 9 ∷ 10 ∷ 11 ∷ ∘) (12 ∷ ∘)) ∷ ∘
+  (model (12 ∷ 6 ∷ 11 ∷ 4 ∷ 1 ∷ []) (5 ∷ 3 ∷ 7 ∷ 7 ∷ [])) ∷
+  (model (6 ∷ 3 ∷ 11 ∷ 4 ∷ 7 ∷ 8 ∷ 3 ∷ 9 ∷ 10 ∷ 1 ∷ []) (5 ∷ [])) ∷
+  (model (12 ∷ 5 ∷ 11 ∷ 4 ∷ 1 ∷ []) (6 ∷ 3 ∷ [])) ∷
+  (model (5 ∷ 3 ∷ 11 ∷ 4 ∷ 7 ∷ 8 ∷ 3 ∷ 9 ∷ 10 ∷ 1 ∷ []) (6 ∷ [])) ∷
+  (model (12 ∷ 4 ∷ 11 ∷ []) (5 ∷ 6 ∷ 3 ∷ 8 ∷ 9 ∷ 1 ∷ [])) ∷
+  (model (12 ∷ 5 ∷ 6 ∷ 4 ∷ 11 ∷ 1 ∷ []) (3 ∷ [])) ∷
+  (model (12 ∷ 4 ∷ 11 ∷ 7 ∷ []) (9 ∷ 5 ∷ 6 ∷ 10 ∷ 8 ∷ 1 ∷ [])) ∷
+  (model (10 ∷ 9 ∷ []) (1 ∷ [])) ∷
+  (model (3 ∷ 4 ∷ 11 ∷ []) (9 ∷ 5 ∷ 6 ∷ 10 ∷ 7 ∷ 1 ∷ [])) ∷
+  (model (12 ∷ 7 ∷ 1 ∷ []) (4 ∷ 11 ∷ 8 ∷ [])) ∷
+  (model (9 ∷ 3 ∷ 10 ∷ 8 ∷ 1 ∷ []) (11 ∷ [])) ∷
+  (model (12 ∷ 4 ∷ 10 ∷ 1 ∷ []) (11 ∷ 3 ∷ [])) ∷
+  (model (3 ∷ 6 ∷ 5 ∷ []) ([])) ∷
+  (model (1 ∷ 2 ∷ 3 ∷ 4 ∷ 5 ∷ 6 ∷ 7 ∷ 8 ∷ 9 ∷ 10 ∷ 11 ∷ []) (12 ∷ [])) ∷ []
 
 testp : Arrow
 testp = (5 ⇒ (⇒ 10))
