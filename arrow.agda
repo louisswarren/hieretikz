@@ -1,4 +1,6 @@
-open import Agda.Builtin.Bool
+data Bool : Set where
+  true  : Bool
+  false : Bool
 
 
 _or_ : Bool → Bool → Bool
@@ -37,9 +39,6 @@ infixr 5 _∷_
 data List (A : Set) : Set where
   ∘   : List A
   _∷_ : A → List A → List A
-{-# BUILTIN LIST List #-}
-{-# BUILTIN NIL  ∘    #-}
-{-# BUILTIN CONS _∷_  #-}
 
 
 any : {A : Set} → (A → Bool) → List A → Bool
@@ -206,6 +205,3 @@ tests = (5 ⇒ (⇒ 3))
 
 testu : Arrow
 testu = (6 ⇒ (⇒ 1))
-
-
-main = (closure proofs (5 ∷ ∘))
