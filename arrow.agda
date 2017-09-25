@@ -12,6 +12,9 @@ _∧_ : Bool → Bool → Bool
 false ∧ _ = false
 true ∧ b  = b
 
+if_then_else_ : {A : Set} → Bool → A → A → A
+if true  then a else _ = a
+if false then _ else b = b
 
 ----------------------------------------
 
@@ -202,14 +205,17 @@ cms =
   (model (3 ∷ 6 ∷ 5 ∷ []) ([])) ∷
   (model (1 ∷ 2 ∷ 3 ∷ 4 ∷ 5 ∷ 6 ∷ 7 ∷ 8 ∷ 9 ∷ 10 ∷ 11 ∷ []) (12 ∷ [])) ∷ []
 
-testp : Arrow
-testp = (5 ⇒ (⇒ 10))
+testp : Relation
+testp = consider proofs cms (5 ⇒ (⇒ 10))
 
-testd : Arrow
-testd = (5 ⇒ (⇒ 4))
+testd : Relation
+testd = consider proofs cms (5 ⇒ (⇒ 4))
 
-tests : Arrow
-tests = (5 ⇒ (⇒ 3))
+tests : Relation
+tests = consider proofs cms (5 ⇒ (⇒ 3))
 
-testu : Arrow
-testu = (6 ⇒ (⇒ 1))
+testu : Relation
+testu = consider proofs cms (6 ⇒ (⇒ 1))
+
+testcl : List ℕ
+testcl = closure proofs (5 ∷ [])
