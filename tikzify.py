@@ -54,6 +54,8 @@ class TikzHierarchy:
         return 'color={{rgb:red,{};green,{};blue,{}}}'.format(r, g, b)
 
     def add_edge(self, a, b, arrow_type='->', label='', *, color=True):
+        if not (a in self.nodes and b in self.nodes):
+            return
         fmt = '\\draw[{}] ({}) to[{}] {}({});'
         if label:
             options = arrow_type
