@@ -1,6 +1,11 @@
+open import IO
+
 data Bool : Set where
   true  : Bool
   false : Bool
+-- {-# BUILTIN BOOL  Bool  #-}
+-- {-# BUILTIN TRUE  true  #-}
+-- {-# BUILTIN FALSE false #-}
 
 
 _∨_ : Bool → Bool → Bool
@@ -12,30 +17,42 @@ _∧_ : Bool → Bool → Bool
 false ∧ _ = false
 true ∧ b  = b
 
+
 if_then_else_ : {A : Set} → Bool → A → A → A
 if true  then a else _ = a
 if false then _ else b = b
 
-----------------------------------------
-
-
-
-data ℕ : Set where
-  zero : ℕ
-  suc  : ℕ → ℕ
-{-# BUILTIN NATURAL ℕ #-}
-
-
-_==_ : ℕ → ℕ → Bool
-zero == zero   = true
-suc n == suc m = n == m
-_ == _         = false
-
-
 
 ----------------------------------------
 
+postulate String : Set
+{-# BUILTIN STRING String #-}
 
+primitive
+  primStringAppend   : String → String → String
+  primStringEquality : String → String → Bool
+  primShowString     : String → String
+
+_>>>_ : String → String → String
+_>>>_ = primStringAppend
+
+_===_ : String → String → Bool
+_===_ = primStringEquality
+
+infixl 1 _>>>_
+
+
+
+----------------------------------------
+
+data Principle : Set where
+  # : String → Principle
+
+
+_==_ : Principle → Principle → Bool
+(# a) == (# b) = a === b
+
+----------------------------------------
 
 data List (A : Set) : Set where
   []  : List A
@@ -52,14 +69,14 @@ any _ []       = false
 any f (x ∷ xs) = (f x) ∨ (any f xs)
 
 
-_∈_ : ℕ → List ℕ → Bool
+_∈_ : Principle → List Principle → Bool
 x ∈ []       = false
 x ∈ (y ∷ ys) with x == y
 ...             | true  = true
 ...             | false = x ∈ ys
 
 
-_∋_ : List ℕ → ℕ → Bool
+_∋_ : List Principle → Principle → Bool
 xs ∋ y = y ∈ xs
 
 
@@ -67,10 +84,9 @@ xs ∋ y = y ∈ xs
 ----------------------------------------
 
 
-
 data Arrow : Set where
-  ⇒_  : ℕ → Arrow
-  _⇒_ : ℕ → Arrow → Arrow
+  ⇒_  : Principle → Arrow
+  _⇒_ : Principle → Arrow → Arrow
 
 
 _≡≡_ : Arrow → Arrow → Bool
@@ -86,7 +102,7 @@ x ∈∈ (y ∷ ys) with x ≡≡ y
 ...              | false = x ∈∈ ys
 
 
-closure : List Arrow → List ℕ → List ℕ
+closure : List Arrow → List Principle → List Principle
 closure [] found               = found
 closure ((⇒ n) ∷ rest) found   = n ∷ (closure rest (n ∷ found))
 closure ((n ⇒ q) ∷ rest) found with (n ∈ found) ∨ (n ∈ (closure rest found))
@@ -94,7 +110,7 @@ closure ((n ⇒ q) ∷ rest) found with (n ∈ found) ∨ (n ∈ (closure rest f
 ...                               | false = closure rest found
 
 
-_,_⊢_ : List Arrow → List ℕ → ℕ → Bool
+_,_⊢_ : List Arrow → List Principle → Principle → Bool
 cs , ps ⊢ q = q ∈ (closure cs ps)
 
 
@@ -109,14 +125,14 @@ cs ⊢ (p ⇒ q) = ((⇒ p) ∷ cs) ⊢ q
 
 
 data Separation : Set where
-  model : List ℕ → List ℕ → Separation
+  model : List Principle → List Principle → Separation
 
 
-modelsupports : Separation → List Arrow → ℕ → Bool
+modelsupports : Separation → List Arrow → Principle → Bool
 modelsupports (model holds _) cs n = cs , holds ⊢ n
 
 
-modeldenies : Separation → List Arrow → ℕ → Bool
+modeldenies : Separation → List Arrow → Principle → Bool
 modeldenies (model _ fails) cs n = any (_∋_ (closure cs ([ n ]))) fails
 
 
@@ -154,68 +170,77 @@ consider cs ms arr with (arr ∈∈ cs)
 
 proofs : List Arrow
 proofs =
-   (3 ⇒ (⇒ 4)) ∷
---   (5 ⇒ (⇒ 4)) ∷
-   (6 ⇒ (⇒ 4)) ∷
-   (3 ⇒ (⇒ 3)) ∷
-   (3 ⇒ (⇒ 3)) ∷
-   (9 ⇒ (⇒ 3)) ∷
-   (9 ⇒ (⇒ 3)) ∷
-   (5 ⇒ (⇒ 7)) ∷
-   (9 ⇒ (⇒ 7)) ∷
-   (6 ⇒ (⇒ 8)) ∷
-   (10 ⇒ (⇒ 8)) ∷
-   (10 ⇒ (⇒ 7)) ∷
-   (5 ⇒ (⇒ 10)) ∷
-   (10 ⇒ (⇒ 4)) ∷
-   (5 ⇒ (⇒ 11)) ∷
-   (6 ⇒ (⇒ 11)) ∷
-   (11 ⇒ (⇒ 4)) ∷
-   (10 ⇒ (⇒ 7)) ∷
-   (8 ⇒ (⇒ 4)) ∷
-   (9 ⇒ (⇒ 7)) ∷
-   (9 ⇒ (⇒ 8)) ∷
-   (3 ⇒ (⇒ 8)) ∷
-   (5 ⇒ (3 ⇒ (⇒ 9))) ∷
-   (6 ⇒ (7 ⇒ (⇒ 10))) ∷
-   (6 ⇒ (3 ⇒ (⇒ 3))) ∷
-   (7 ⇒ (⇒ 7)) ∷
-   (7 ⇒ (⇒ 7)) ∷
-   (7 ⇒ (8 ⇒ (⇒ 10))) ∷
-   (3 ⇒ (10 ⇒ (⇒ 9))) ∷
-   (5 ⇒ (⇒ 1)) ∷
-   (3 ⇒ (1 ⇒ (⇒ 9))) ∷
-   (1 ⇒ (⇒ 2)) ∷
-   (10 ⇒ (⇒ 2)) ∷ []
+   ((# "3") ⇒ (⇒ (# "4"))) ∷
+--   ((# "5") ⇒ (⇒ (# "4"))) ∷
+   ((# "6") ⇒ (⇒ (# "4"))) ∷
+   ((# "3") ⇒ (⇒ (# "3"))) ∷
+   ((# "3") ⇒ (⇒ (# "3"))) ∷
+   ((# "9") ⇒ (⇒ (# "3"))) ∷
+   ((# "9") ⇒ (⇒ (# "3"))) ∷
+   ((# "5") ⇒ (⇒ (# "7"))) ∷
+   ((# "9") ⇒ (⇒ (# "7"))) ∷
+   ((# "6") ⇒ (⇒ (# "8"))) ∷
+   ((# "10") ⇒ (⇒ (# "8"))) ∷
+   ((# "10") ⇒ (⇒ (# "7"))) ∷
+   ((# "5") ⇒ (⇒ (# "10"))) ∷
+   ((# "10") ⇒ (⇒ (# "4"))) ∷
+   ((# "5") ⇒ (⇒ (# "11"))) ∷
+   ((# "6") ⇒ (⇒ (# "11"))) ∷
+   ((# "11") ⇒ (⇒ (# "4"))) ∷
+   ((# "10") ⇒ (⇒ (# "7"))) ∷
+   ((# "8") ⇒ (⇒ (# "4"))) ∷
+   ((# "9") ⇒ (⇒ (# "7"))) ∷
+   ((# "9") ⇒ (⇒ (# "8"))) ∷
+   ((# "3") ⇒ (⇒ (# "8"))) ∷
+   ((# "5") ⇒ ((# "3") ⇒ (⇒ (# "9")))) ∷
+   ((# "6") ⇒ ((# "7") ⇒ (⇒ (# "10")))) ∷
+   ((# "6") ⇒ ((# "3") ⇒ (⇒ (# "3")))) ∷
+   ((# "7") ⇒ (⇒ (# "7"))) ∷
+   ((# "7") ⇒ (⇒ (# "7"))) ∷
+   ((# "7") ⇒ ((# "8") ⇒ (⇒ (# "10")))) ∷
+   ((# "3") ⇒ ((# "10") ⇒ (⇒ (# "9")))) ∷
+   ((# "5") ⇒ (⇒ (# "1"))) ∷
+   ((# "3") ⇒ ((# "1") ⇒ (⇒ (# "9")))) ∷
+   ((# "1") ⇒ (⇒ (# "2"))) ∷
+   ((# "10") ⇒ (⇒ (# "2"))) ∷ []
 
 cms : List Separation
 cms =
-  (model (12 ∷ 6 ∷ 11 ∷ 4 ∷ 1 ∷ []) (5 ∷ 3 ∷ 7 ∷ 7 ∷ [])) ∷
-  (model (6 ∷ 3 ∷ 11 ∷ 4 ∷ 7 ∷ 8 ∷ 3 ∷ 9 ∷ 10 ∷ 1 ∷ []) (5 ∷ [])) ∷
-  (model (12 ∷ 5 ∷ 11 ∷ 4 ∷ 1 ∷ []) (6 ∷ 3 ∷ [])) ∷
-  (model (5 ∷ 3 ∷ 11 ∷ 4 ∷ 7 ∷ 8 ∷ 3 ∷ 9 ∷ 10 ∷ 1 ∷ []) (6 ∷ [])) ∷
-  (model (12 ∷ 4 ∷ 11 ∷ []) (5 ∷ 6 ∷ 3 ∷ 8 ∷ 9 ∷ 1 ∷ [])) ∷
-  (model (12 ∷ 5 ∷ 6 ∷ 4 ∷ 11 ∷ 1 ∷ []) (3 ∷ [])) ∷
-  (model (12 ∷ 4 ∷ 11 ∷ 7 ∷ []) (9 ∷ 5 ∷ 6 ∷ 10 ∷ 8 ∷ 1 ∷ [])) ∷
-  (model (10 ∷ 9 ∷ []) (1 ∷ [])) ∷
-  (model (3 ∷ 4 ∷ 11 ∷ []) (9 ∷ 5 ∷ 6 ∷ 10 ∷ 7 ∷ 1 ∷ [])) ∷
-  (model (12 ∷ 7 ∷ 1 ∷ []) (4 ∷ 11 ∷ 8 ∷ [])) ∷
-  (model (9 ∷ 3 ∷ 10 ∷ 8 ∷ 1 ∷ []) (11 ∷ [])) ∷
-  (model (12 ∷ 4 ∷ 10 ∷ 1 ∷ []) (11 ∷ 3 ∷ [])) ∷
-  (model (3 ∷ 6 ∷ 5 ∷ []) ([])) ∷
-  (model (1 ∷ 2 ∷ 3 ∷ 4 ∷ 5 ∷ 6 ∷ 7 ∷ 8 ∷ 9 ∷ 10 ∷ 11 ∷ []) (12 ∷ [])) ∷ []
+  (model ((# "12") ∷ (# "6") ∷ (# "11") ∷ (# "4") ∷ (# "1") ∷ []) ((# "5") ∷ (# "3") ∷ (# "7") ∷ (# "7") ∷ [])) ∷
+  (model ((# "6") ∷ (# "3") ∷ (# "11") ∷ (# "4") ∷ (# "7") ∷ (# "8") ∷ (# "3") ∷ (# "9") ∷ (# "10") ∷ (# "1") ∷ []) ((# "5") ∷ [])) ∷
+  (model ((# "12") ∷ (# "5") ∷ (# "11") ∷ (# "4") ∷ (# "1") ∷ []) ((# "6") ∷ (# "3") ∷ [])) ∷
+  (model ((# "5") ∷ (# "3") ∷ (# "11") ∷ (# "4") ∷ (# "7") ∷ (# "8") ∷ (# "3") ∷ (# "9") ∷ (# "10") ∷ (# "1") ∷ []) ((# "6") ∷ [])) ∷
+  (model ((# "12") ∷ (# "4") ∷ (# "11") ∷ []) ((# "5") ∷ (# "6") ∷ (# "3") ∷ (# "8") ∷ (# "9") ∷ (# "1") ∷ [])) ∷
+  (model ((# "12") ∷ (# "5") ∷ (# "6") ∷ (# "4") ∷ (# "11") ∷ (# "1") ∷ []) ((# "3") ∷ [])) ∷
+  (model ((# "12") ∷ (# "4") ∷ (# "11") ∷ (# "7") ∷ []) ((# "9") ∷ (# "5") ∷ (# "6") ∷ (# "10") ∷ (# "8") ∷ (# "1") ∷ [])) ∷
+  (model ((# "10") ∷ (# "9") ∷ []) ((# "1") ∷ [])) ∷
+  (model ((# "3") ∷ (# "4") ∷ (# "11") ∷ []) ((# "9") ∷ (# "5") ∷ (# "6") ∷ (# "10") ∷ (# "7") ∷ (# "1") ∷ [])) ∷
+  (model ((# "12") ∷ (# "7") ∷ (# "1") ∷ []) ((# "4") ∷ (# "11") ∷ (# "8") ∷ [])) ∷
+  (model ((# "9") ∷ (# "3") ∷ (# "10") ∷ (# "8") ∷ (# "1") ∷ []) ((# "11") ∷ [])) ∷
+  (model ((# "12") ∷ (# "4") ∷ (# "10") ∷ (# "1") ∷ []) ((# "11") ∷ (# "3") ∷ [])) ∷
+  (model ((# "3") ∷ (# "6") ∷ (# "5") ∷ []) ([])) ∷
+  (model ((# "1") ∷ (# "2") ∷ (# "3") ∷ (# "4") ∷ (# "5") ∷ (# "6") ∷ (# "7") ∷ (# "8") ∷ (# "9") ∷ (# "10") ∷ (# "11") ∷ []) ((# "12") ∷ [])) ∷ []
 
 testp : Relation
-testp = consider proofs cms (5 ⇒ (⇒ 10))
+testp = consider proofs cms ((# "5") ⇒ (⇒ (# "10")))
 
 testd : Relation
-testd = consider proofs cms (5 ⇒ (⇒ 4))
+testd = consider proofs cms ((# "5") ⇒ (⇒ (# "4")))
 
 tests : Relation
-tests = consider proofs cms (5 ⇒ (⇒ 3))
+tests = consider proofs cms ((# "5") ⇒ (⇒ (# "3")))
 
 testu : Relation
-testu = consider proofs cms (6 ⇒ (⇒ 1))
+testu = consider proofs cms ((# "6") ⇒ (⇒ (# "1")))
 
-testcl : List ℕ
-testcl = closure proofs (5 ∷ [])
+testcl : List Principle
+testcl = closure proofs ((# "5") ∷ [])
+
+
+
+stringifylp : List Principle → String
+stringifylp [] = "[]"
+stringifylp ((# s) ∷ xs) = s >>> " ∷ " >>> (stringifylp xs)
+
+
+main = run (putStrLn (stringifylp testcl))
