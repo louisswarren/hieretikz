@@ -1,43 +1,79 @@
-open import IO
+open import Data.Bool.Base using (Bool)
+------------------------------------------------------------------------
+-- The Agda standard library
+--
+-- IO
+------------------------------------------------------------------------
 
-data Bool : Set where
-  true  : Bool
-  false : Bool
--- {-# BUILTIN BOOL  Bool  #-}
--- {-# BUILTIN TRUE  true  #-}
--- {-# BUILTIN FALSE false #-}
+open import Coinduction
+open import Data.Unit
+open import Data.String
+open import Data.Colist
+open import Function
+import IO.Primitive as Prim
+open import Level
 
+------------------------------------------------------------------------
+-- The IO monad
+
+-- One cannot write "infinitely large" computations with the
+-- postulated IO monad in IO.Primitive without turning off the
+-- termination checker (or going via the FFI, or perhaps abusing
+-- something else). The following coinductive deep embedding is
+-- introduced to avoid this problem. Possible non-termination is
+-- isolated to the run function below.
+
+infixl 1 _>>=_ _>>_
+
+data IO {a} (A : Set a) : Set (suc a) where
+  lift   : (m : Prim.IO A) → IO A
+  return : (x : A) → IO A
+  _>>=_  : {B : Set a} (m : ∞ (IO B)) (f : (x : B) → ∞ (IO A)) → IO A
+  _>>_   : {B : Set a} (m₁ : ∞ (IO B)) (m₂ : ∞ (IO A)) → IO A
+
+{-# NON_TERMINATING #-}
+
+run : ∀ {a} {A : Set a} → IO A → Prim.IO A
+run (lift m)   = m
+run (return x) = Prim.return x
+run (m  >>= f) = Prim._>>=_ (run (♭ m )) λ x → run (♭ (f x))
+run (m₁ >> m₂) = Prim._>>=_ (run (♭ m₁)) λ _ → run (♭ m₂)
+
+putStr∞ : Costring → IO ⊤
+putStr∞ s =
+  ♯ lift (Prim.putStr s) >>
+  ♯ return _
+
+putStr : String → IO ⊤
+putStr s = putStr∞ (toCostring s)
+
+putStrLn∞ : Costring → IO ⊤
+putStrLn∞ s =
+  ♯ lift (Prim.putStrLn s) >>
+  ♯ return _
+
+putStrLn : String → IO ⊤
+putStrLn s = putStrLn∞ (toCostring s)
 
 _∨_ : Bool → Bool → Bool
-true ∨ _  = true
-false ∨ b = b
+Bool.true ∨ _  = Bool.true
+Bool.false ∨ b = b
 
 
 _∧_ : Bool → Bool → Bool
-false ∧ _ = false
-true ∧ b  = b
+Bool.false ∧ _ = Bool.false
+Bool.true ∧ b  = b
 
 
 if_then_else_ : {A : Set} → Bool → A → A → A
-if true  then a else _ = a
-if false then _ else b = b
+if Bool.true  then a else _ = a
+if Bool.false then _ else b = b
 
 
 ----------------------------------------
 
-postulate String : Set
-{-# BUILTIN STRING String #-}
-
-primitive
-  primStringAppend   : String → String → String
-  primStringEquality : String → String → Bool
-  primShowString     : String → String
-
 _>>>_ : String → String → String
 _>>>_ = primStringAppend
-
-_===_ : String → String → Bool
-_===_ = primStringEquality
 
 infixl 1 _>>>_
 
@@ -49,8 +85,8 @@ data Principle : Set where
   # : String → Principle
 
 
-_==_ : Principle → Principle → Bool
-(# a) == (# b) = a === b
+_=p=_ : Principle → Principle → Bool
+(# a) =p= (# b) = a == b
 
 ----------------------------------------
 
@@ -60,24 +96,24 @@ data List (A : Set) : Set where
 infixr 5 _∷_
 
 
-[_] : {A : Set} → A → List A
-[ x ] = x ∷ []
+[[_]] : {A : Set} → A → List A
+[[ x ]] = x ∷ []
 
 
 any : {A : Set} → (A → Bool) → List A → Bool
-any _ []       = false
+any _ []       = Bool.false
 any f (x ∷ xs) = (f x) ∨ (any f xs)
 
 
-_∈_ : Principle → List Principle → Bool
-x ∈ []       = false
-x ∈ (y ∷ ys) with x == y
-...             | true  = true
-...             | false = x ∈ ys
+_∈∈_ : Principle → List Principle → Bool
+x ∈∈ []       = Bool.false
+x ∈∈ (y ∷ ys) with x =p= y
+...             | Bool.true  = Bool.true
+...             | Bool.false = x ∈∈ ys
 
 
-_∋_ : List Principle → Principle → Bool
-xs ∋ y = y ∈ xs
+_∋∋_ : List Principle → Principle → Bool
+xs ∋∋ y = y ∈∈ xs
 
 
 
@@ -90,32 +126,32 @@ data Arrow : Set where
 
 
 _≡≡_ : Arrow → Arrow → Bool
-(⇒ q) ≡≡ (⇒ s)     = q == s
-(p ⇒ q) ≡≡ (r ⇒ s) = (p == r) ∧ (q ≡≡ s)
-_ ≡≡ _             = false
+(⇒ q) ≡≡ (⇒ s)     = q =p= s
+(p ⇒ q) ≡≡ (r ⇒ s) = (p =p= r) ∧ (q ≡≡ s)
+_ ≡≡ _             = Bool.false
 
 
-_∈∈_ : Arrow → List Arrow → Bool
-x ∈∈ []       = false
-x ∈∈ (y ∷ ys) with x ≡≡ y
-...              | true  = true
-...              | false = x ∈∈ ys
+_∈∈∈∈_ : Arrow → List Arrow → Bool
+x ∈∈∈∈ []       = Bool.false
+x ∈∈∈∈ (y ∷ ys) with x ≡≡ y
+...              | Bool.true  = Bool.true
+...              | Bool.false = x ∈∈∈∈ ys
 
 
 closure : List Arrow → List Principle → List Principle
 closure [] found               = found
 closure ((⇒ n) ∷ rest) found   = n ∷ (closure rest (n ∷ found))
-closure ((n ⇒ q) ∷ rest) found with (n ∈ found) ∨ (n ∈ (closure rest found))
-...                               | true  = closure (q ∷ rest) found
-...                               | false = closure rest found
+closure ((n ⇒ q) ∷ rest) found with (n ∈∈ found) ∨ (n ∈∈ (closure rest found))
+...                               | Bool.true  = closure (q ∷ rest) found
+...                               | Bool.false = closure rest found
 
 
 _,_⊢_ : List Arrow → List Principle → Principle → Bool
-cs , ps ⊢ q = q ∈ (closure cs ps)
+cs , ps ⊢ q = q ∈∈ (closure cs ps)
 
 
 _⊢_ : List Arrow → Arrow → Bool
-cs ⊢ (⇒ q)   = q ∈ (closure cs [])
+cs ⊢ (⇒ q)   = q ∈∈ (closure cs [])
 cs ⊢ (p ⇒ q) = ((⇒ p) ∷ cs) ⊢ q
 
 
@@ -133,7 +169,7 @@ modelsupports (model holds _) cs n = cs , holds ⊢ n
 
 
 modeldenies : Separation → List Arrow → Principle → Bool
-modeldenies (model _ fails) cs n = any (_∋_ (closure cs ([ n ]))) fails
+modeldenies (model _ fails) cs n = any (_∋∋_ (closure cs ([[ n ]]))) fails
 
 
 _⟪!_⟫_ : List Arrow → Separation → Arrow → Bool
@@ -142,7 +178,7 @@ cs ⟪! m ⟫ (p ⇒ q) = (modelsupports m cs p) ∧ (cs ⟪! m ⟫ q)
 
 
 _⟪_⟫_ : List Arrow → List Separation → Arrow → Bool
-cs ⟪ [] ⟫ arr     = false
+cs ⟪ [] ⟫ arr     = Bool.false
 cs ⟪ m ∷ ms ⟫ arr = (cs ⟪! m ⟫ arr) ∨ (cs ⟪ ms ⟫ arr)
 
 
@@ -159,13 +195,13 @@ data Relation : Set where
 
 
 consider : List Arrow → List Separation → Arrow → Relation
-consider cs ms arr with (arr ∈∈ cs)
-...                   | true  = Proved
-...                   | false with (cs ⊢ arr)
-...                              | true  = Derivable
-...                              | false with (cs ⟪ ms ⟫ arr)
-...                                         | true  = Separated
-...                                         | false = Unknown
+consider cs ms arr with (arr ∈∈∈∈ cs)
+...                   | Bool.true  = Proved
+...                   | Bool.false with (cs ⊢ arr)
+...                              | Bool.true  = Derivable
+...                              | Bool.false with (cs ⟪ ms ⟫ arr)
+...                                         | Bool.true  = Separated
+...                                         | Bool.false = Unknown
 
 
 proofs : List Arrow
