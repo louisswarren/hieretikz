@@ -9,6 +9,11 @@ efq = 'efq'
 globals().update({future: future for future in
  'ud udn lem wlem dp dpn he dnsu dnse glpon glpoa gmp mgmp dgp'.split()})
 
+# These are actually equivalent. Condense them once investigations are complete.
+# glpo = lem
+# hen = dpn
+# wgmp = dnse
+
 formula_layout = '''\
     glpoa
                               lem
@@ -36,9 +41,14 @@ unnamed_proofs = {
     (dpn, hen), (hen, dpn),
     (dnsu, wgmp), (wgmp, dnsu),
     (lem, wlem),
+    (dp, dpn),
+    (he, hen),
     (glpoa, lem),
     (dp, dnsu),
     (glpo, dpn),
+    (he, dnse),
+    (glpo, dnse),
+    (gmp, dnse),
 }
 
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
