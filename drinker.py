@@ -2,18 +2,20 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'uds udsn lem wlem dp dpn he dnsu dnse glpon glpoa gmp mgmp dgp'.split()
+formulae = 'lem wlem dgp glpo glpoa gmp wgmp dp he dpn hen dnsu dnse ud ip'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
+globals().update({future: future for future in
+ 'ud udn lem wlem dp dpn he dnsu dnse glpon glpoa gmp mgmp dgp'.split()})
 
 formula_layout = '''\
     glpoa
                               lem
                 dp                             he
                                     dpn
-                uds  gmp   mgmp     dgp
-             udsn
+                ud  gmp   mgmp     dgp
+             udn
             dnsu       glpon                    dnse
                               wlem
 '''
@@ -23,111 +25,71 @@ formula_strs[dnse] = R'DNS$\exists$'
 formula_strs[glpoa] = "GLPO$'$"
 formula_strs[glpon] = R'GLPO$_\neg$'
 
-wgmp = dnsu
-glpo = lem
-hen = dpn
 formula_strs[dnsu] = R'DNS$\forall$,WGMP'
 formula_strs[lem] = R'LEM,GLPO'
 formula_strs[dpn] = R'DP$_\lnot$,HE$_\lnot$'
 
 
 unnamed_proofs = {
+    (he, ip), (ip, he),
+    (lem, glpo), (glpo, lem),
+    (dpn, hen), (hen, dpn),
+    (dnsu, wgmp), (wgmp, dnsu),
     (lem, wlem),
-    (dp, wlem), #This actually assumes multiple terms
-    (he, wlem), #This actually assumes multiple terms
-    (lem, glpo),
-    (glpo, lem),
     (glpoa, lem),
-    (glpoa, glpo),
     (dp, dnsu),
-    (glpoa, dnsu),
-    (he, dnse),
-    (gmp, dnse),
-    (gmp, dnsu),
-    (dp, gmp),
-    (gmp, wlem),
-    (dp, dgp),
-    (he, dgp),
-    (dgp, wlem),
-    (gmp, wgmp),
-    (dnse, wlem),
-    (glpoa, wgmp),
-    (glpoa, dnse),
-    (glpo, dnse),
-    (dp, lem, glpoa),
-    (hen, dnsu, gmp), #hen suffices ...
-    (he, lem, glpo),
-    (wgmp, dnsu),
-    (dnsu, wgmp),
-    (wgmp, dnse, gmp),
-    (lem, gmp, glpoa),
-    (dp, dpn),
-    (he, hen),
-    (dp, hen),
-    (he, dpn),
-    (dpn, hen),
-    (hen, dpn),
-    (dpn, wlem),
-    (hen, wlem),
-    (lem, glpon),
-    (glpon, wlem),
     (glpo, dpn),
-    (dp, uds),
-    (lem, uds, glpoa),
-    (uds, udsn),
-    (gmp, udsn),
-    (glpoa, mgmp),
-    (mgmp, wlem),
 }
+
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
 named_models = {
     'dp-cm': (
-        {efq, he, dgp, wlem, glpon, uds},
+        {efq, he, dgp, wlem, glpon, ud},
         {dp, lem, dnsu, wgmp, mgmp},
     ),
     'dp-cm-lobot': (
-        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, uds},
+        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
         {dp},
     ),
     'he-cm': (
-        {efq, dp, dgp, wlem, glpon, uds},
+        {efq, dp, dgp, wlem, glpon, ud},
         {he, lem},
     ),
     'he-cm-lobot': (
-        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, uds},
+        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
         {he},
     ),
     'linear-growing-terms': (
         {efq, wlem, dgp},
-        {dp, he, lem, dnse, glpoa, uds},
+        {dp, he, lem, dnse, glpoa, ud},
     ),
     'two-world-constant-terms': (
-        {efq, dp, he, wlem, dgp, uds},
+        {efq, dp, he, wlem, dgp, ud},
         {lem},
     ),
     'two-world-growing-terms': (
         {efq, wlem, dgp, wgmp},
-        {glpoa, dp, he, dpn, hen, gmp, dnse, glpon, uds},
+        {glpoa, dp, he, dpn, hen, gmp, dnse, glpon, ud},
     ),
     'two-world-growing-terms-lobot': (
         {gmp, glpoa},
-        {uds},
+        {ud},
     ),
     'two-world-growing-terms-with-bot': (
         {lem, wlem, dgp},
-        {glpoa, dp, he, gmp, wgmp, uds, mgmp},
+        {glpoa, dp, he, gmp, wgmp, ud, mgmp},
     ),
     'v-const-term': (
-        {efq, dnsu, uds},
+        {efq, dnsu, ud},
         {wlem, dgp, dnse},
     ),
     'v-const-term-lobot': (
-        {glpoa, lem, dpn, hen, gmp, dnse, glpon, uds},
+        {glpoa, lem, dpn, hen, gmp, dnse, glpon, ud},
         {dgp},
     ),
     'diamond-constant-terms': (
-        {efq, wlem, gmp, uds},
+        {efq, wlem, gmp, ud},
         {dgp, lem},
     ),
     'beth-width-two': (
