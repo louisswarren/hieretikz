@@ -43,12 +43,16 @@ unnamed_proofs = {
     (lem, wlem),
     (dp, dpn),
     (he, hen),
+    (gmp, wgmp),
+    (dgp, wlem),
     (glpoa, lem),
     (dp, dnsu),
     (glpo, dpn),
     (he, dnse),
     (glpo, dnse),
     (gmp, dnse),
+    (dpn, dnse),
+    (glpoa, wgmp),
 }
 
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
@@ -105,6 +109,10 @@ named_models = {
     'beth-width-two': (
         {lem, he, dp},
         set(),
+    ),
+    'one-term-v': (
+        {dp, he},
+        {wlem, dgp},
     ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
