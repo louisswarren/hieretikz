@@ -16,11 +16,11 @@ globals().update({future: future for future in
 
 formula_layout = '''\
     glpoa
-                              lem
+                              lem       glpo
                 dp                             he
-                                    dpn
-                ud  gmp   mgmp     dgp
-             udn
+                                    dpn        hen
+                ud  gmp            dgp
+        wgmp    
             dnsu       glpon                    dnse
                               wlem
 '''
@@ -46,6 +46,7 @@ unnamed_proofs = {
     (gmp, wgmp),
     (dgp, wlem),
     (glpoa, lem),
+    (glpoa, gmp),
     (dp, dnsu),
     (glpo, dpn),
     (he, dnse),
