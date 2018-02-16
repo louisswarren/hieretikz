@@ -47,6 +47,7 @@ unnamed_proofs = {
     (dgp, wlem),
     (glpoa, lem),
     (glpoa, gmp),
+    (dp, ud),
     (dp, gmp),
 #    (dp, dnsu),
     (glpo, dpn),
