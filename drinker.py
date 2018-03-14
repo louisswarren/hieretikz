@@ -2,7 +2,7 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'lem wlem dgp glpo glpoa gmp wgmp dp he dpn hen dnsu dnse ud ip'.split()
+formulae = 'tt lem wlem dgp glpo glpoa gmp wgmp dp he dpn hen dnsu dnse ud ip'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
@@ -20,7 +20,7 @@ formula_layout = '''\
                 dp                             he
                                     dpn        hen
                 ud  gmp            dgp
-        wgmp    
+        wgmp
             dnsu       glpon                    dnse
                               wlem
 '''
@@ -56,6 +56,10 @@ unnamed_proofs = {
     (gmp, dnse),
     (dpn, dnse),
     (glpoa, wgmp),
+    (dp, efq, tt, dgp),
+    (he, efq, tt, dgp),
+    (dp, tt, wlem),
+    (he, tt, wlem),
 }
 
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
@@ -121,6 +125,8 @@ named_models = {
         {f for f in formulae if f is not efq},
         {efq},
     ),
+    'tt-weak': ({tt}, {f for f in formulae if f is not tt}),
+    'tt-strong': ({f for f in formulae if f is not tt}, {tt}),
 }
 models = [(k, *map(frozenset, v)) for k, v in named_models.items()]
 
