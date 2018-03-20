@@ -37,8 +37,8 @@ class Tier:
 class Hierarchy:
     def __init__(self, arrows, tiers):
         self.arrows = frozenset(arrows)
-        self.tiers = frozenset(tiers)
         self._closure_cache = {}
+        self.tiers = frozenset(self.complete_tier(tier) for tier in tiers)
 
     def _closure_paths(self, paths):
         frontier = {y: ((xs, y), *(paths[x] for x in arrow.tails if paths[x]))
@@ -54,6 +54,16 @@ class Hierarchy:
             paths = self._closure_paths({x: () for x in nodes})
             self._closure_cache[node_set] = paths
         return self._closure_cache[node_set]
+
+    def simple_upwards_closure(self, node):
+        pass
+
+
+    def complete_tier(self, tier):
+        clow = frozenset(self.closure(tier.low))
+        chigh = NotImplementedError
+        raise chigh
+        return Tier(clow, chigh, tier.name)
 
     def under_quotient(self, node):
         arrows = frozenset(arrow.under_quotient(node) for arrow in self.arrows)
