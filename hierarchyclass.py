@@ -1,9 +1,6 @@
-_compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
+import itertools
 
-def ArrowLoopError(tails, head, name):
-    name_msg = name and f"'{name}': "
-    message = 'Loop arrow {}{} -> {}'.format(name_msg, ','.join(tails), head)
-    return Exception(message)
+_compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
 def TierOverlapError(low, high, name):
     name_msg = name and f"'{name}': "
@@ -12,14 +9,22 @@ def TierOverlapError(low, high, name):
 
 class Arrow:
     def __init__(self, tails, head, name=''):
-        if head in tails:
-            raise ArrowLoopError(tails, head, name)
         self.tails = frozenset(tails)
-        self.head = frozenset(head)
+        self.head = head
         self.name = name
+        if head in tails:
+            raise Exception(f'Loop arrow {self}')
+
+    @property
+    def edge(self):
+        return tuple(self.tails) + (self.head,)
+
+    def __str__(self):
+        name_msg = self.name and f"'{self.name}': "
+        return '{}{} -> {}'.format(name_msg, ','.join(self.tails), self.head)
 
     def all_tails_in(self, preds):
-        return all(self.tails in preds)
+        return all(tail in preds for tail in self.tails)
 
     def under_quotient(self, node):
         reduced_tails = frozenset(x for x in self.tails if x != node)
@@ -27,11 +32,15 @@ class Arrow:
 
 class Tier:
     def __init__(self, low, high, name=''):
-        if set(low).intersection(set(high)):
-            raise TierOverlapError(low, high, name)
         self.low = frozenset(low)
         self.high = frozenset(high)
         self.name = name
+        if set(low).intersection(set(high)):
+            raise Exception(f'Tier overlap {self}')
+
+    def __str__(self):
+        name_msg = self.name and f"'{self.name}': "
+        return '{}{} // {}'.format(name_msg, ','.join(self.low), self.high)
 
     def has_foundation(self, node):
         return node in self.low
@@ -45,17 +54,16 @@ class Tier:
 class Hierarchy:
     def __init__(self, arrows, tiers):
         self.arrows = frozenset(arrows)
-        self._closure_cache = {}
         # Precompute all single closures
         self.single_closures = {}
-        for tails, head in self.arrows:
-            for tail in tails:
+        for arrow in self.arrows:
+            for tail in arrow.tails:
                 self.single_closures[tail] = self.closure(tail)
-            self.single_closures[head] = self.closure(head)
+            self.single_closures[arrow.head] = self.closure(arrow.head)
         self.tiers = frozenset(self.complete_tier(tier) for tier in tiers)
 
     def _closure_paths(self, paths):
-        frontier = {y: ((xs, y), *(paths[x] for x in arrow.tails if paths[x]))
+        frontier = {arrow.head: (arrow, *(paths[x] for x in arrow.tails if paths[x]))
                     for arrow in self.arrows if arrow.all_tails_in(paths)}
         if all(found in paths for found in frontier):
             return paths
@@ -64,10 +72,7 @@ class Hierarchy:
 
     def closure(self, nodes):
         node_set = frozenset(nodes)
-        if node_set not in self._closure_cache:
-            paths = self._closure_paths({x: () for x in nodes})
-            self._closure_cache[node_set] = paths
-        return self._closure_cache[node_set]
+        return self._closure_paths({x: () for x in nodes})
 
     @_compose(frozenset)
     def simple_upwards_closure(self, node):
@@ -81,6 +86,7 @@ class Hierarchy:
         chigh = set().union(self.simple_upwards_closure(x) for x in tier.high)
         return Tier(clow, chigh, tier.name)
 
+    @_compose(frozenset)
     def find_qarrows(self, nodes, order=1):
         for r in range(1, order + 1):
             for tails in itertools.combinations(nodes, r):
