@@ -2,6 +2,16 @@ import itertools
 
 _compose = lambda f: lambda g: lambda *a, **k: f(g(*a, **k))
 
+def _fs_memoise(f):
+    cache = {}
+    def g(*args):
+        key = tuple(frozenset(a) if isinstance(a, set) else a for a in args)
+        if key not in cache:
+            cache[key] = f(*args)
+        return cache[key]
+    return g
+
+
 def TierOverlapError(low, high, name):
     name_msg = name and f"'{name}': "
     message = 'Tier overlap {}{} // {}'.format(name_msg, low, high)
@@ -29,7 +39,7 @@ class Arrow:
         return all(tail in preds for tail in self.tails)
 
     def under_quotient(self, node):
-        reduced_tails = frozenset(x for x in self.tails if x != node)
+        reduced_tails = (x for x in self.tails if x != node)
         return Arrow(reduced_tails, self.head, self.name)
 
 class Tier:
@@ -59,11 +69,12 @@ class Tier:
 class Hierarchy:
     def __init__(self, arrows, tiers):
         self.arrows = frozenset(arrows)
-        self.known_nodes = self._find_known_nodes()
         self.tiers = frozenset(self.complete_tier(tier) for tier in tiers)
 
+    @property
+    @_fs_memoise
     @_compose(frozenset)
-    def _find_known_nodes(self):
+    def known_nodes(self):
         for arrow in self.arrows:
             yield arrow.head
             yield from arrow.tails
@@ -76,10 +87,11 @@ class Hierarchy:
         frontier.update(paths)
         return self._closure_paths(frontier)
 
+    @_fs_memoise
     def closure(self, nodes):
-        node_set = frozenset(nodes)
         return self._closure_paths({x: () for x in nodes})
 
+    @_fs_memoise
     @_compose(frozenset)
     def simple_upwards_closure(self, node):
         for root in self.known_nodes:
@@ -92,6 +104,7 @@ class Hierarchy:
         print(chigh)
         return Tier(clow, chigh, tier.name)
 
+    @_fs_memoise
     @_compose(frozenset)
     def find_qarrows(self, nodes, order=1):
         for r in range(1, order + 1):
@@ -107,6 +120,6 @@ class Hierarchy:
                         yield Arrow(tails, head)
 
     def under_quotient(self, node):
-        arrows = frozenset(arrow.under_quotient(node) for arrow in self.arrows)
-        tiers = frozenset(tier for tier in tiers if tier.has_foundation(node))
+        arrows = (arrow.under_quotient(node) for arrow in self.arrows)
+        tiers = (tier for tier in tiers if tier.has_foundation(node))
         return Hierarchy(arrows, tiers)
