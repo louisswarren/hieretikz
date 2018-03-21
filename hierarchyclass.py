@@ -42,6 +42,9 @@ class Arrow:
         reduced_tails = (x for x in self.tails if x != node)
         return Arrow(reduced_tails, self.head, self.name)
 
+    def __lt__(self, other):
+        return (self.head, self.tails) < (other.head, other.tails)
+
 class Tier:
     def __init__(self, low, high, name=''):
         self.low = frozenset(low)
@@ -121,5 +124,5 @@ class Hierarchy:
 
     def under_quotient(self, node):
         arrows = (arrow.under_quotient(node) for arrow in self.arrows)
-        tiers = (tier for tier in tiers if tier.has_foundation(node))
+        tiers = (tier for tier in self.tiers if tier.has_foundation(node))
         return Hierarchy(arrows, tiers)

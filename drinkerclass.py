@@ -62,6 +62,9 @@ unnamed_proofs = {
     (he, tt, wlem),
 }
 
+# EFQ isn't on the diagram, so these won't be plotted
+unnamed_proofs.update({(efq, lem, f) for f in formulae if f not in (efq, lem)})
+
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
 named_models = {
@@ -140,8 +143,16 @@ if __name__ == '__main__':
     minimal_diagram.add_edges((set(proofs)), color=False)
     minimal_diagram.add_edges(set(arrow.edge for arrow in qarrows), 'dashed')
 
+    inth = h.under_quotient(efq)
+    int_qarrows = inth.find_qarrows(set(formulae))
+    int_diagram = TikzHierarchy(name_dict=formula_strs)
+    int_diagram.add_string_node_layout(formula_layout)
+    int_diagram.add_edges(set(proofs), color=False)
+    int_diagram.add_edges(set(arrow.edge for arrow in int_qarrows), 'dashed')
+
     tex = make_sections(
         ('Minimal Logic', minimal_diagram),
+        ('Intuitionistic Logic', int_diagram),
     )
 
     document = make_latex_document(tex)
