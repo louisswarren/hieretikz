@@ -14,6 +14,8 @@ class Arrow:
         self.name = name
         if head in tails:
             raise Exception(f'Loop arrow {self}')
+        assert(isinstance(head, str))
+        assert(all(isinstance(tail, str) for tail in tails))
 
     @property
     def edge(self):
@@ -37,10 +39,13 @@ class Tier:
         self.name = name
         if set(low).intersection(set(high)):
             raise Exception(f'Tier overlap {self}')
+        assert(all(isinstance(x, str) for x in low))
+        assert(all(isinstance(x, str) for x in high))
+        print(self)
 
     def __str__(self):
         name_msg = self.name and f"'{self.name}': "
-        return '{}{} // {}'.format(name_msg, ','.join(self.low), self.high)
+        return '{}{} // {}'.format(name_msg, ','.join(self.low), ','.join(self.high))
 
     def has_foundation(self, node):
         return node in self.low
@@ -54,13 +59,14 @@ class Tier:
 class Hierarchy:
     def __init__(self, arrows, tiers):
         self.arrows = frozenset(arrows)
-        # Precompute all single closures
-        self.single_closures = {}
-        for arrow in self.arrows:
-            for tail in arrow.tails:
-                self.single_closures[tail] = self.closure(tail)
-            self.single_closures[arrow.head] = self.closure(arrow.head)
+        self.known_nodes = self._find_known_nodes()
         self.tiers = frozenset(self.complete_tier(tier) for tier in tiers)
+
+    @_compose(frozenset)
+    def _find_known_nodes(self):
+        for arrow in self.arrows:
+            yield arrow.head
+            yield from arrow.tails
 
     def _closure_paths(self, paths):
         frontier = {arrow.head: (arrow, *(paths[x] for x in arrow.tails if paths[x]))
@@ -76,14 +82,14 @@ class Hierarchy:
 
     @_compose(frozenset)
     def simple_upwards_closure(self, node):
-        # Use the fact that single closures have been precomputed
-        for root, closure in self.single_closures.items():
-            if node in closure:
+        for root in self.known_nodes:
+            if node in self.closure((root,)):
                 yield root
 
     def complete_tier(self, tier):
         clow = self.closure(tier.low)
-        chigh = set().union(self.simple_upwards_closure(x) for x in tier.high)
+        chigh = set().union(*(self.simple_upwards_closure(x) for x in tier.high))
+        print(chigh)
         return Tier(clow, chigh, tier.name)
 
     @_compose(frozenset)

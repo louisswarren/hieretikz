@@ -133,7 +133,7 @@ models = [(k, *map(frozenset, v)) for k, v in named_models.items()]
 
 if __name__ == '__main__':
     h = Hierarchy((Arrow(tails, head) for *tails, head in unnamed_proofs),
-                  (Tier(low, high) for low, high in named_models.values()))
+                  (Tier(low, high, name) for name, (low, high) in named_models.items()))
     qarrows = h.find_qarrows(formulae)
     minimal_diagram = TikzHierarchy(name_dict=formula_strs)
     minimal_diagram.add_string_node_layout(formula_layout)
