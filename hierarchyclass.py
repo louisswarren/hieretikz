@@ -122,6 +122,18 @@ class Hierarchy:
                     else:
                         yield Arrow(tails, head)
 
+    @_fs_memoise
+    def uncertainty(self, nodes, order=1):
+        return len(self.find_qarrows(nodes, order))
+
+    def evaluate_qarrow(self, qarrow, nodes, order=1):
+        hplus = Hierarchy(set(self.arrows) | {qarrow}, self.tiers)
+        qtier = Tier(qarrow.tails, {qarrow.head})
+        hminus = Hierarchy(self.arrows, set(self.tiers) | {qtier})
+        return (self.uncertainty(nodes) - hplus.uncertainty(nodes),
+                self.uncertainty(nodes) - hminus.uncertainty(nodes))
+
+
     def under_quotient(self, node):
         arrows = (arrow.under_quotient(node) for arrow in self.arrows)
         tiers = (tier for tier in self.tiers if tier.has_foundation(node))
