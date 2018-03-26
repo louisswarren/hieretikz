@@ -2,25 +2,26 @@ import subprocess
 from hierarchyclass import *
 from tikzify import *
 
-formulae = 'tt lem wlem dgp glpo glpoa gmp wgmp dp he dpn hen dnsu dnse ud ip'.split()
+formulae = 'tt lem wlem dgp glpoa gmp dp he dpn dnsu dnse ud'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
 globals().update({future: future for future in
- 'ud udn lem wlem dp dpn he dnsu dnse glpon glpoa gmp mgmp dgp'.split()})
+ 'glpon mgmp'.split()})
+formulae += [glpon, mgmp]
 
-# These are actually equivalent. Condense them once investigations are complete.
-# glpo = lem
-# hen = dpn
-# wgmp = dnse
+# These are actually equivalent.
+ip = he
+glpo = lem
+hen = dpn
+wgmp = dnsu
 
 formula_layout = '''\
     glpoa
-                              lem       glpo
+                              lem
                 dp                             he
-                                    dpn        hen
+                                    dpn
                 ud  gmp            dgp
-        wgmp
             dnsu       glpon                    dnse
                               wlem
 '''
@@ -36,10 +37,10 @@ formula_strs[dpn] = R'DP$_\lnot$,HE$_\lnot$'
 
 
 unnamed_proofs = {
-    (he, ip), (ip, he),
-    (lem, glpo), (glpo, lem),
-    (dpn, hen), (hen, dpn),
-    (dnsu, wgmp), (wgmp, dnsu),
+#    (he, ip), (ip, he),
+#    (lem, glpo), (glpo, lem),
+#    (dpn, hen), (hen, dpn),
+#    (dnsu, wgmp), (wgmp, dnsu),
     (lem, wlem),
     (dp, dpn),
     (he, hen),
@@ -60,6 +61,7 @@ unnamed_proofs = {
     (he, efq, tt, dgp),
     (dp, tt, wlem),
     (he, tt, wlem),
+    (gmp, mgmp), (glpo, glpon), (glpon, wlem), (glpon, dnse), # Speculation
 }
 
 # EFQ isn't on the diagram, so these won't be plotted
@@ -151,6 +153,15 @@ if __name__ == '__main__':
     int_diagram.add_edges(set(proofs), color=False)
     int_diagram.add_edges(set(arrow.edge for arrow in int_qarrows), 'dashed')
 
+    tth = h.under_quotient(tt)
+    tt_qarrows = tth.find_qarrows(set(formulae))
+    tt_ev_qarrows = {arrow.edge: tth.evaluate_qarrow(arrow, set(formulae)) for arrow in tt_qarrows}
+    tt_diagram = TikzHierarchy(name_dict=formula_strs)
+    tt_diagram.add_string_node_layout(formula_layout)
+    tt_diagram.add_edges(set(proofs), color=False)
+    tt_diagram.add_edges(set(arrow.edge for arrow in tt_qarrows), 'dashed')
+
+
     tex = make_sections(
         ('Minimal Logic', minimal_diagram),
         ('Investigations ({})'.format(len(qarrows)),
@@ -158,6 +169,9 @@ if __name__ == '__main__':
         ('Intuitionistic Logic', int_diagram),
         ('Investigations ({})'.format(len(int_qarrows)),
             make_columns(make_connections_list(int_ev_qarrows)), 1),
+        ('Two-termed semantics', tt_diagram),
+        ('Investigations ({})'.format(len(tt_qarrows)),
+            make_columns(make_connections_list(tt_ev_qarrows)), 1),
     )
 
     document = make_latex_document(tex)
