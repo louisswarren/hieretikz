@@ -71,51 +71,51 @@ proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
 named_models = {
     'dp-cm': (
-        {efq, he, dgp, wlem, glpon, ud},
+        {tt, efq, he, dgp, wlem, glpon, ud},
         {dp, lem, dnsu, wgmp, mgmp},
     ),
     'dp-cm-lobot': (
-        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
+        {tt, he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
         {dp},
     ),
     'he-cm': (
-        {efq, dp, dgp, wlem, glpon, ud},
+        {tt, efq, dp, dgp, wlem, glpon, ud},
         {he, lem},
     ),
     'he-cm-lobot': (
-        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
+        {tt, dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
         {he},
     ),
     'linear-growing-terms': (
-        {efq, wlem, dgp},
+        {tt, efq, wlem, dgp},
         {dp, he, lem, dnse, glpoa, ud},
     ),
     'two-world-constant-terms': (
-        {efq, dp, he, wlem, dgp, ud},
+        {tt, efq, dp, he, wlem, dgp, ud},
         {lem},
     ),
     'two-world-growing-terms': (
-        {efq, wlem, dgp, wgmp},
+        {tt, efq, wlem, dgp, wgmp},
         {glpoa, dp, he, dpn, hen, gmp, dnse, glpon, ud},
     ),
     'two-world-growing-terms-lobot': (
-        {gmp, glpoa},
+        {tt, gmp, glpoa},
         {ud},
     ),
     'two-world-growing-terms-with-bot': (
-        {lem, wlem, dgp},
+        {tt, lem, wlem, dgp},
         {glpoa, dp, he, gmp, wgmp, ud, mgmp},
     ),
     'v-const-term': (
-        {efq, dnsu, ud},
+        {tt, efq, dnsu, ud},
         {wlem, dgp, dnse},
     ),
     'v-const-term-lobot': (
-        {glpoa, lem, dpn, hen, gmp, dnse, glpon, ud},
+        {tt, glpoa, lem, dpn, hen, gmp, dnse, glpon, ud},
         {dgp},
     ),
     'diamond-constant-terms': (
-        {efq, wlem, gmp, ud},
+        {tt, efq, wlem, gmp, ud},
         {dgp, lem},
     ),
     'beth-width-two': (
@@ -146,7 +146,7 @@ if __name__ == '__main__':
     minimal_diagram.add_edges(set(arrow.edge for arrow in qarrows), 'dashed')
 
     inth = h.under_quotient(efq)
-    int_qarrows = inth.find_qarrows(set(formulae))
+    int_qarrows = inth.find_qarrows(set(formulae) - {efq})
     int_ev_qarrows = {arrow.edge: inth.evaluate_qarrow(arrow, set(formulae)) for arrow in int_qarrows}
     int_diagram = TikzHierarchy(name_dict=formula_strs)
     int_diagram.add_string_node_layout(formula_layout)
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     int_diagram.add_edges(set(arrow.edge for arrow in int_qarrows), 'dashed')
 
     tth = h.under_quotient(tt)
-    tt_qarrows = tth.find_qarrows(set(formulae))
+    tt_qarrows = tth.find_qarrows(set(formulae) - {tt})
     tt_ev_qarrows = {arrow.edge: tth.evaluate_qarrow(arrow, set(formulae)) for arrow in tt_qarrows}
     tt_diagram = TikzHierarchy(name_dict=formula_strs)
     tt_diagram.add_string_node_layout(formula_layout)
