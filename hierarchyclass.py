@@ -54,7 +54,6 @@ class Tier:
             raise Exception(f'Tier overlap {self}')
         assert(all(isinstance(x, str) for x in low))
         assert(all(isinstance(x, str) for x in high))
-        print(self)
 
     def __str__(self):
         name_msg = self.name and f"'{self.name}': "
@@ -96,15 +95,15 @@ class Hierarchy:
 
     @_fs_memoise
     @_compose(frozenset)
-    def simple_upwards_closure(self, node):
+    def simple_upwards_closure(self, node, assuming):
         for root in self.known_nodes:
-            if node in self.closure((root,)):
+            if node in self.closure(assuming | {root}):
                 yield root
 
     def complete_tier(self, tier):
         clow = self.closure(tier.low)
-        chigh = set().union(*(self.simple_upwards_closure(x) for x in tier.high))
-        print(chigh)
+        chigh = set().union(*(self.simple_upwards_closure(x, frozenset(clow))
+                              for x in tier.high))
         return Tier(clow, chigh, tier.name)
 
     @_fs_memoise
