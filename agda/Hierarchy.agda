@@ -5,7 +5,8 @@ open import common
 
 module Hierarchy (Γ : Set)(_==_ : Γ → Γ → Bool) where
 
-_∈_ = membership _==_
+_∈_        = mkmembership _==_
+intersects = mkintersects _==_
 
 record Arrow : Set where
   constructor _⇒_
@@ -27,9 +28,9 @@ closure : List Γ → List Arrow → List Γ
 closure γs rs = ?
 
 completion : Tier → List Arrow → Tier
-completion (low ⊃̷ high) rs = clow ⊃̷ filter γs in-upwards-closure
-                             where
-                               γs = domain rs
-                               clow = closure low rs
-                               in-upwards-closure : Γ → Bool
-                               in-upwards-closure γ = {!   !}
+completion (low ⊃̷ high) rs = clow ⊃̷ filter inconsistent (domain rs)
+  where
+    clow = closure low rs
+    inconsistent : Γ → Bool
+    inconsistent γ = intersects (closure (γ ∷ clow) rs) high
+
