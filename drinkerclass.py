@@ -61,6 +61,7 @@ unnamed_proofs = {
     (he, efq, tt, dgp),
     (dp, tt, wlem),
     (he, tt, wlem),
+    (gmp, tt, wlem),
     (gmp, mgmp), (glpo, glpon), (glpon, wlem), (glpon, dnse), # Speculation
 }
 
