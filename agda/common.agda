@@ -1,5 +1,6 @@
 open import Agda.Builtin.Bool
 open import Agda.Builtin.List
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
 
 
 _++_ : {A : Set} → List A → List A → List A
@@ -29,3 +30,21 @@ mkintersects {A} eq xs ys = any is-in-ys xs
                             where
                               is-in-ys : A → Bool
                               is-in-ys x = mkmembership eq x ys
+
+iter : {A : Set} → (ℕ → A) → ℕ → List A
+iter f zero = f zero ∷ []
+iter f (suc n) = f (suc n) ∷ iter f n
+
+
+data _∈_ {A : Set}(a : A) : List A → Set where
+  refl  : ∀{xs}   → a ∈ (a ∷ xs)
+  recur : ∀{x xs} → a ∈ xs → a ∈ (x ∷ xs)
+
+record Σ (S : Set)(T : S → Set) : Set where
+  constructor _,_
+  field
+    fst : S
+    snd : T fst
+
+_×_ : Set → Set → Set
+S × T = Σ S (λ _ → T)
