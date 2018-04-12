@@ -18,10 +18,13 @@ def TierOverlapError(low, high, name):
     return Exception(message)
 
 class Arrow:
-    def __init__(self, tails, head, name=''):
+    def __init__(self, tails, head, name=None):
         self.tails = frozenset(tails)
         self.head = head
-        self.name = name
+        if name is not None:
+            self.name = name
+        else:
+            self.name = ','.join(map(str, self.tails)) + '->' + str(self.head)
         if head in tails:
             raise Exception(f'Loop arrow {self}')
         assert(isinstance(head, str))
@@ -122,15 +125,15 @@ class Hierarchy:
                         yield Arrow(tails, head)
 
     @_fs_memoise
-    def uncertainty(self, nodes, order=1):
+    def uncertainty(self, nodes, order):
         return len(self.find_qarrows(nodes, order))
 
-    def evaluate_qarrow(self, qarrow, nodes, order=1):
+    def evaluate_qarrow(self, qarrow, nodes, order):
         hplus = Hierarchy(set(self.arrows) | {qarrow}, self.tiers)
         qtier = Tier(qarrow.tails, {qarrow.head})
         hminus = Hierarchy(self.arrows, set(self.tiers) | {qtier})
-        return (self.uncertainty(nodes) - hplus.uncertainty(nodes),
-                self.uncertainty(nodes) - hminus.uncertainty(nodes))
+        return (self.uncertainty(nodes, order) - hplus.uncertainty(nodes, order),
+                self.uncertainty(nodes, order) - hminus.uncertainty(nodes, order))
 
 
     def under_quotient(self, node):
