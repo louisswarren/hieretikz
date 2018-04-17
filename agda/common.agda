@@ -19,6 +19,12 @@ mkmembership _==_ a (x ∷ xs) with a == x
 ...                          | false = mkmembership _==_ a xs
 ...                          | true  = true
 
+all : {A : Set} → (A → Bool) → List A → Bool
+all f [] = true
+all f (x ∷ xs) with f x
+...            | false = false
+...            | true  = all f xs
+
 any : {A : Set} → (A → Bool) → List A → Bool
 any f [] = false
 any f (x ∷ xs) with f x
@@ -40,6 +46,10 @@ data _∈_ {A : Set}(a : A) : List A → Set where
   refl  : ∀{xs}   → a ∈ (a ∷ xs)
   recur : ∀{x xs} → a ∈ xs → a ∈ (x ∷ xs)
 
+data _⊂_ {A : Set} : List A → List A → Set where
+  empty : ∀{ys} → [] ⊂ ys
+  recur : ∀{xs ys x} → x ∈ ys → xs ⊂ ys → (x ∷ xs) ⊂ ys
+
 record Σ (S : Set)(T : S → Set) : Set where
   constructor _,_
   field
@@ -48,3 +58,17 @@ record Σ (S : Set)(T : S → Set) : Set where
 
 _×_ : Set → Set → Set
 S × T = Σ S (λ _ → T)
+
+
+data False : Set where
+record True : Set where
+
+istrue : Bool → Set
+istrue true = True
+istrue false = False
+
+
+
+--test : ∀ xs → ∀ ys → istrue (all (λ z → mkmembership _==_ z ys) xs) → xs ⊂ ys
+--test [] ys pf = empty
+--test (x ∷ xs) ys pf = recur {!   !} (test xs ys {!   !})
