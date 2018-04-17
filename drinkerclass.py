@@ -140,7 +140,7 @@ if __name__ == '__main__':
     h = Hierarchy((Arrow(tails, head) for *tails, head in unnamed_proofs),
                   (Tier(low, high, name) for name, (low, high) in named_models.items()))
     qarrows = h.find_qarrows(set(formulae))
-    ev_qarrows = {arrow.edge: h.evaluate_qarrow(arrow, set(formulae)) for arrow in qarrows}
+    ev_qarrows = {arrow.edge: h.evaluate_qarrow(arrow, set(formulae), 1) for arrow in qarrows}
     minimal_diagram = TikzHierarchy(name_dict=formula_strs)
     minimal_diagram.add_string_node_layout(formula_layout)
     minimal_diagram.add_edges((set(proofs)), color=False)
@@ -148,18 +148,19 @@ if __name__ == '__main__':
 
     inth = h.under_quotient(efq)
     int_qarrows = inth.find_qarrows(set(formulae) - {efq})
-    int_ev_qarrows = {arrow.edge: inth.evaluate_qarrow(arrow, set(formulae)) for arrow in int_qarrows}
+    int_ev_qarrows = {arrow.edge: inth.evaluate_qarrow(arrow, set(formulae), 1) for arrow in int_qarrows}
     int_diagram = TikzHierarchy(name_dict=formula_strs)
     int_diagram.add_string_node_layout(formula_layout)
-    int_diagram.add_edges(set(proofs), color=False)
+    int_diagram.add_edges(set(arrow.edge for arrow in inth.arrows), color=False)
     int_diagram.add_edges(set(arrow.edge for arrow in int_qarrows), 'dashed')
 
     tth = h.under_quotient(tt)
     tt_qarrows = tth.find_qarrows(set(formulae) - {tt})
-    tt_ev_qarrows = {arrow.edge: tth.evaluate_qarrow(arrow, set(formulae)) for arrow in tt_qarrows}
+    tt_ev_qarrows = {arrow.edge: tth.evaluate_qarrow(arrow, set(formulae), 1) for arrow in tt_qarrows}
     tt_diagram = TikzHierarchy(name_dict=formula_strs)
     tt_diagram.add_string_node_layout(formula_layout)
-    tt_diagram.add_edges(set(proofs), color=False)
+    tt_diagram.add_edges(set(arrow.edge for arrow in tth.arrows), color=False)
+    print((dp, efq, dgp) in set(arrow.edge for arrow in tth.arrows))
     tt_diagram.add_edges(set(arrow.edge for arrow in tt_qarrows), 'dashed')
 
 
