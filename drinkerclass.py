@@ -66,7 +66,7 @@ unnamed_proofs = {
 }
 
 # EFQ isn't on the diagram, so these won't be plotted
-unnamed_proofs.update({(efq, lem, f) for f in formulae if f not in (efq, lem)})
+unnamed_proofs.update({(efq, lem, f) for f in formulae if f not in (efq, lem, tt)})
 
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
@@ -124,15 +124,21 @@ named_models = {
         set(),
     ),
     'one-term-v': (
-        {dp, he},
+        {efq, dp, he},
         {wlem, dgp},
     ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
         {efq},
     ),
-    'tt-weak': ({tt}, {f for f in formulae if f is not tt}),
-    'tt-strong': ({f for f in formulae if f is not tt}, {tt}),
+    'one-world-one-term': (
+        {f for f in formulae if f is not tt} | {efq},
+        {tt},
+    ),
+    'non-full-dp-cm-with-single-term-root': (
+        {he, efq},
+        {ud},
+    ),
 }
 models = [(k, *map(frozenset, v)) for k, v in named_models.items()]
 
@@ -160,7 +166,6 @@ if __name__ == '__main__':
     tt_diagram = TikzHierarchy(name_dict=formula_strs)
     tt_diagram.add_string_node_layout(formula_layout)
     tt_diagram.add_edges(set(arrow.edge for arrow in tth.arrows), color=False)
-    print((dp, efq, dgp) in set(arrow.edge for arrow in tth.arrows))
     tt_diagram.add_edges(set(arrow.edge for arrow in tt_qarrows), 'dashed')
 
 
