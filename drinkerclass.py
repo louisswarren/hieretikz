@@ -2,13 +2,12 @@ import subprocess
 from hierarchyclass import *
 from tikzify import *
 
-formulae = 'tt lem wlem dgp glpoa gmp dp he dpn dnsu dnse ud'.split()
+formulae = 'tt lem wlem dgp glpoa gmp dp he dnsu dnse ud'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
 globals().update({future: future for future in
- 'glpon mgmp'.split()})
-formulae += [glpon, mgmp]
+ 'dpn glpon mgmp glpon'.split()})
 
 # These are actually equivalent.
 ip = he
@@ -20,9 +19,8 @@ formula_layout = '''\
     glpoa
                               lem
                 dp                             he
-                                    dpn
                 ud  gmp            dgp
-            dnsu       glpon                    dnse
+            dnsu                                dnse
                               wlem
 '''
 
@@ -127,6 +125,10 @@ named_models = {
         {efq, dp, he},
         {wlem, dgp},
     ),
+    'one-term-v-lem': (
+        {dp, he, lem},
+        {dgp},
+    ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
         {efq},
@@ -152,6 +154,13 @@ if __name__ == '__main__':
     minimal_diagram.add_edges((set(proofs)), color=False)
     minimal_diagram.add_edges(set(arrow.edge for arrow in qarrows), 'dashed')
 
+    qarrows2 = h.find_qarrows(set(formulae), 5)
+    ev_qarrows2 = {arrow.edge: h.evaluate_qarrow(arrow, set(formulae), 2) for arrow in qarrows2}
+    minimal_diagram2 = TikzHierarchy(name_dict=formula_strs)
+    minimal_diagram2.add_string_node_layout(formula_layout)
+    minimal_diagram2.add_edges((set(proofs)), color=False)
+    minimal_diagram2.add_edges(set(arrow.edge for arrow in qarrows2), 'dashed')
+
     inth = h.under_quotient(efq)
     int_qarrows = inth.find_qarrows(set(formulae) - {efq})
     int_ev_qarrows = {arrow.edge: inth.evaluate_qarrow(arrow, set(formulae), 1) for arrow in int_qarrows}
@@ -173,6 +182,9 @@ if __name__ == '__main__':
         ('Minimal Logic', minimal_diagram),
         ('Investigations ({})'.format(len(qarrows)),
             make_columns(make_connections_list(ev_qarrows)), 1),
+        ('Minimal Logic 2', minimal_diagram2),
+        ('Investigations ({})'.format(len(qarrows2)),
+            make_columns(make_connections_list(ev_qarrows2)), 1),
         ('Intuitionistic Logic', int_diagram),
         ('Investigations ({})'.format(len(int_qarrows)),
             make_columns(make_connections_list(int_ev_qarrows)), 1),
