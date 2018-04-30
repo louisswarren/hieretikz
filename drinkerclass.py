@@ -60,6 +60,7 @@ unnamed_proofs = {
     (dp, tt, wlem),
     (he, tt, wlem),
     (gmp, tt, wlem),
+    (dp, lem, glpoa),
     (gmp, mgmp), (glpo, glpon), (glpon, wlem), (glpon, dnse), # Speculation
 }
 
@@ -126,7 +127,7 @@ named_models = {
         {wlem, dgp},
     ),
     'one-term-v-lem': (
-        {dp, he, lem},
+        {dp, he, lem, ud, glpoa},
         {dgp},
     ),
     'trivial-lobot': (
@@ -139,6 +140,10 @@ named_models = {
     ),
     'non-full-dp-cm-with-single-term-root': (
         {he, efq},
+        {ud},
+    ),
+    'non-full-dp-cm-with-single-term-root-lem': (
+        {he, lem},
         {ud},
     ),
 }
@@ -155,7 +160,7 @@ if __name__ == '__main__':
     minimal_diagram.add_edges(set(arrow.edge for arrow in qarrows), 'dashed')
 
     qarrows2 = h.find_qarrows(set(formulae), 5)
-    ev_qarrows2 = {arrow.edge: h.evaluate_qarrow(arrow, set(formulae), 2) for arrow in qarrows2}
+    ev_qarrows2 = {arrow.edge: h.evaluate_qarrow(arrow, set(formulae), 5) for arrow in qarrows2}
     minimal_diagram2 = TikzHierarchy(name_dict=formula_strs)
     minimal_diagram2.add_string_node_layout(formula_layout)
     minimal_diagram2.add_edges((set(proofs)), color=False)
