@@ -2,26 +2,24 @@ import subprocess
 from hierarchy import *
 from tikzify import *
 
-formulae = 'tt lem wlem dgp glpo glpoa gmp wgmp dp he dpn hen dnsu dnse ud ip'.split()
+formulae = 'tt lem wlem dgp glpoa gmp dp he dnsu dnse ud'.split()
 globals().update({f: f for f in formulae})
 efq = 'efq'
 
 globals().update({future: future for future in
- 'ud udn lem wlem dp dpn he dnsu dnse glpon glpoa gmp mgmp dgp'.split()})
+ 'dpn glpon mgmp glpon'.split()})
 
 # These are actually equivalent. Condense them once investigations are complete.
-# glpo = lem
-# hen = dpn
-# wgmp = dnse
+glpo = lem
+hen = dpn
+wgmp = dnsu
 
 formula_layout = '''\
     glpoa
-                              lem       glpo
+                              lem
                 dp                             he
-                                    dpn        hen
                 ud  gmp            dgp
-        wgmp
-            dnsu       glpon                    dnse
+            dnsu                                dnse
                               wlem
 '''
 
@@ -36,10 +34,6 @@ formula_strs[dpn] = R'DP$_\lnot$,HE$_\lnot$'
 
 
 unnamed_proofs = {
-    (he, ip), (ip, he),
-    (lem, glpo), (glpo, lem),
-    (dpn, hen), (hen, dpn),
-    (dnsu, wgmp), (wgmp, dnsu),
     (lem, wlem),
     (dp, dpn),
     (he, hen),
@@ -60,57 +54,59 @@ unnamed_proofs = {
     (he, efq, tt, dgp),
     (dp, tt, wlem),
     (he, tt, wlem),
+    (gmp, tt, wlem),
+    (dp, lem, glpoa),
 }
 
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
 
 named_models = {
     'dp-cm': (
-        {efq, he, dgp, wlem, glpon, ud},
+        {tt, efq, he, dgp, wlem, glpon, ud},
         {dp, lem, dnsu, wgmp, mgmp},
     ),
     'dp-cm-lobot': (
-        {he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
+        {tt, he, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
         {dp},
     ),
     'he-cm': (
-        {efq, dp, dgp, wlem, glpon, ud},
+        {tt, efq, dp, dgp, wlem, glpon, ud},
         {he, lem},
     ),
     'he-cm-lobot': (
-        {dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
+        {tt, dp, lem, dpn, hen, dgp, wlem, dnsu, dnse, glpo, glpoa, glpon, gmp, ud},
         {he},
     ),
     'linear-growing-terms': (
-        {efq, wlem, dgp},
+        {tt, efq, wlem, dgp},
         {dp, he, lem, dnse, glpoa, ud},
     ),
     'two-world-constant-terms': (
-        {efq, dp, he, wlem, dgp, ud},
+        {tt, efq, dp, he, wlem, dgp, ud},
         {lem},
     ),
     'two-world-growing-terms': (
-        {efq, wlem, dgp, wgmp},
+        {tt, efq, wlem, dgp, wgmp},
         {glpoa, dp, he, dpn, hen, gmp, dnse, glpon, ud},
     ),
     'two-world-growing-terms-lobot': (
-        {gmp, glpoa},
+        {tt, gmp, glpoa},
         {ud},
     ),
     'two-world-growing-terms-with-bot': (
-        {lem, wlem, dgp},
+        {tt, lem, wlem, dgp},
         {glpoa, dp, he, gmp, wgmp, ud, mgmp},
     ),
     'v-const-term': (
-        {efq, dnsu, ud},
+        {tt, efq, dnsu, ud},
         {wlem, dgp, dnse},
     ),
     'v-const-term-lobot': (
-        {glpoa, lem, dpn, hen, gmp, dnse, glpon, ud},
+        {tt, glpoa, lem, dpn, hen, gmp, dnse, glpon, ud},
         {dgp},
     ),
     'diamond-constant-terms': (
-        {efq, wlem, gmp, ud},
+        {tt, efq, wlem, gmp, ud},
         {dgp, lem},
     ),
     'beth-width-two': (
@@ -118,15 +114,29 @@ named_models = {
         set(),
     ),
     'one-term-v': (
-        {dp, he},
+        {efq, dp, he},
         {wlem, dgp},
+    ),
+    'one-term-v-lem': (
+        {dp, he, lem, ud, glpoa},
+        {dgp},
     ),
     'trivial-lobot': (
         {f for f in formulae if f is not efq},
         {efq},
     ),
-    'tt-weak': ({tt}, {f for f in formulae if f is not tt}),
-    'tt-strong': ({f for f in formulae if f is not tt}, {tt}),
+    'one-world-one-term': (
+        {f for f in formulae if f is not tt} | {efq},
+        {tt},
+    ),
+    'non-full-dp-cm-with-single-term-root': (
+        {he, efq},
+        {ud},
+    ),
+    'non-full-dp-cm-with-single-term-root-lem': (
+        {he, lem},
+        {ud},
+    ),
 }
 models = [(k, *map(frozenset, v)) for k, v in named_models.items()]
 
