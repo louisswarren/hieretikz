@@ -61,6 +61,7 @@ unnamed_proofs = {
     (he, tt, wlem),
     (gmp, tt, wlem),
     (dp, lem, glpoa),
+#    (gmp, lem, glpoa), # Not in tome
     (dnse, tt, wlem),
     (gmp, mgmp), (glpo, glpon), (glpon, wlem), (glpon, dnse), # Speculation
 }
@@ -127,6 +128,10 @@ named_models = {
         {efq, dp, he},
         {wlem, dgp},
     ),
+    'one-term-v-lobot': (
+        {tt, dp, he},
+        {dgp},
+    ),
     'one-term-v-lem': (
         {dp, he, lem, ud, glpoa},
         {dgp},
@@ -144,7 +149,7 @@ named_models = {
         {ud},
     ),
     'non-full-dp-cm-with-single-term-root-lem': (
-        {he, lem},
+        {tt, he, lem},
         {ud},
     ),
 }

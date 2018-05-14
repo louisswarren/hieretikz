@@ -14,13 +14,20 @@ glpo = lem
 hen = dpn
 wgmp = dnsu
 
+#formula_layout = '''\
+#    glpoa
+#                              lem
+#                dp                             he
+#                ud  gmp            dgp
+#            dnsu                                dnse
+#                              wlem
+#'''
 formula_layout = '''\
-    glpoa
-                              lem
-                dp                             he
-                ud  gmp            dgp
-            dnsu                                dnse
-                              wlem
+glpoa         dp            he
+              ud
+       gmp           dgp          lem
+             dnsu           dnse
+                     wlem
 '''
 
 formula_strs = {f: f.upper() for f in formulae}
@@ -53,9 +60,9 @@ unnamed_proofs = {
     (dp, efq, tt, dgp),
     (he, efq, tt, dgp),
 #    (dp, tt, wlem),
-    (he, tt, wlem),
-    (gmp, tt, wlem),
-    (dp, lem, glpoa),
+#    (he, tt, wlem),
+#    (gmp, tt, wlem),
+#    (dp, lem, glpoa), Not irrelevant, but higher level
     (dnse, tt, wlem),
 }
 
@@ -108,7 +115,7 @@ named_models = {
     ),
     'diamond-constant-terms': (
         {tt, efq, wlem, gmp, ud},
-        {dgp, lem},
+        {dgp, lem, dp, he},
     ),
     'beth-width-two': (
         {lem, he, dp},
@@ -117,6 +124,10 @@ named_models = {
     'one-term-v': (
         {efq, dp, he},
         {wlem, dgp},
+    ),
+    'one-term-v-lobot': (
+        {tt, dp, he},
+        {dgp},
     ),
     'one-term-v-lem': (
         {dp, he, lem, ud, glpoa},
@@ -135,7 +146,7 @@ named_models = {
         {ud},
     ),
     'non-full-dp-cm-with-single-term-root-lem': (
-        {he, lem},
+        {tt, he, lem},
         {ud},
     ),
 }

@@ -79,10 +79,13 @@ def is_redundant_edge(edge, edges):
 
 def spanning_tree(edges, basis=set()):
     '''Find a spanning tree for a graph.'''
-    for edge in sorted(edges):
-        if is_redundant_edge(edge, (edges - {edge}) | basis):
-            return spanning_tree(frozenset(edges) - {edge}, basis)
+    print("Spanning trees disabled")
     return edges
+    # Not working
+    #for edge in sorted(edges):
+    #    if is_redundant_edge(edge, (edges - {edge}) | basis):
+    #        return spanning_tree(frozenset(edges) - {edge}, basis)
+    #return edges
 
 @_compose(tuple)
 def evaluate_possible_edge(edge, vertices, edges, separations, free=(), order=1):
