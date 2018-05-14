@@ -54,13 +54,14 @@ unnamed_proofs = {
     (glpo, dnse),
     (gmp, dnse),
     (dpn, dnse),
-    (glpoa, wgmp),
+#    (glpoa, wgmp),
     (dp, efq, tt, dgp),
     (he, efq, tt, dgp),
-    (dp, tt, wlem),
+#    (dp, tt, wlem),
     (he, tt, wlem),
     (gmp, tt, wlem),
     (dp, lem, glpoa),
+    (dnse, tt, wlem),
     (gmp, mgmp), (glpo, glpon), (glpon, wlem), (glpon, dnse), # Speculation
 }
 
@@ -159,8 +160,8 @@ if __name__ == '__main__':
     minimal_diagram.add_edges((set(proofs)), color=False)
     minimal_diagram.add_edges(set(arrow.edge for arrow in qarrows), 'dashed')
 
-    qarrows2 = h.find_qarrows(set(formulae), 5)
-    ev_qarrows2 = {arrow.edge: h.evaluate_qarrow(arrow, set(formulae), 5) for arrow in qarrows2}
+    qarrows2 = h.find_qarrows(set(formulae), 2)
+    ev_qarrows2 = {arrow.edge: h.evaluate_qarrow(arrow, set(formulae), 2) for arrow in qarrows2}
     minimal_diagram2 = TikzHierarchy(name_dict=formula_strs)
     minimal_diagram2.add_string_node_layout(formula_layout)
     minimal_diagram2.add_edges((set(proofs)), color=False)

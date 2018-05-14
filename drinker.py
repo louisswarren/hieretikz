@@ -49,13 +49,14 @@ unnamed_proofs = {
     (glpo, dnse),
     (gmp, dnse),
     (dpn, dnse),
-    (glpoa, wgmp),
+#    (glpoa, wgmp),
     (dp, efq, tt, dgp),
     (he, efq, tt, dgp),
-    (dp, tt, wlem),
+#    (dp, tt, wlem),
     (he, tt, wlem),
     (gmp, tt, wlem),
     (dp, lem, glpoa),
+    (dnse, tt, wlem),
 }
 
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
