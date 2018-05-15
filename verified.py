@@ -94,27 +94,23 @@ named_models = {
             {dp, he, dgp},
         ),
         'one-world-one-term': (
-            set(formulae) | {efq},
+            (set(formulae) - {tt}) | {efq},
             {tt},
         ),
-        'two-world-growing-terms-lobot': (
-            {dgp, gmp, glpoa},
-            {efq, ud},
+        'two-world-growing-terms-2-3': (
+            {tt, efq, dgp, wlem, dnsu},
+            {dnse, ud},
         ),
         'two-world-growing-terms-lem': (
             {lem},
             {efq, gmp, ud, dnsu, dp, he},
         ),
-        'two-world-growing-terms': (
-            {efq, dgp, wlem},
-            {dnse},
+        'two-world-growing-terms-lobot': (
+            {dgp, gmp, glpoa},
+            {efq, ud},
         ),
         'nonfull': (
-            {he},
-            {ud},
-        ),
-        'tt-grow': (
-            {tt},
+            {he, efq},
             {ud},
         ),
 }
