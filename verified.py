@@ -67,6 +67,7 @@ unnamed_proofs = {
 }
 
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
+proofs.update({(lem, efq, f) : 'classical' for f in formulae if f != tt})
 
 named_models = {
         'dp-cm': (
@@ -89,6 +90,10 @@ named_models = {
             {efq, dp, he},
             {wlem, dgp},
         ),
+        'v-one-term-lobot': (
+            {tt, dp, he, glpoa},
+            {dgp},
+        ),
         'diamond-const': (
             {efq, tt, wlem, gmp},
             {dp, he, dgp},
@@ -101,16 +106,20 @@ named_models = {
             {tt, efq, dgp, wlem, dnsu},
             {dnse, ud},
         ),
-        'two-world-growing-terms-lem': (
-            {lem},
-            {efq, gmp, ud, dnsu, dp, he},
+        'two-world-growing-terms-2-3-lem': (
+            {tt, lem},
+            {efq, dgp, gmp, ud, dnsu, dp, he},
         ),
         'two-world-growing-terms-lobot': (
-            {dgp, gmp, glpoa},
-            {efq, ud},
+            {tt, dgp, gmp, glpoa},
+            {efq, ud, he, dp},
         ),
         'nonfull': (
             {he, efq},
+            {ud},
+        ),
+        'nonfull-2': (
+            {he, tt, efq},
             {ud},
         ),
 }
@@ -132,7 +141,7 @@ if __name__ == '__main__':
 
     int_proofs = dict(proofs)
     int_models = {m for m in models if efq in m[1]}
-    int_proofs.update({(lem, f): 'classical' for f in formulae})
+    int_proofs.update({(lem, f): 'classical' for f in formulae if f != tt})
     int_possible_edges = find_possible_connections(
                          formulae, int_proofs, int_models)
     int_diagram = TikzHierarchy(name_dict=formula_strs)
@@ -141,12 +150,12 @@ if __name__ == '__main__':
     int_diagram.add_edges(int_possible_edges, 'dashed')
 
 
-    two_possible_edges = find_evaluated_connections(
-                             formulae, set(proofs), list(models), free=(), order=2)
+    efqtt_possible_edges = find_evaluated_connections(
+                             formulae, set(proofs), list(models), free=(efq, tt), order=1)
     two_diagram = TikzHierarchy(name_dict=formula_strs)
     two_diagram.add_string_node_layout(formula_layout)
     two_diagram.add_edges(spanning_tree(set(proofs)), color=False)
-    two_diagram.add_edges(set(two_possible_edges), 'dashed')
+    two_diagram.add_edges(set(efqtt_possible_edges), 'dashed')
 
 
     tex = make_sections(
@@ -157,9 +166,9 @@ if __name__ == '__main__':
         ('Intuitionistic Logic', int_diagram),
         ('Investigations ({})'.format(len(int_possible_edges)),
             make_columns('\n'.join(map(str, int_possible_edges))), 1),
-        ('Minimal Logic Two-premise Possibilities', two_diagram),
-        ('Investigations ({})'.format(len(two_possible_edges)),
-            make_columns(make_connections_list(two_possible_edges)), 1),
+        ('Inuitionistic Logic Two-term Possibilities', two_diagram),
+        ('Investigations ({})'.format(len(efqtt_possible_edges)),
+            make_columns(make_connections_list(efqtt_possible_edges)), 1),
     )
 
     document = make_latex_document(tex)
