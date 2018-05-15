@@ -72,16 +72,16 @@ allproofs = set(proofs) | {(lem, efq, f) for f in formulae if f != tt}
 
 named_models = {
         'dp-cm': (
-            {efq, tt, he, wlem, dgp, ud},
+            {efq, tt, he, dgp, wlem, ud},
             {dp, lem, dnsu},
         ),
         'he-cm': (
-            {efq, tt, dp, wlem, dgp},
+            {efq, tt, dp, dgp, wlem},
             {he, lem},
         ),
         'v-const': (
             {efq, tt, dnsu, ud},
-            {dp, he, wlem, dgp, dnse},
+            {dp, he, dgp, wlem, dnse},
         ),
         'v-const-lem': (
             {glpoa, lem},
@@ -89,7 +89,7 @@ named_models = {
         ),
         'v-one-term': (
             {efq, dp, he},
-            {wlem, dgp},
+            {dgp, wlem},
         ),
         'v-one-term-lobot': (
             {tt, dp, he, glpoa},
