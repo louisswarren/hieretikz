@@ -67,7 +67,8 @@ unnamed_proofs = {
 }
 
 proofs = {p: '{}-{}'.format(','.join(p[:-1]), p[-1]) for p in unnamed_proofs}
-proofs.update({(lem, efq, f) : 'classical' for f in formulae if f != tt})
+
+allproofs = set(proofs) | {(lem, efq, f) for f in formulae if f != tt}
 
 named_models = {
         'dp-cm': (
@@ -151,7 +152,7 @@ if __name__ == '__main__':
 
 
     efqtt_possible_edges = find_evaluated_connections(
-                             formulae, set(proofs), list(models), free=(efq, tt), order=1)
+                             formulae, set(allproofs), list(models), free=(efq, tt), order=1)
     two_diagram = TikzHierarchy(name_dict=formula_strs)
     two_diagram.add_string_node_layout(formula_layout)
     two_diagram.add_edges(spanning_tree(set(proofs)), color=False)
