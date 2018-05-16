@@ -109,7 +109,7 @@ named_models = {
         ),
         'two-world-growing-terms-2-3-lem': (
             {tt, lem},
-            {efq, dgp, gmp, ud, dnsu, dp, he},
+            {efq, gmp, ud, dnsu, dp, he},
         ),
         'two-world-growing-terms-lobot': (
             {tt, dgp, gmp, glpoa},
