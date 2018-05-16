@@ -25,8 +25,8 @@ wgmp = dnsu
 formula_layout = '''\
 glpoa         dp            he
               ud
-       gmp           dgp          lem
-             dnsu           dnse
+gmp           lem     dgp
+dnsu                         dnse
                      wlem
 '''
 
