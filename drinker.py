@@ -157,13 +157,13 @@ if __name__ == '__main__':
     possible_edges = find_evaluated_connections(formulae, set(proofs), list(models))
     minimal_diagram = TikzHierarchy(name_dict=formula_strs)
     minimal_diagram.add_string_node_layout(formula_layout)
-    minimal_diagram.add_edges(spanning_tree(set(proofs)), color=False)
+    minimal_diagram.add_edges(set(proofs), color=False)
     minimal_diagram.add_edges(set(possible_edges), 'dashed')
 
 
     efq_diagram = TikzHierarchy(minimal_diagram)
     efq_proofs = {(lem, efq, f): 'classical' for f in formulae}
-    efq_diagram.add_edges(spanning_tree(set(efq_proofs), set(proofs)), 'dotted')
+    efq_diagram.add_edges(set(efq_proofs), 'dotted')
 
 
     int_proofs = dict(proofs)
@@ -173,7 +173,7 @@ if __name__ == '__main__':
                          formulae, int_proofs, int_models)
     int_diagram = TikzHierarchy(name_dict=formula_strs)
     int_diagram.add_string_node_layout(formula_layout)
-    int_diagram.add_edges(spanning_tree(set(int_proofs)), color=False)
+    int_diagram.add_edges(set(int_proofs), color=False)
     int_diagram.add_edges(int_possible_edges, 'dashed')
 
 
@@ -181,7 +181,7 @@ if __name__ == '__main__':
                              formulae, set(proofs), list(models), free=(), order=2)
     two_diagram = TikzHierarchy(name_dict=formula_strs)
     two_diagram.add_string_node_layout(formula_layout)
-    two_diagram.add_edges(spanning_tree(set(proofs)), color=False)
+    two_diagram.add_edges(set(proofs), color=False)
     two_diagram.add_edges(set(two_possible_edges), 'dashed')
 
 
