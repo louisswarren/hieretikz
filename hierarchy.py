@@ -82,7 +82,7 @@ def evaluate_possible_edge(edge, vertices, edges, separations, free=(), order=1)
     '''Find the value of knowing about the existence of an edge.
 
     Returns a tuple, giving the number of possible connections if the edge
-    exists, and the number if the edge doesn't exist.'''
+    exists, and the number if the edge does not exist.'''
     ne = edges | {edge}
     *tails, head = edge
     ns = separations + [(None, frozenset({*tails}), frozenset({head}))]
